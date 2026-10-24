@@ -6014,7 +6014,6 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   </div>
   <div class="dp-exit dp-cfm" id="dpCfm" role="alertdialog" aria-label="Cevap onayı">
     <div class="dp-card">
-      <div class="dp-ic">🤔</div>
       <h3>Emin misin?</h3>
       <p>Seçtiğin cevap: <b id="dpCfmA"></b></p>
       <button type="button" class="dp-btn gold show" id="dpCfmYes">Evet, eminim</button>
@@ -6046,7 +6045,10 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   function num(k){try{return Math.max(0,parseInt(localStorage.getItem(k)||'0',10)||0)}catch(e){return 0}}
   function add(k,n){try{localStorage.setItem(k,String(num(k)+n))}catch(e){}}
   function soundOn(){return typeof SND==='undefined'||!!SND}
-  function coinSrc(){var c=$('coinIc');return(c&&c.src)||''}
+  function coinSrc(){var h=$('homeWalletCoin');if(h&&h.src&&/^data:/.test(h.src))return h.src;var c=$('coinIc');return(c&&c.src)||''}
+  /* Sağ üstteki sayaç = ana sayfadaki coin bakiyesi. 20 soru tamamlanana kadar kazanılanlar (eC) üstüne eklenir. */
+  function scVal(){return banked?num(WK):num(WK)+eC}
+  function paintSc(){var n=$('dpScN');if(n)n.textContent=scVal().toLocaleString('tr-TR')}
   function setCoinImgs(){var src=coinSrc();['dpScImg','dpExitImg'].forEach(function(id){var im=$(id);if(im&&src&&im.src!==src)im.src=src})}
   var s,queue=[],cur=null,order=[0,1,2,3],locked=false,tmr=null,t0=0,pausedMs=0,eC=0,cd=null,cdOn=false,fbTimer=null,lastText='',sess=0,pendingNext=false,answered=0,banked=false,justBanked=false,bankedAmt=0,bankTmr=null,pend=-1;
 
@@ -6108,7 +6110,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     cur=queue.shift();locked=false;lastText=cur.q;
     if(s.seen.indexOf(cur.id)<0){s.seen.push(cur.id);save(s)}
     order=[0,1,2,3];if(!cur.o.some(function(o){return/hepsi|hiçbiri|yukarıdaki/i.test(o)}))sh(order);
-    $('dpCat').textContent=cur.c;$('dpQ').textContent=cur.q;$('dpScN').textContent=eC;paintProg();if(justBanked){justBanked=false;showBank()}
+    $('dpCat').textContent=cur.c;$('dpQ').textContent=cur.q;paintSc();paintProg();if(justBanked){justBanked=false;showBank()}
     $('dpO').innerHTML=order.map(function(oi,k){return'<button type="button" class="dp-o" data-oi="'+oi+'"><i>'+'ABCD'[k]+'</i><span>'+esc(cur.o[oi])+'</span></button>'}).join('');
     $('dpGame').scrollTop=0;startTimer()}
 
@@ -6130,13 +6132,14 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     answered++;if(ok)eC+=COIN;
     if(banked){if(ok)add(WK,COIN)}
     else if(answered>=MIN_Q){banked=true;bankedAmt=eC;justBanked=true;if(eC>0)add(WK,eC)}
-    try{ok?playCorrectSound():playWrongSound()}catch(e){}
-    if(ok)dpCoin();
-    var my=sess,from=$('dpO').querySelector('.dp-o.ok');
+    var my=sess,from=$('dpO').querySelector('.dp-o.ok'),went=false;
     clearTimeout(fbTimer);
-    if(ok){/* doğru: toast yok, coin uçarak sağ üstteki coine eklenir, sonra otomatik sonraki soru */
-      fbTimer=setTimeout(function(){if(my!==sess)return;flyCoins(from,my,function(){if(my!==sess)return;$('dpScN').textContent=eC;goNext(my)})},120)}
-    else{$('dpScN').textContent=eC;fbTimer=setTimeout(function(){showFb(ok,oi)},FB_DELAY)}}
+    if(ok){/* 1) doğru sesi  2) altın sesi + altınlar sağ üstteki coine uçar  3) sıradaki soru */
+      var go=function(){if(went||my!==sess)return;went=true;clearTimeout(fbTimer);dpCoin();
+        flyCoins(from,my,function(){if(my!==sess)return;paintSc();goNext(my)})};
+      fbTimer=setTimeout(go,2200);/* güvenlik: ses bitmezse oyun takılmasın */
+      try{playCorrectSound(function(){setTimeout(go,60)})}catch(e){go()}}
+    else{try{playWrongSound()}catch(e){}paintSc();fbTimer=setTimeout(function(){showFb(ok,oi)},FB_DELAY)}}
   function bump(){var c=$('dpSc');if(c&&c.animate)c.animate([{transform:'scale(1)'},{transform:'scale(1.2)'},{transform:'scale(1)'}],{duration:220})}
   function goNext(my){if(my!==sess)return;if($('dpExit').classList.contains('on')){pendingNext=true;return}ask()}
   function flyCoins(from,my,done){
@@ -6208,7 +6211,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 <style id="dp-toast-cfm">
 #dailyPlay .dp-bank{top:50%;z-index:6;padding:16px 18px;font-size:16px;transform:translate(-50%,-42%)}
 #dailyPlay .dp-bank.on{transform:translate(-50%,-50%)}
-#dailyPlay .dp-cfm{z-index:5;align-items:flex-end;padding-bottom:max(18px,env(safe-area-inset-bottom));background:rgba(1,12,8,.55);-webkit-backdrop-filter:none;backdrop-filter:none}
+#dailyPlay .dp-cfm{z-index:5;align-items:center;justify-content:center;padding:22px;background:rgba(1,12,8,.55);-webkit-backdrop-filter:none;backdrop-filter:none}
 #dailyPlay .dp-o.sel{box-shadow:0 6px 0 #6b5720,0 0 0 3px #ffe08a,0 0 20px rgba(255,224,138,.6),inset 0 2px 0 rgba(255,255,255,.32)}
 </style>
 
@@ -6255,6 +6258,64 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 #profm .pf2-rkn{font-size:11px;font-weight:900;color:#ffe9a8;line-height:1.1}
 #profm .rk.lock .pf2-rkn{opacity:.55}
 </style>
+
+<style id="profile-fit">
+/* Profil penceresi: kesinlikle kaydırma yok. Tüm ölçüler em; ekran kısaysa JS --pfz'yi küçültür ve her şey sığar. */
+html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-behavior:none!important}
+#profm{touch-action:none!important;overscroll-behavior:none!important;padding:max(8px,env(safe-area-inset-top)) 8px max(8px,env(safe-area-inset-bottom))!important}
+#profm .lbw{width:100%!important;max-height:100%!important;justify-content:center!important}
+#profm .lbc.pf2{--pfz:16px;font-size:var(--pfz)!important;width:min(100%,380px)!important;max-width:100%!important;
+  max-height:calc(100vh - 16px)!important;max-height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important;
+  overflow:hidden!important;overscroll-behavior:none!important;padding:1.1em 1em .9em!important;border-radius:1.6em!important;touch-action:none!important}
+#profm .pf2 .lbx{top:calc(var(--pfz)*.6)!important;right:calc(var(--pfz)*.6)!important;width:calc(var(--pfz)*2.1)!important;height:calc(var(--pfz)*2.1)!important}
+#profm .pf2 .lbx::before{font-size:calc(var(--pfz)*1.05)!important}
+#profm .pf2-head{gap:.4em!important}
+#profm .pf2 .pfc{width:5.2em!important;height:5.2em!important}
+#profm .pf2 .pfn{font-size:1.45em!important;padding:.05em 0!important}
+#profm .pf2-sub{gap:.6em!important}
+#profm .pf2-rk{font-size:.8em!important;padding:.35em .9em!important}
+#profm .pf2 .pfidc{padding:.3em .75em!important;gap:.4em!important}
+#profm .pf2 .pfidc small{font-size:.7em!important}
+#profm .pf2 .pfidc b{font-size:.88em!important}
+#profm .pf2-card{margin-top:.6em!important;padding:.6em .85em!important;border-radius:1.1em!important}
+#profm .pf2-lbl{font-size:.75em!important}
+#profm .pf2-pts{font-size:1.25em!important}
+#profm .pf2-track{height:.8em!important;margin:.4em 0 .3em!important}
+#profm .pf2-note{font-size:.8em!important}
+#profm .pf2-stats{gap:.6em!important;margin-top:.6em!important}
+#profm .pf2-st{padding:.5em .2em .45em!important;border-radius:1em!important}
+#profm .pf2-st b{font-size:1.5em!important}
+#profm .pf2-st small{font-size:.66em!important;margin-top:.2em!important}
+#profm .pf2-wl{height:.7em!important;margin:.4em 0 .5em!important}
+#profm .pf2-best{font-size:.8em!important}
+#profm .pf2-best b{font-size:1.1em!important}
+#profm .pf2 .rkp{margin:.6em 0 0!important;padding:.6em .6em .5em!important;border-radius:1.1em!important}
+#profm .pf2 .rkh{margin-bottom:.45em!important;font-size:.75em!important}
+#profm .pf2 .rkg{gap:.5em .5em!important}
+#profm .pf2 .rk{gap:.2em!important}
+#profm .pf2 .rkc{max-width:3.9em!important}
+#profm .pf2 .rkk b{font-size:1.2em!important}
+#profm .pf2 .rkk span{font-size:.6em!important;padding:.1em .45em!important}
+#profm .pf2-rkn{font-size:.68em!important}
+</style>
+<script id="profile-fit-js">
+(function(){
+  var m=document.getElementById('profm');if(!m)return;
+  var card=m.querySelector('.pf2');if(!card)return;
+  function fit(){
+    if(!m.classList.contains('on'))return;
+    var z=16,guard=0;card.style.setProperty('--pfz',z+'px');
+    while(card.scrollHeight>card.clientHeight+0.5&&z>7&&guard++<80){z-=0.25;card.style.setProperty('--pfz',z+'px')}
+  }
+  function later(){fit();setTimeout(fit,120);setTimeout(fit,450)}
+  new MutationObserver(later).observe(m,{attributes:true,attributeFilter:['class']});
+  window.addEventListener('resize',later);window.addEventListener('orientationchange',later);
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',later);
+  /* profil açıkken arkadaki sayfa kaymasın */
+  m.addEventListener('touchmove',function(e){e.preventDefault()},{passive:false});
+  m.addEventListener('wheel',function(e){e.preventDefault()},{passive:false});
+})();
+</script>
 
 <style id="ilim-menu-compact">
 /* Kategori sayfası: küçük butonlar, soldan başlayarak yan yana satırlar; yalnızca Namaz açık */

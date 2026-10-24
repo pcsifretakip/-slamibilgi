@@ -1200,9 +1200,13 @@ transition:opacity 2.6s ease-in-out,transform 2.6s ease-in-out,visibility 0s lin
 </div></div></div>
 <div class="lbm" id="friendsManageModal" aria-hidden="true"><div class="lbw"><div class="lbc friends-manage-card" role="dialog" aria-label="Arkadaşlarım">
   <button class="lbx" id="friendsManageClose" aria-label="Kapat">✕</button>
-  <div class="friend-add-icon">🤝</div><h2>Arkadaşlarım</h2><p>Ekli arkadaşlarını yönetebilirsin.</p>
+  <div class="friend-add-icon">🤝</div><h2>Arkadaşlarım</h2><p id="fmSub">Ekli arkadaşlarını yönetebilirsin.</p>
+  <div class="fm-tabs" role="tablist"><button type="button" class="fm-tab on" data-fm-tab="f" role="tab">Arkadaşlar</button><button type="button" class="fm-tab" data-fm-tab="b" role="tab">Engellenenler <span id="fmBlkN"></span></button></div>
+  <div class="fm-msg" id="fmMsg" role="status"></div>
   <div id="friendsManageList"><div class="fm-empty">Arkadaş listesi yükleniyor…</div></div>
-</div></div></div>
+  <div id="blockedManageList" hidden></div>
+</div></div>
+<div class="fm-cf" id="fmConfirm" role="alertdialog" aria-modal="true"><div class="fm-cfc"><div class="fm-cfi" id="fmCfIc">❓</div><h3 id="fmCfT"></h3><p id="fmCfP"></p><div class="fm-cfb"><button type="button" id="fmCfNo">Vazgeç</button><button type="button" id="fmCfYes">Evet</button></div></div></div></div>
 <div class="lbm" id="pusm"><div class="lbc" role="dialog" aria-label="Kıble Pusulası">
   <button class="lbx" id="pusX" aria-label="Kapat"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   <div class="lbk" style="margin-top:6px">KIBLE</div>
@@ -5243,28 +5247,62 @@ window.lbFetch=async()=>{try{if(Date.now()-lastLb<8000)return;lastLb=Date.now();
   R.forEach(r=>{if(r.status==='rejected')console.warn('lb',r.reason)});
   if($('lbm').classList.contains('on')&&typeof showLb==='function')showLb(lbPrev,true)}catch(e){console.warn('lb',e)}};
 if(ok&&localStorage.getItem('islamibilgi_name'))setTimeout(boot,1500);
-// Arkadaşlarım: listele, arkadaşlıktan çıkar ve engelle
-const fmModal=document.getElementById('friendsManageModal'), fmList=document.getElementById('friendsManageList');
+// Arkadaşlarım: listele, arkadaşlıktan çıkar, engelle ve engellenenler listesi
+const fmModal=document.getElementById('friendsManageModal'), fmList=document.getElementById('friendsManageList'), fmBlk=document.getElementById('blockedManageList'), fmMsgEl=document.getElementById('fmMsg');
+let fmTab='f';
+function fmNote(x){if(!fmMsgEl)return;fmMsgEl.textContent=x||'';fmMsgEl.classList.toggle('on',!!x);clearTimeout(fmNote.t);if(x)fmNote.t=setTimeout(()=>{fmMsgEl.classList.remove('on');fmMsgEl.textContent=''},3400)}
+function fmSetTab(x){fmTab=x;if(!fmModal)return;fmModal.querySelectorAll('[data-fm-tab]').forEach(b=>b.classList.toggle('on',b.dataset.fmTab===x));fmList.hidden=x!=='f';fmBlk.hidden=x!=='b';const s=document.getElementById('fmSub');if(s)s.textContent=x==='f'?'Ekli arkadaşlarını yönetebilirsin.':'Engellediğin oyuncular burada listelenir.'}
+/* modern onay penceresi (tarayıcının confirm kutusu yerine) */
+function fmAsk(o){return new Promise(res=>{const box=document.getElementById('fmConfirm'),y=document.getElementById('fmCfYes'),n=document.getElementById('fmCfNo');
+  document.getElementById('fmCfIc').textContent=o.icon||'❓';document.getElementById('fmCfT').textContent=o.title||'';document.getElementById('fmCfP').textContent=o.text||'';
+  y.textContent=o.yes||'Evet';y.className=o.danger?'danger':'';
+  const done=v=>{box.classList.remove('on');y.onclick=n.onclick=box.onclick=null;res(v)};
+  y.onclick=()=>done(true);n.onclick=()=>done(false);box.onclick=e=>{if(e.target===box)done(false)};box.classList.add('on')})}
 async function refreshManagedFriends(){
   if(!fmList)return;
-  if(!await boot()){fmList.innerHTML='<div class="fm-empty">Bağlantı kurulamadı. İnternetini kontrol et.</div>';return}
+  if(!await boot()){const m='<div class="fm-empty">Bağlantı kurulamadı. İnternetini kontrol et.</div>';fmList.innerHTML=m;fmBlk.innerHTML=m;return}
   fmList.innerHTML='<div class="fm-empty">Yükleniyor…</div>';
   try{
     const snap=await F.getDocs(F.collection(db,'users',uid,'friends'));
-    if(snap.empty){fmList.innerHTML='<div class="fm-empty">Henüz ekli arkadaşın yok.</div>';return}
-    const rows=await Promise.all(snap.docs.map(async d=>{let u=d.data();try{const x=await F.getDoc(F.doc(db,'users',u.uid));if(x.exists())u={...u,...x.data()}}catch(e){}return {id:d.id,uid:u.uid||'',name:u.name||'Oyuncu',pts:+u.pts||0}}));
-    fmList.innerHTML=rows.map(r=>'<div class="fm-row"><div class="fm-avatar">'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</div><div class="fm-details"><b>'+esc(r.name)+'</b><small>ID '+esc(r.id)+' · '+r.pts+' puan</small></div><div class="fm-actions"><button type="button" data-fm-remove="'+esc(r.id)+'" title="Arkadaşlıktan çıkar">Çıkar</button><button type="button" data-fm-block="'+esc(r.id)+'" data-fm-uid="'+esc(r.uid)+'" title="Engelle">Engelle</button></div></div>').join('');
+    if(snap.empty){fmList.innerHTML='<div class="fm-empty">Henüz ekli arkadaşın yok.</div>'}
+    else{
+      const rows=await Promise.all(snap.docs.map(async d=>{let u=d.data();try{const x=await F.getDoc(F.doc(db,'users',u.uid));if(x.exists())u={...u,...x.data()}}catch(e){}return {id:d.id,uid:u.uid||'',name:u.name||'Oyuncu',pts:+u.pts||0}}));
+      fmList.innerHTML=rows.map(r=>'<div class="fm-row"><div class="fm-avatar">'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</div><div class="fm-details"><b>'+esc(r.name)+'</b><small>ID '+esc(r.id)+' · '+r.pts+' puan</small></div><div class="fm-actions"><button type="button" data-fm-remove="'+esc(r.id)+'" data-fm-name="'+esc(r.name)+'">Çıkar</button><button type="button" data-fm-block="'+esc(r.id)+'" data-fm-uid="'+esc(r.uid)+'" data-fm-name="'+esc(r.name)+'">Engelle</button></div></div>').join('')}
   }catch(e){console.warn('friends list',e);fmList.innerHTML='<div class="fm-empty">Arkadaşlar yüklenemedi.</div>'}
+  try{
+    const bs=await F.getDocs(F.collection(db,'users',uid,'blocked')),n=document.getElementById('fmBlkN');
+    if(n)n.textContent=bs.size?'('+bs.size+')':'';
+    if(bs.empty){fmBlk.innerHTML='<div class="fm-empty">Engellediğin oyuncu yok.</div>'}
+    else{
+      const rows=bs.docs.map(d=>{const x=d.data();return{id:d.id,name:x.name||'Engellenen oyuncu',ts:+x.ts||0}}).sort((p,q)=>q.ts-p.ts);
+      fmBlk.innerHTML=rows.map(r=>'<div class="fm-row"><div class="fm-avatar blk">🚫</div><div class="fm-details"><b>'+esc(r.name)+'</b><small>ID '+esc(r.id)+'</small></div><div class="fm-actions one"><button type="button" data-fm-unblock="'+esc(r.id)+'" data-fm-name="'+esc(r.name)+'">Engeli Kaldır</button></div></div>').join('')}
+  }catch(e){console.warn('blocked list',e);fmBlk.innerHTML='<div class="fm-empty">Engellenenler yüklenemedi.</div>'}
 }
 const fmOpen=document.getElementById('openFriendsManage'),fmClose=document.getElementById('friendsManageClose');
-if(fmOpen)fmOpen.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(fmModal){document.body.appendChild(fmModal);fmModal.classList.add('on');fmModal.style.setProperty('display','flex','important');fmModal.style.setProperty('z-index','2147483647','important');fmModal.style.setProperty('position','fixed','important');fmModal.style.setProperty('inset','0','important');await refreshManagedFriends()}});
+if(fmOpen)fmOpen.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(fmModal){document.body.appendChild(fmModal);fmModal.classList.add('on');fmModal.style.setProperty('display','flex','important');fmModal.style.setProperty('z-index','2147483647','important');fmModal.style.setProperty('position','fixed','important');fmModal.style.setProperty('inset','0','important');fmSetTab('f');fmNote('');await refreshManagedFriends()}});
 if(fmClose)fmClose.onclick=()=>fmModal.classList.remove('on');
-if(fmModal)fmModal.addEventListener('click',e=>{if(e.target===fmModal)fmModal.classList.remove('on')});
-if(fmList)fmList.addEventListener('click',async e=>{
- const rem=e.target.closest('[data-fm-remove]'),blk=e.target.closest('[data-fm-block]');if(!rem&&!blk)return;if(!await boot())return;
- const id=(rem||blk).dataset.fmRemove|| (blk&&blk.dataset.fmBlock); if(!id)return;
- if(rem){if(!confirm('Bu kişiyi arkadaşlıktan çıkarmak istiyor musun?'))return;try{await F.deleteDoc(F.doc(db,'users',uid,'friends',id));const u=blk?.dataset.fmUid;await refreshManagedFriends();msg('Arkadaşlıktan çıkarıldı.')}catch(x){msg('Arkadaşlıktan çıkarılamadı.')}}
- else if(blk){if(!confirm('Bu kişiyi engellemek istiyor musun? Engellendiğinde arkadaş listesinden çıkarılır.'))return;try{const other=blk.dataset.fmUid;await F.setDoc(F.doc(db,'users',uid,'blocked',id),{uid:other,pid:id,name:'Engellenen oyuncu',ts:Date.now()});await F.deleteDoc(F.doc(db,'users',uid,'friends',id));if(other)await F.deleteDoc(F.doc(db,'users',other,'friends',pid));await refreshManagedFriends();msg('Oyuncu engellendi.')}catch(x){console.warn(x);msg('Engelleme başarısız oldu. Firestore kurallarını kontrol et.')}}
+if(fmModal)fmModal.addEventListener('click',e=>{if(e.target===fmModal||e.target.classList.contains('lbw'))fmModal.classList.remove('on')});
+if(fmModal)fmModal.addEventListener('click',async e=>{
+  const tab=e.target.closest('[data-fm-tab]');if(tab){fmSetTab(tab.dataset.fmTab);return}
+  const rem=e.target.closest('[data-fm-remove]'),blk=e.target.closest('[data-fm-block]'),unb=e.target.closest('[data-fm-unblock]');
+  const btn=rem||blk||unb;if(!btn||btn.disabled)return;if(!await boot())return;
+  const id=btn.dataset.fmRemove||btn.dataset.fmBlock||btn.dataset.fmUnblock,name=btn.dataset.fmName||'Bu oyuncu';if(!id)return;
+  if(rem){
+    if(!await fmAsk({icon:'👋',title:'Arkadaşlıktan çıkar',text:name+' arkadaş listenden çıkarılsın mı?',yes:'Evet, çıkar',danger:true}))return;
+    try{await F.deleteDoc(F.doc(db,'users',uid,'friends',id));await refreshManagedFriends();fmNote(name+' arkadaşlıktan çıkarıldı.')}catch(x){console.warn(x);fmNote('Arkadaşlıktan çıkarılamadı.')}
+  }else if(blk){
+    if(!await fmAsk({icon:'🚫',title:'Oyuncuyu engelle',text:name+' engellensin mi? Arkadaş listenden çıkarılır ve sana istek gönderemez.',yes:'Evet, engelle',danger:true}))return;
+    try{
+      const other=btn.dataset.fmUid;
+      await F.setDoc(F.doc(db,'users',uid,'blocked',id),{uid:other,pid:id,name:name,ts:Date.now()});
+      await F.deleteDoc(F.doc(db,'users',uid,'friends',id));
+      if(other){try{await F.deleteDoc(F.doc(db,'users',other,'friends',pid))}catch(z){}}
+      await refreshManagedFriends();fmNote(name+' engellenenler listesine eklendi.')
+    }catch(x){console.warn(x);fmNote('Engelleme başarısız oldu. Firestore kurallarını kontrol et.')}
+  }else if(unb){
+    if(!await fmAsk({icon:'✅',title:'Engeli kaldır',text:name+' için engel kaldırılsın mı?',yes:'Evet, kaldır'}))return;
+    try{await F.deleteDoc(F.doc(db,'users',uid,'blocked',id));await refreshManagedFriends();fmNote(name+' engelden çıkarıldı.')}catch(x){console.warn(x);fmNote('Engel kaldırılamadı.')}
+  }
 });
 </script>
 
@@ -5327,21 +5365,42 @@ if(fmList)fmList.addEventListener('click',async e=>{
 <style id="friends-manage-styles">
 #profm .profile-friend-tab{display:block}
 #profm #openFriendsManage{margin-top:10px}
-#friendsManageModal{position:fixed!important;inset:0!important;z-index:2147483647!important;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(4,7,30,.84);isolation:isolate}
+#friendsManageModal{position:fixed!important;inset:0!important;z-index:2147483647!important;display:none;align-items:center;justify-content:center;padding:14px;background:rgba(4,7,30,.84);isolation:isolate}
 #friendsManageModal.on{display:flex!important;visibility:visible!important}
-#friendsManageModal .friends-manage-card{position:relative;width:min(100%,430px);max-height:min(82dvh,720px);overflow:auto;box-sizing:border-box;padding:25px 14px 18px;border:2px solid #e8bd55;border-radius:24px;background:linear-gradient(160deg,#192c66,#0a143b);box-shadow:0 15px 40px #0009;color:#fff0bd;text-align:center}
-#friendsManageModal h2{margin:5px 0 7px;font-size:25px;font-weight:900}
-#friendsManageModal p{margin:0 0 14px;font-size:13px;color:#c9d9ff}
-#friendsManageList{display:grid;gap:9px;text-align:left}
-#friendsManageList .fm-row{display:flex;align-items:center;gap:9px;padding:9px;border:1px solid #6176b4;border-radius:13px;background:#101d49}
-#friendsManageList .fm-avatar{width:36px;height:36px;flex:0 0 36px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(#ffe48a,#d99419);color:#382100;font-weight:900}
-#friendsManageList .fm-details{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
-#friendsManageList .fm-details b{overflow-wrap:anywhere;color:#fff0bd;font-size:13px}
-#friendsManageList .fm-details small{font-size:10px;color:#c9d9ff}
-#friendsManageList .fm-actions{display:flex;flex-direction:column;gap:5px}
-#friendsManageList .fm-actions button{border:1px solid #ffe08a;border-radius:8px;padding:6px 8px;background:#d99b21;color:#2e1a00;font-size:11px;font-weight:800}
-#friendsManageList .fm-actions button[data-fm-block]{background:#8f3041;color:#fff;border-color:#f39aa7}
-#friendsManageList .fm-empty{padding:18px 10px;text-align:center;color:#d8e2ff;font-size:13px}
+#friendsManageModal [hidden]{display:none!important}
+#friendsManageModal .friends-manage-card{position:relative;width:min(100%,540px);max-height:min(90dvh,820px);min-height:min(58dvh,440px);overflow:auto;box-sizing:border-box;padding:34px 18px 22px;border:2.5px solid #e8bd55;border-radius:30px;background:linear-gradient(160deg,#192c66,#0a143b);box-shadow:0 15px 40px #0009;color:#fff0bd;text-align:center}
+#friendsManageModal h2{margin:6px 0 8px;font-size:32px;font-weight:900}
+#friendsManageModal p{margin:0 0 16px;font-size:16px;color:#c9d9ff}
+.fm-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.fm-tab{padding:12px 8px;border-radius:14px;border:1.5px solid #4d63a8;background:#101d49;color:#c9d9ff;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.fm-tab.on{background:linear-gradient(#ffe48a,#d99419);color:#2e1a00;border-color:#ffe08a}
+.fm-tab span{font-size:13px}
+.fm-msg{display:none;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(61,255,160,.14);box-shadow:inset 0 0 0 1.5px rgba(61,255,160,.45);color:#d6ffe9;font-size:14px;font-weight:800}
+.fm-msg.on{display:block}
+#friendsManageList,#blockedManageList{display:grid;gap:12px;text-align:left}
+#friendsManageModal .fm-row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px;border:1.5px solid #6176b4;border-radius:18px;background:#101d49}
+#friendsManageModal .fm-avatar{width:54px;height:54px;flex:0 0 54px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(#ffe48a,#d99419);color:#382100;font-size:23px;font-weight:900}
+#friendsManageModal .fm-avatar.blk{background:linear-gradient(#ff8a9a,#b3243b);color:#fff;font-size:24px}
+#friendsManageModal .fm-details{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+#friendsManageModal .fm-details b{overflow-wrap:anywhere;color:#fff0bd;font-size:18px}
+#friendsManageModal .fm-details small{font-size:13px;color:#c9d9ff}
+#friendsManageModal .fm-actions{flex:0 0 100%;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#friendsManageModal .fm-actions.one{grid-template-columns:1fr}
+#friendsManageModal .fm-actions button{border:1px solid #ffe08a;border-radius:12px;padding:13px 8px;background:#d99b21;color:#2e1a00;font-family:inherit;font-size:16px;font-weight:900;cursor:pointer}
+#friendsManageModal .fm-actions button[data-fm-block]{background:#8f3041;color:#fff;border-color:#f39aa7}
+#friendsManageModal .fm-actions button[data-fm-unblock]{background:#1d8f5f;color:#fff;border-color:#7ff0bd}
+#friendsManageModal .fm-empty{padding:26px 10px;text-align:center;color:#d8e2ff;font-size:15px}
+.fm-cf{position:absolute;inset:0;z-index:5;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(2,6,24,.72);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.fm-cf.on{display:flex}
+.fm-cfc{width:min(100%,380px);padding:28px 20px 20px;border-radius:28px;text-align:center;background:linear-gradient(160deg,#1c3170,#0a143b);box-shadow:0 0 0 2.5px #e8bd55,0 24px 50px rgba(0,0,0,.65),inset 0 2px 0 rgba(255,255,255,.15);animation:fmPop .22s ease-out}
+.fm-cfi{font-size:50px;line-height:1;margin-bottom:8px}
+.fm-cfc h3{margin:0 0 8px;font-size:23px;font-weight:900;color:#fff0bd}
+#friendsManageModal .fm-cfc p{margin:0 0 18px;font-size:16px;line-height:1.45;font-weight:700;color:#d6e2ff}
+.fm-cfb{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fm-cfb button{padding:14px 8px;border-radius:14px;border:1px solid #ffe08a;font-family:inherit;font-size:16px;font-weight:900;cursor:pointer;background:linear-gradient(#ffe48a,#d99419);color:#2e1a00}
+#fmCfNo{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)}
+#fmCfYes.danger{background:linear-gradient(#ff7a8a,#c0233c);color:#fff;border-color:#ffb3bd}
+@keyframes fmPop{from{transform:scale(.88);opacity:0}to{transform:scale(1);opacity:1}}
 </style>
 
 <style id="online-friends-presence-style">
@@ -6013,6 +6072,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   function goNext(my){if(my!==sess)return;if($('dpExit').classList.contains('on')){pendingNext=true;return}ask()}
   function flyCoins(from,my,done){
     var tgt=$('dpScImg'),src=coinSrc(),root=$('dailyPlay');
+    try{playCoinSound()}catch(e){}
     if(!tgt||!from||!src||!from.animate||(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)){bump();setTimeout(done,500);return}
     var fr=from.getBoundingClientRect(),tr=tgt.getBoundingClientRect(),S=30,N=5,left=N,
         sx=fr.left+fr.width/2,sy=fr.top+fr.height/2,tx=tr.left+tr.width/2,ty=tr.top+tr.height/2;

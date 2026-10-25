@@ -6003,7 +6003,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
       <div class="dp-opts" id="dpO"></div>
     </section>
   </div>
-  <div class="dp-bank" id="dpBank" role="status" aria-live="polite"></div>
+  <div class="dp-exit dp-blur" id="dpBank" role="alertdialog" aria-label="Coinler yüklendi"><div class="dp-card"><p id="dpBankT" style="font-size:18px;margin:0 0 18px"></p><button type="button" class="dp-btn gold show" id="dpBankBtn">Devam</button></div></div>
   <div class="dp-exit" id="dpFb" role="alertdialog" aria-label="Cevap sonucu">
     <div class="dp-card dp-fbc" id="dpFbC">
       <div class="dp-ic" id="dpFbIc"></div>
@@ -6088,12 +6088,12 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 
   /* En az MIN_Q soru kuralı: tamamlanana kadar kazanılan coinler yalnızca bu oyunda (eC) tutulur, hesaba (WK) yazılmaz. */
   function paintProg(){var p=$('dpProg');if(!p)return;
-    if(banked){p.className='dp-prog ok';p.textContent='✓ Coinler hesabında'}
+    if(banked){p.className='dp-prog ok';p.textContent='✓ Soru '+((answered%MIN_Q)+1)+'/'+MIN_Q}
     else{p.className='dp-prog';p.textContent='Soru '+(answered+1)+'/'+MIN_Q}}
   function hideBank(){clearTimeout(bankTmr);var b=$('dpBank');if(b)b.classList.remove('on')}
   function showBank(){var b=$('dpBank');if(!b)return;
-    b.innerHTML=bankedAmt>0?('🎉 '+MIN_Q+' soruyu tamamladın! Kazandığın <b>'+bankedAmt+'</b> coin hesabına yüklendi.'):('🎉 '+MIN_Q+' soruyu tamamladın! Bundan sonra kazandığın coinler hesabına doğrudan yüklenecek.');
-    b.classList.add('on');clearTimeout(bankTmr);bankTmr=setTimeout(hideBank,30000)}
+    $('dpBankT').innerHTML=bankedAmt>0?(MIN_Q+' soruyu bildin! Kazandığın <b>'+bankedAmt+'</b> coin hesabına yüklendi.'):(MIN_Q+' soruyu bildin! Kazandığın coinler hesabına yüklendi.');
+    b.classList.add('on')}
   function paintExit(){
     var t=$('dpExitT'),p=$('dpExitP'),l=$('dpExitLbl'),lv=$('dpLeave');
     $('dpExitCoin').textContent=eC;
@@ -6106,11 +6106,11 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     $('dpCfmA').textContent='ABCD'[k]+') '+cur.o[oi];$('dpCfm').classList.add('on')}
   function dpCoin(){if(!soundOn())return;try{queuedCoinSound=false}catch(e){}try{coinAudio.pause();coinAudio.currentTime=0;var p=coinAudio.play();if(p&&p.catch)p.catch(function(){})}catch(e){}}
   function ask(){
-    hideCfm();if(!queue.length)refill();
+    hideCfm();if(justBanked){showBank();return}if(!queue.length)refill();
     cur=queue.shift();locked=false;lastText=cur.q;
     if(s.seen.indexOf(cur.id)<0){s.seen.push(cur.id);save(s)}
     order=[0,1,2,3];if(!cur.o.some(function(o){return/hepsi|hiçbiri|yukarıdaki/i.test(o)}))sh(order);
-    $('dpCat').textContent=cur.c;$('dpQ').textContent=cur.q;paintSc();paintProg();if(justBanked){justBanked=false;showBank()}
+    $('dpCat').textContent=cur.c;$('dpQ').textContent=cur.q;paintSc();paintProg();
     $('dpO').innerHTML=order.map(function(oi,k){return'<button type="button" class="dp-o" data-oi="'+oi+'"><i>'+'ABCD'[k]+'</i><span>'+esc(cur.o[oi])+'</span></button>'}).join('');
     $('dpGame').scrollTop=0;startTimer()}
 
@@ -6130,7 +6130,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     for(var i=0;i<btns.length;i++){var b=btns[i],v=+b.dataset.oi;b.disabled=true;
       if(v===q.a)b.classList.add('ok');else if(v===oi)b.classList.add('no');else b.classList.add('dim')}
     answered++;if(ok)eC+=COIN;
-    if(banked){if(ok)add(WK,COIN)}
+    if(banked){if(ok)add(WK,COIN);if(answered%MIN_Q===0){justBanked=true;bankedAmt=0}}
     else if(answered>=MIN_Q){banked=true;bankedAmt=eC;justBanked=true;if(eC>0)add(WK,eC)}
     var my=sess,from=$('dpO').querySelector('.dp-o.ok'),went=false;
     clearTimeout(fbTimer);
@@ -6178,6 +6178,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     if(!locked){t0=Date.now()-Math.min(TIME*1000-100,pausedMs);clearInterval(tmr);tmr=setInterval(tickT,100);resumeCd()}
     else if(pendingNext){pendingNext=false;ask()}});
   $('dpLeave').addEventListener('click',close);
+  $('dpBankBtn').addEventListener('click',function(){justBanked=false;hideBank();ask()});
   window.openDailyPlay=function(e){
     if(e){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation()}
     if(start())$('dailyPlay').classList.add('on')};
@@ -6212,6 +6213,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 #dailyPlay .dp-bank{top:50%;z-index:6;padding:16px 18px;font-size:16px;transform:translate(-50%,-42%)}
 #dailyPlay .dp-bank.on{transform:translate(-50%,-50%)}
 #dailyPlay .dp-cfm{z-index:5;align-items:center;justify-content:center;padding:22px;background:rgba(1,12,8,.55);-webkit-backdrop-filter:none;backdrop-filter:none}
+#dailyPlay .dp-blur{z-index:6;background:rgba(1,12,8,.38);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
 #dailyPlay .dp-o.sel{box-shadow:0 6px 0 #6b5720,0 0 0 3px #ffe08a,0 0 20px rgba(255,224,138,.6),inset 0 2px 0 rgba(255,255,255,.32)}
 </style>
 

@@ -5728,6 +5728,17 @@ if(fmModal)fmModal.addEventListener('click',async e=>{
 .rq2 .rq2-x{left:21.8%;width:56.9%;top:76.1%;height:6.2%;padding:0;border:0;border-radius:99px;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent}
 .rq2 .rq2-x:active{background:rgba(255,255,255,.14)}
 </style>
+<style id="home-layout-v2">
+/* Ana sayfa düzeni: 1) Günlük Sorular · Sıralama · İlim Puanı Topla  2) Mağaza · Hakkımızda · Ayarlar  3) Online Oyna (ortada, geniş) */
+#sLogin .hgrid #bStart{order:1!important}
+#sLogin .hgrid #bLbL{order:2!important}
+#sLogin .hgrid .hm.hbd[aria-label="Kategoriler"]{order:3!important}
+#sLogin .hgrid #bShop{order:4!important}
+#sLogin .hgrid #bAbout{order:5!important}
+#sLogin .hgrid #bSetT{order:6!important}
+#sLogin .hgrid .hm.hbd#bOnline{order:7!important;grid-column:2/span 4!important;width:100%!important;aspect-ratio:auto!important;margin:0!important;justify-self:stretch!important}
+#sLogin .hgrid .hm.hbd#bOnline img{width:100%!important;height:auto!important;object-fit:contain!important}
+</style>
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */
@@ -6099,7 +6110,7 @@ if(fmModal)fmModal.addEventListener('click',async e=>{
   function fit(){
     var s=document.getElementById('sLogin'),q=document.getElementById('bQuranRead');
     if(!s||!q||!s.classList.contains('on'))return;
-    var gb=0;['bAbout','bShop','bSetT'].forEach(function(id){var e=document.getElementById(id);if(!e)return;var r=e.getBoundingClientRect();if(r.height>0&&r.bottom>gb)gb=r.bottom});
+    var gb=0;['bAbout','bShop','bSetT','bOnline'].forEach(function(id){var e=document.getElementById(id);if(!e)return;var r=e.getBoundingClientRect();if(r.height>0&&r.bottom>gb)gb=r.bottom});
     if(!gb)return;
     var sr=s.getBoundingClientRect(),H=window.innerHeight,ratio=383/520,gap=8,pad=8;
     var w=Math.min(window.innerWidth*.38,170),maxBottom=H-pad;

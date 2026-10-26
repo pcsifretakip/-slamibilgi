@@ -5910,6 +5910,77 @@ setInterval(fit,700);fit();
 })();
 </script>
 
+<style id="tour-css">
+#tourRoot{position:fixed;inset:0;z-index:2147483000;display:none;font-family:"Nunito",system-ui,sans-serif}
+#tourRoot.on{display:block}
+#tourBlock{position:absolute;inset:0}
+#tourSpot{position:absolute;border-radius:16px;box-shadow:0 0 0 9999px rgba(2,16,10,.82),0 0 0 3px #f0dc9e,0 0 22px 4px rgba(240,220,158,.7);transition:all .28s ease;pointer-events:none;animation:tourPulse 1.4s ease-in-out infinite}
+@keyframes tourPulse{50%{box-shadow:0 0 0 9999px rgba(2,16,10,.82),0 0 0 6px rgba(240,220,158,.55),0 0 30px 8px rgba(240,220,158,.5)}}
+#tourTip{position:absolute;left:16px;right:16px;max-width:340px;margin:0 auto;padding:14px 16px;border-radius:18px;color:#f6f3ea;background:linear-gradient(#0b4d33,#052e1e);border:2px solid #c9ab5e;box-shadow:0 10px 30px rgba(0,0,0,.6);transition:top .28s ease}
+#tourTip h4{margin:0 0 4px;font-size:17px;font-weight:900;color:#f0dc9e}
+#tourTip p{margin:0 0 12px;font-size:14.5px;line-height:1.4;font-weight:700;color:#e4efe8}
+#tourTip .tr{display:flex;align-items:center;gap:8px}
+#tourTip .dots{flex:1;display:flex;gap:5px}
+#tourTip .dots i{width:7px;height:7px;border-radius:50%;background:#2d6b52}
+#tourTip .dots i.a{background:#f0dc9e}
+#tourTip button{font:900 14px inherit;font-family:inherit;border:0;border-radius:999px;padding:9px 16px;cursor:pointer}
+#tourSkip{background:transparent;color:#a9c7b8}
+#tourNext{background:linear-gradient(#fff0b8,#c9ab5e);color:#2a1f05;box-shadow:0 3px 0 #6b5720}
+#tourHelp{position:fixed;left:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:50;width:34px;height:34px;border-radius:50%;border:2px solid #c9ab5e;background:rgba(5,46,30,.85);color:#f0dc9e;font:900 17px inherit;font-family:inherit;display:none;cursor:pointer}
+#tourHelp.show{display:block}
+</style>
+<div id="tourRoot" role="dialog" aria-label="Tanıtım turu"><div id="tourBlock"></div><div id="tourSpot"></div>
+<div id="tourTip"><h4 id="tourH"></h4><p id="tourP"></p><div class="tr"><div class="dots" id="tourDots"></div><button id="tourSkip">Atla</button><button id="tourNext">İleri</button></div></div></div>
+<button id="tourHelp" aria-label="Tanıtımı tekrar göster">?</button>
+<script id="tour-js">(function(){
+var KEY='islamibilgi_tour_v1',STEPS=[
+{s:'#openFriendAdd',t:'Arkadaş Ekle',p:'Arkadaşının 7 haneli oyuncu ID\'sini girerek ona istek gönderebilirsin.'},
+{s:'#openFriendsManage',t:'Arkadaşlarım',p:'Eklediğin arkadaşları burada görür, yönetirsin.'},
+{s:'#bStart',t:'Günlük Sorular',p:'Her gün soruları cevapla, ilim puanı topla.'},
+{s:'button.hm[aria-label="Kategoriler"]',t:'İlim Puanı Topla',p:'Kategorilerdeki soruları çözerek ilim puanı kazan.'},
+{s:'#bOnline',t:'Online Oyna',p:'Arkadaşlarınla veya diğer oyuncularla yarış.'},
+{s:'#bLbL',t:'Sıralama',p:'Puanını ve arkadaşlarının sıralamasını gör.'},
+{s:'#bShop',t:'Mağaza',p:'Coin ile joker ve diğer ürünleri buradan al.'},
+{s:'#bTasbihat',t:'Tesbihat ve Dualar',p:'Namaz, zikir ve dualar, anlamlarıyla birlikte burada.'},
+{s:'#bSetT',t:'Ayarlar',p:'Ses, titreşim ve bildirim ayarlarını buradan yönet.'},
+{s:'#homeWalletChip',t:'Coin Bakiyen',p:'Kazandığın coinler burada görünür.'},
+{s:'#hAv',t:'Profilin',p:'Adın ve rütben burada görünür. Dokununca profilin açılır, hadi bakalım!'},
+{m:1,s:'#profm .pf2-head',t:'Profil Kartın',p:'Kullanıcı adın, rütben ve arkadaşlarının seni bulması için ID numaran burada.'},
+{m:1,s:'#profm .pf2-card',t:'İlim Puanın',p:'Oyun oynadıkça ilim puanı kazanırsın. Çubuk, sonraki rütbeye ne kadar kaldığını gösterir.'},
+{m:1,s:'#profm .rkp',t:'Kazanabileceğin Rütbeler',p:'Talebe 2.500 P · Yolcu 5.000 P · Çırak 10.000 P · Mütefekkir 20.000 P · Muallim 30.000 P · Üstad 40.000 P. En üste çıkmaya hazır mısın?'}
+],R,spot,tip,i=0,list=[],tm;
+function $(q){return document.querySelector(q)}
+function vis(e){if(!e)return false;var r=e.getBoundingClientRect();return r.width>8&&r.height>8&&r.bottom>0&&r.top<innerHeight}
+function done(){try{localStorage.setItem(KEY,'1')}catch(e){}}
+function place(){var e=$(list[i].s);if(!vis(e)){return next()}
+ var r=e.getBoundingClientRect(),pd=6;
+ spot.style.cssText='left:'+(r.left-pd)+'px;top:'+(r.top-pd)+'px;width:'+(r.width+pd*2)+'px;height:'+(r.height+pd*2)+'px';
+ var th=tip.offsetHeight,below=r.bottom+th+24<innerHeight;
+ tip.style.top=(below?r.bottom+18:(r.top-th-18>=10?r.top-th-18:Math.max(10,innerHeight-th-10)))+'px'}
+function show(){var st=list[i];$('#tourH').textContent=st.t;$('#tourP').textContent=st.p;
+ $('#tourNext').textContent=i==list.length-1?'Bitir':'İleri';
+ $('#tourDots').innerHTML=list.map(function(_,k){return'<i'+(k==i?' class="a"':'')+'></i>'}).join('');
+ var pm=$('#profm'),op=pm&&pm.classList.contains('on'),wait=60;
+ if(st.m&&!op){var h=$('#hProf');if(h)h.click();wait=550}else if(!st.m&&op){closeM();wait=450}
+ setTimeout(function(){var e=$(st.s);if(e&&e.scrollIntoView)e.scrollIntoView({block:'nearest'});setTimeout(place,80)},wait)}
+function next(){i++;if(i>=list.length)return end();show()}
+function closeM(){var m=$('#profm');if(m&&m.classList.contains('on')){var x=$('#profX');if(x)x.click();else m.classList.remove('on')}}
+function end(){closeM();R.classList.remove('on');document.body.style.overflow='';done()}
+function start(force){if(!force&&localStorage.getItem(KEY))return;
+ list=STEPS.filter(function(s){return s.m||vis($(s.s))});if(!list.length)return;i=0;R.classList.add('on');show()}
+function ready(){var b=document.body,l=$('#sLogin');return !b.classList.contains('introOn')&&l&&l.classList.contains('on')&&vis($('#bStart'))&&($('#hName')||{}).textContent}
+function init(){R=$('#tourRoot');spot=$('#tourSpot');tip=$('#tourTip');
+ document.body.appendChild(R);document.body.appendChild($('#tourHelp'));
+ $('#tourNext').onclick=next;$('#tourSkip').onclick=end;
+ $('#tourHelp').onclick=function(){start(true)};
+ addEventListener('resize',function(){if(R.classList.contains('on'))place()});
+ window.startTour=function(){start(true)};
+ setInterval(function(){var l=$('#sLogin');$('#tourHelp').classList.toggle('show',!document.body.classList.contains('introOn')&&!!l&&l.classList.contains('on')&&!R.classList.contains('on'))},600);
+ var n=0;tm=setInterval(function(){n++;if(localStorage.getItem(KEY)||n>120){clearInterval(tm);return}
+  if(ready()){clearInterval(tm);setTimeout(function(){if(ready())start(false)},900)}},700)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();</script>
+
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */

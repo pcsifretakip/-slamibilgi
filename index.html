@@ -6819,6 +6819,23 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #profm .rk.lock .pf2-rkn{opacity:1!important}
 </style>
 
+<style id="profile-v9">
+/* sade: resimli arka plan yok, kapatma tuşu kartın içinde sağ üstte */
+#profm{background:linear-gradient(180deg,#0a1650,#050b30)!important}
+#profm .lbc.pf2{margin-top:0!important;max-height:calc(100vh - 16px)!important;max-height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important;padding:1em .9em .9em!important;box-shadow:0 .6em 1.6em rgba(0,0,0,.6)!important}
+#profm .pf2 .lbx{position:absolute!important;top:.6em!important;right:.6em!important;left:auto!important;bottom:auto!important;transform:none!important;width:2.4em!important;height:2.4em!important;z-index:20!important;display:grid!important;place-items:center;pointer-events:auto!important;opacity:1!important}
+#profm .pf2 .pfc{margin-top:0!important;width:5.4em!important;height:5.4em!important;box-shadow:0 0 0 .18em #e7b84a,0 0 0 .3em #0b1b55!important}
+#profm .pf2 .pfc.rkon{box-shadow:none!important}
+#profm .pf2 .pfn{width:62%!important;font-size:1.6em!important;box-shadow:none!important}
+#profm .pf2-card,#profm .pf2-st,#profm .pf2 .rkp{box-shadow:none!important}
+#profm .pf2-card{margin-top:.55em!important}
+#profm .pf2-pts{font-size:1.5em!important;text-shadow:none!important}
+#profm .pf2-wl .w{box-shadow:none!important}
+#profm .pf2-st::before{width:1.5em;height:1.5em}
+#profm .pf2-st b,#profm .pf2-st.win b,#profm .pf2-st.lose b{font-size:1.5em!important}
+#profm .pf2-rkn{box-shadow:none!important}
+</style>
+
 <style id="ilim-menu-compact">
 /* Kategori sayfası: küçük butonlar, soldan başlayarak yan yana satırlar; yalnızca Namaz açık */
 #yakindaOnlyScreen .ilim-buttons{display:flex!important;flex-direction:row!important;flex-wrap:wrap!important;justify-content:flex-start!important;align-items:flex-start!important;align-content:flex-start!important;gap:8px!important;width:100%!important}
@@ -6975,4 +6992,16 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #friendsManageModal .fm-actions button[data-fm-unblock]{background:linear-gradient(#37c98a,#117a52)!important;border-color:#a3f5d0!important;color:#fff!important;box-shadow:0 3px 0 #08492f,0 4px 8px rgba(0,0,0,.4)}
 #friendsManageModal .fm-empty{padding:calc(var(--u)*10) 10px 0;text-align:center;color:#fff;font-family:"Georgia","Noto Serif",serif;font-weight:600;font-size:max(16px,calc(var(--u)*5))}
 #friendsManageModal .fm-empty::after{content:"◆";display:block;margin:calc(var(--u)*3) auto 0;width:62%;color:#f2c14e;font-size:12px;line-height:14px;text-shadow:0 0 6px #e8a91c;background:linear-gradient(90deg,transparent,#e8b53a 40%,#e8b53a 60%,transparent) center/100% 1px no-repeat}
+</style>
+
+<style id="friends-font-v2">
+/* Arkadaşlarım: profildeki yazı tipi (Nunito) + daha küçük liste puntosu */
+#friendsManageModal #fmSub,#friendsManageModal .fm-rank,#friendsManageModal .fm-avatar,#friendsManageModal .fm-details b,#friendsManageModal .fm-details small,#friendsManageModal .fm-actions button,#friendsManageModal .fm-empty{font-family:"Nunito","SF Pro Rounded",-apple-system,system-ui,"Segoe UI",Roboto,sans-serif!important}
+#friendsManageModal .fm-rank{font-size:max(12px,calc(var(--u)*4.2))!important;font-weight:900!important}
+#friendsManageModal .fm-avatar{width:calc(var(--u)*11)!important;height:calc(var(--u)*11)!important;flex:0 0 calc(var(--u)*11)!important;font-size:max(15px,calc(var(--u)*5))!important;font-weight:900!important}
+#friendsManageModal .fm-details b{font-size:max(13px,calc(var(--u)*3.9))!important;font-weight:900!important}
+#friendsManageModal .fm-details small{font-size:max(10.5px,calc(var(--u)*2.9))!important;font-weight:700!important}
+#friendsManageModal .fm-actions button{font-size:max(12px,calc(var(--u)*3.5))!important;font-weight:900!important;padding:calc(var(--u)*2.1) 6px!important}
+#friendsManageModal .fm-row{padding:calc(var(--u)*2.4) calc(var(--u)*2.8)!important;gap:calc(var(--u)*1.8) calc(var(--u)*2.2)!important}
+#friendsManageModal .fm-empty{font-size:max(14px,calc(var(--u)*4.2))!important}
 </style>

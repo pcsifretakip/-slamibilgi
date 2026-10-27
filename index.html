@@ -6259,7 +6259,68 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 /* seyirci jokeri kartı */
 </style>
 <style id="online-duel-image-integration">
-/* ÇEVRİM İÇİ DÜELLO ekranı: gerçek HTML/CSS. Tüm ölçüler panel genişliğine (cqw) bağlı, her ekranda aynı oranda küçülür/büyür. */
+/* ÇEVRİM İÇİ DÜELLO ekranı: ge
+<style id="dini-gunler-feature-style">
+#bDiniGunler{position:absolute;left:50%;transform:translateX(-50%);width:var(--qr-w,min(38vw,170px));top:var(--qr-top,84%);z-index:20;border:0;background:transparent;padding:0;cursor:pointer}
+#bDiniGunler .dgd-button{min-height:54px;border-radius:15px;border:1px solid #d9b15d;background:linear-gradient(145deg,#09213a,#061629);color:#f5d889;box-shadow:0 5px 16px #0008,inset 0 0 0 2px #d9b15d22;display:flex;align-items:center;justify-content:center;gap:7px;padding:8px;font-weight:900;font-size:clamp(10px,2.8vw,13px);line-height:1.15;text-align:center}
+#bDiniGunler .dgd-button span{font-size:20px}
+#diniGunlerScreen{position:fixed;inset:0;z-index:100000;background:radial-gradient(ellipse at 50% 0%,#173c5a,#071326 60%,#030b17);color:#f5f0df;display:none;overflow-y:auto;padding:calc(12px + env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));box-sizing:border-box}
+#diniGunlerScreen.on{display:block}
+.dgd-wrap{max-width:900px;margin:0 auto}
+.dgd-top{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.dgd-back{border:1px solid #c79d4d;background:#0d2943;color:#f7d982;border-radius:12px;width:42px;height:42px;font-size:25px}
+.dgd-heading{flex:1;text-align:center;font-family:Georgia,serif;color:#f8d780;font-size:clamp(23px,6vw,34px);font-weight:900;text-shadow:0 2px 8px #000}
+.dgd-sub{text-align:center;color:#d4e0e8;font-size:12px;margin:-6px 0 16px}
+.dgd-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.dgd-month{border:1px solid #d5a64c;border-radius:13px;background:linear-gradient(150deg,#09213c,#06152a);box-shadow:inset 0 0 0 2px #d5a64c22;overflow:hidden}
+.dgd-month h3{text-align:center;margin:0;padding:9px 5px;background:linear-gradient(90deg,#112b47,#173b5b,#112b47);border-bottom:1px solid #b78b3b;color:#f6d781;font-family:Georgia,serif;font-size:14px;letter-spacing:.08em}
+.dgd-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;padding:8px 9px;border-bottom:1px solid #24415e;align-items:center;font-size:12px}
+.dgd-row:last-child{border-bottom:0}
+.dgd-name{line-height:1.25}
+.dgd-date{color:#f8d780;font-weight:800;white-space:nowrap;font-size:11px}
+.dgd-hijri{grid-column:1/-1;color:#a9c4d5;font-size:10px;margin-top:-2px}
+.dgd-note{text-align:center;color:#9fb8ca;font-size:10px;line-height:1.45;margin:14px auto 0;max-width:700px}
+@media(max-width:480px){.dgd-grid{gap:7px}.dgd-row{padding:7px 6px;grid-template-columns:minmax(0,1fr);gap:3px}.dgd-date{font-size:10px}.dgd-month h3{font-size:12px;padding:8px 3px}.dgd-name{font-size:11px}.dgd-hijri{font-size:9px}}
+</style>
+<div id="diniGunlerScreen" aria-hidden="true">
+ <div class="dgd-wrap">
+  <div class="dgd-top"><button class="dgd-back" type="button" aria-label="Ana sayfaya dön">‹</button><div class="dgd-heading"><span id="dgdYear"></span><br>DİNİ GÜN VE GECELER</div><div style="width:42px"></div></div>
+  <div class="dgd-sub">Rabbimiz, bizleri hayırlı gün ve gecelerde nice güzel amellere ulaştırsın.</div>
+  <div class="dgd-grid" id="dgdGrid"></div>
+  <div class="dgd-note">Tarihler Diyanet İşleri Başkanlığının dini günler takvimi esas alınarak gösterilir. Hicrî takvim gözleme göre bir gün farklılık gösterebilir.</div>
+ </div>
+</div>
+<script id="dini-gunler-feature-js">
+(function(){
+ const home=document.getElementById('sLogin'),q=document.getElementById('bQuranRead'),screen=document.getElementById('diniGunlerScreen');
+ if(!home||!q||!screen)return;
+ const btn=document.createElement('button');btn.type='button';btn.id='bDiniGunler';btn.setAttribute('aria-label','Dini gün ve geceler');btn.innerHTML='<div class="dgd-button"><span>☾</span><b>DİNİ GÜN VE GECELER</b></div>';home.appendChild(btn);
+ const months=['OCAK','ŞUBAT','MART','NİSAN','MAYIS','HAZİRAN','TEMMUZ','AĞUSTOS','EYLÜL','EKİM','KASIM','ARALIK'];
+ const events={
+  2026:[
+   ['15 Ocak','Miraç Kandili','26 Recep 1447'],['2 Şubat','Berat Kandili','14 Şaban 1447'],['19 Şubat','Ramazan Başlangıcı','1 Ramazan 1447'],['16 Mart','Kadir Gecesi','26 Ramazan 1447'],['19 Mart','Ramazan Bayramı Arefesi','29 Ramazan 1447'],['20 Mart','Ramazan Bayramı (1. Gün)','1 Şevval 1447'],['21 Mart','Ramazan Bayramı (2. Gün)','2 Şevval 1447'],['22 Mart','Ramazan Bayramı (3. Gün)','3 Şevval 1447'],['26 Mayıs','Kurban Bayramı Arefesi','9 Zilhicce 1447'],['27 Mayıs','Kurban Bayramı (1. Gün)','10 Zilhicce 1447'],['28 Mayıs','Kurban Bayramı (2. Gün)','11 Zilhicce 1447'],['29 Mayıs','Kurban Bayramı (3. Gün)','12 Zilhicce 1447'],['30 Mayıs','Kurban Bayramı (4. Gün)','13 Zilhicce 1447'],['16 Haziran','Hicrî Yılbaşı','1 Muharrem 1448'],['25 Haziran','Aşure Günü','10 Muharrem 1448'],['24 Ağustos','Mevlid Kandili','11 Rebiülevvel 1448'],['10 Aralık','Üç Ayların Başlangıcı','1 Recep 1448'],['10 Aralık','Regaib Kandili','1 Recep 1448']],
+  2027:[
+   ['4 Ocak','Miraç Kandili','27 Recep 1448'],['22 Ocak','Berat Kandili','15 Şaban 1448'],['8 Şubat','Ramazan Başlangıcı','1 Ramazan 1448'],['5 Mart','Kadir Gecesi','27 Ramazan 1448'],['8 Mart','Ramazan Bayramı Arefesi','29 Ramazan 1448'],['9 Mart','Ramazan Bayramı (1. Gün)','1 Şevval 1448'],['10 Mart','Ramazan Bayramı (2. Gün)','2 Şevval 1448'],['11 Mart','Ramazan Bayramı (3. Gün)','3 Şevval 1448'],['15 Mayıs','Kurban Bayramı Arefesi','9 Zilhicce 1448'],['16 Mayıs','Kurban Bayramı (1. Gün)','10 Zilhicce 1448'],['17 Mayıs','Kurban Bayramı (2. Gün)','11 Zilhicce 1448'],['18 Mayıs','Kurban Bayramı (3. Gün)','12 Zilhicce 1448'],['19 Mayıs','Kurban Bayramı (4. Gün)','13 Zilhicce 1448'],['6 Haziran','Hicrî Yılbaşı','1 Muharrem 1449'],['15 Haziran','Aşure Günü','10 Muharrem 1449'],['13 Ağustos','Mevlid Kandili','12 Rebiülevvel 1449'],['29 Kasım','Üç Ayların Başlangıcı','1 Recep 1449'],['2 Aralık','Regaib Kandili','1 Recep 1449'],['24 Aralık','Miraç Kandili','27 Recep 1449']]
+ };
+ function render(){
+  const year=new Date().getFullYear();document.getElementById('dgdYear').textContent=year;
+  const list=events[year]||events[2027];
+  const grouped=Array.from({length:12},()=>[]);
+  list.forEach(e=>{const parts=e[0].split(' '),mi=months.findIndex(m=>m===({'Ocak':'OCAK','Şubat':'ŞUBAT','Mart':'MART','Nisan':'NİSAN','Mayıs':'MAYIS','Haziran':'HAZİRAN','Temmuz':'TEMMUZ','Ağustos':'AĞUSTOS','Eylül':'EYLÜL','Ekim':'EKİM','Kasım':'KASIM','Aralık':'ARALIK'}[parts[1]]));if(mi>=0)grouped[mi].push(e)});
+  document.getElementById('dgdGrid').innerHTML=grouped.map((arr,i)=>'<section class="dgd-month"><h3>'+months[i]+'</h3>'+(arr.length?arr.map(e=>'<div class="dgd-row"><div class="dgd-name">'+e[1]+'</div><div class="dgd-date">'+e[0]+'</div><div class="dgd-hijri">'+e[2]+'</div></div>').join(''):'<div class="dgd-row"><div class="dgd-name" style="color:#7893a8">Bu ay için kayıtlı özel gün yok</div></div>')+'</section>').join('');
+ }
+ function fit(){if(!home.classList.contains('on'))return;const r=q.getBoundingClientRect(),hr=home.getBoundingClientRect();btn.style.left=(r.left+r.width/2-hr.left)+'px';btn.style.top=(r.bottom-hr.top+8)+'px';btn.style.width=getComputedStyle(q).width;btn.style.transform='translateX(-50%)';btn.style.setProperty('--qr-w',getComputedStyle(q).width)}
+ function open(){render();screen.classList.add('on');screen.setAttribute('aria-hidden','false');document.body.style.overflow='hidden'}
+ function close(){screen.classList.remove('on');screen.setAttribute('aria-hidden','true');document.body.style.overflow=''}
+ btn.addEventListener('click',open);screen.querySelector('.dgd-back').addEventListener('click',close);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&screen.classList.contains('on'))close()});
+ window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);window.addEventListener('load',()=>setTimeout(fit,500));
+ if(window.MutationObserver)new MutationObserver(fit).observe(home,{attributes:true,attributeFilter:['class']});
+ const oldShow=window.show;if(typeof oldShow==='function')window.show=function(id){if(screen.classList.contains('on'))close();return oldShow.apply(this,arguments)};
+ setTimeout(fit,300);
+})();
+</script>
+rçek HTML/CSS. Tüm ölçüler panel genişliğine (cqw) bağlı, her ekranda aynı oranda küçülür/büyür. */
 #frm{overflow-y:auto;align-items:flex-start;padding:46px 12px 22px;-webkit-overflow-scrolling:touch}
 #frm .frp{--arch:polygon(50% 0,59% 4.5%,80% 11%,100% 19%,100% 90%,91% 95%,62% 95%,50% 100%,38% 95%,9% 95%,0 90%,0 19%,20% 11%,41% 4.5%);--pill:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%);--rib:polygon(4% 0,96% 0,100% 50%,96% 100%,4% 100%,0 50%);
  position:relative;box-sizing:border-box;container-type:inline-size;width:min(94vw,460px,calc((100dvh - 96px)/1.08));max-width:none;max-height:none;height:auto;aspect-ratio:auto;margin:auto;overflow:visible;padding:0;
@@ -7422,6 +7483,40 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 .qb-locate[hidden]{display:none}
 .qb-hint{display:flex;align-items:center;gap:12px;max-width:340px;margin:0;color:#6b7280;font-size:14px;line-height:1.35}
 .qb-hint svg{flex:none}
+/* Kıble pusulası: uygulamanın koyu teal ve altın tonlarına uyumlu, sade görünüm */
+#sQibla{
+  background:linear-gradient(180deg,#07171b 0%,#0b2428 100%) !important;
+  color:#f3f6f4 !important;
+}
+#sQibla .qb-head b{color:#f3f6f4 !important}
+#sQibla .qb-head button{
+  background:#123238 !important;
+  color:#f4d58a !important;
+  border:1px solid rgba(244,213,138,.18) !important;
+}
+#sQibla .qb-dial{filter:drop-shadow(0 8px 22px rgba(0,0,0,.28))}
+#sQibla .qb-pointer,#sQibla .qb-dot{background:#f4d58a}
+#sQibla .qb-deg{color:#f7f3e9 !important}
+#sQibla .qb-info{
+  background:rgba(17,49,54,.94) !important;
+  border:1px solid rgba(244,213,138,.18) !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.16) !important;
+}
+#sQibla .qb-info small{color:#a9c1bd !important}
+#sQibla .qb-info b{color:#f7f3e9 !important}
+#sQibla .qb-info i{background:rgba(198,220,214,.2) !important}
+#sQibla .qb-status{color:#b7cbc7 !important}
+#sQibla .qb-status.ok{color:#86efac !important}
+#sQibla .qb-locate{
+  background:#c89b43 !important;
+  color:#102326 !important;
+  box-shadow:0 5px 14px rgba(0,0,0,.18);
+}
+#sQibla .qb-hint{color:#a9c1bd !important}
+#sQibla .qb-hint svg{color:#e4c36d !important}
+@media (max-width:380px){
+  #sQibla .qb-head b{font-size:19px}
+}
 </style>
 
 

@@ -4983,6 +4983,17 @@ function runTimer(){stop();countdownSoundStarted=false;try{countdownSound.pause(
 let legacyModalOpen=false,audienceAnimTimer=null;
 function pauseForLegacyModal(){if(timer){clearInterval(timer);timer=null}try{countdownSound.pause()}catch(e){}}
 function closeLegacyJoker(){if(audienceAnimTimer){clearInterval(audienceAnimTimer);audienceAnimTimer=null}['hc','au','veil'].forEach(id=>$(id)&&$(id).classList.remove('on'));legacyModalOpen=false;if(left>0){timer=setInterval(()=>{left--;updateRoundClock();playCountdownIfNeeded();if(left<=1){try{countdownSound.pause();countdownSound.currentTime=0}catch(e){}}if(left<=0){stop();answer(-1,true)}},1000)}}
+let mollaAnswerAudio=null;
+function playMollaAnswerSound(answerIndex){
+ const files=['a.mp3','b.mp3','c.mp3','d.mp3'];
+ try{
+  if(mollaAnswerAudio){mollaAnswerAudio.pause();mollaAnswerAudio.currentTime=0}
+  mollaAnswerAudio=new Audio(files[answerIndex]||files[0]);
+  mollaAnswerAudio.preload='auto';
+  const playing=mollaAnswerAudio.play();
+  if(playing&&playing.catch)playing.catch(()=>{});
+ }catch(e){}
+}
 function showLegacyMolla(letter,txt){pauseForLegacyModal();legacyModalOpen=true;$('hcL').textContent=letter;$('hcQ').textContent=txt;$('veil').classList.add('on');$('hc').classList.add('on')}
 function showLegacyAudience(pct,off,ok){
 pauseForLegacyModal();legacyModalOpen=true;
@@ -5038,7 +5049,7 @@ function joker(k){if(questions[at]&&questions[at].a==null){$('irNote').textConte
 used[k]=true;jokerQuestion=true;renderRoundJokers();const q=questions[at],bs=[...content.querySelectorAll('[data-answer]')];
 if(k==='feraset'){let wrong=bs.filter(b=>+b.dataset.answer!==q.a&&!b.disabled).sort(()=>Math.random()-.5).slice(0,2);wrong.forEach(b=>{b.disabled=true;b.style.opacity='.25';b.dataset.eliminated='1'});$('irNote').textContent='Feraset: iki yanlış seçenek elendi.'}
 if(k==='seyirci'){const vals=[0,1,2,3].map(n=>n===q.a?25+Math.random()*35:Math.random()*30);const sum=vals.reduce((a,b)=>a+b,0);const pct=vals.map(v=>Math.round(v/sum*100));showLegacyAudience(pct,bs.map(b=>b.disabled),q.a);return}
-if(k==='molla'){const L='ABCD'[q.a],V=['Evladım, bence cevap '+L+' şıkkı.','Bismillah, '+L+' şıkkını işaretle derim.','Bunu biliyorum! '+L+' şıkkı bence.','Maşallah, sağlam soru! Cevap '+L+' şıkkı.'];showLegacyMolla(L,V[Math.floor(Math.random()*V.length)]);return}
+if(k==='molla'){const L='ABCD'[q.a],V=['Evladım, bence cevap '+L+' şıkkı.','Bismillah, '+L+' şıkkını işaretle derim.','Bunu biliyorum! '+L+' şıkkı bence.','Maşallah, sağlam soru! Cevap '+L+' şıkkı.'];playMollaAnswerSound(q.a);showLegacyMolla(L,V[Math.floor(Math.random()*V.length)]);return}
 if(k==='ciftcevap'){doubleActive=true;doubleAttempted=false;$('irNote').textContent='Çift Cevap aktif: ilk cevabın yanlış olsa bir kez daha seçebilirsin.'}
 showJokerModal(jokerNames[k],$('irNote').innerHTML);
 }

@@ -4785,7 +4785,7 @@ function advance(delay){setTimeout(()=>{at++;loadQuestion()},delay)}
 function gameOver(){
  stop();
  try{const keep=new Set(seenQuestionIds);questions.slice(at+1).forEach(x=>keep.delete(qid(x)));resPut(cat,{roundNo:roundNo,qids:null,seen:[...keep]})}catch(e){}
- const canAd=adsRound<MAX_ROUND_ADS;
+ const canAd=true; // Canlar bitince reklamla devam seçeneği her zaman gösterilir.
  irGameOver(correct,{
   ad:canAd?()=>adReward(()=>{adsRound++;lives=3;updateStatus();hideIrModal();advance(0)},()=>{}):null,
   wrong:wrongList.length?()=>openWrongPage(wrongList.slice()):null,
@@ -7094,7 +7094,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     $('dpGoP').innerHTML='Bu oyunda <b>'+rightN+'</b> doğru yaptın. Kazandığın coinler hesabında duruyor. Kaldığın yerden devam edebilirsin.';
     box.innerHTML='';
     function mk(cls,html,fn){var b=document.createElement('button');b.type='button';b.className='dp-btn show '+cls;b.innerHTML=html;b.onclick=fn;box.appendChild(b);return b}
-    if(adsUsed<MAX_ADS&&window.__adReward)mk('blue','📺 Reklam izle · devam et',function(){window.__adReward(function(){adsUsed++;continueGame()},function(){},$('dailyPlay'))});
+    if(window.__adReward)mk('blue','📺 Reklam izle · devam et',function(){window.__adReward(function(){adsUsed++;continueGame()},function(){},$('dailyPlay'))});
     mk(bal<CONT?'dim':'','<img class="dp-coin" alt="" src="'+esc(coinSrc())+'">'+CONT+' coin ile devam et'+(bal<CONT?' <small>(Bakiye: '+bal+')</small>':''),function(){
       if(num(WK)<CONT){$('dpGoP').innerHTML='<b>Yeterli coin yok.</b> Bakiyen: '+num(WK)+' coin. Reklam izleyerek devam edebilirsin.';return}
       add(WK,-CONT);continueGame()});
@@ -7718,22 +7718,27 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 </style>
 
 <style id="dini-gunler-next-to-quran-fix">
-/* Dini Günler butonu Kur'an Okuma butonunun yanına alınır. */
-#sLogin>#bQuranRead.qrbtn{left:var(--home-pair-left,5px)!important;right:auto!important;top:var(--home-pair-top,81%)!important;bottom:auto!important;width:var(--home-pair-item,min(38vw,170px))!important;height:auto!important;aspect-ratio:520/383!important;transform:none!important;margin:0!important;}
-#sLogin>#bDiniGunler{left:var(--home-pair-dini-left,calc(5px + min(38vw,170px) + 8px))!important;top:var(--home-pair-top,81%)!important;bottom:auto!important;width:var(--home-pair-item,min(38vw,170px))!important;transform:none!important;}
+/* Ana sayfada Online Oyna'nın altında: Kur'an Oku ve Dini Gün ve Geceler yan yana. */
+#sLogin>#bQuranRead.qrbtn{left:var(--home-pair-left,5px)!important;right:auto!important;top:var(--home-pair-top,81%)!important;bottom:auto!important;width:var(--home-pair-item,min(38vw,150px))!important;height:auto!important;aspect-ratio:520/383!important;transform:none!important;margin:0!important;}
+#sLogin>#bDiniGunler{left:var(--home-pair-dini-left,calc(5px + min(38vw,150px) + 8px))!important;top:var(--home-pair-top,81%)!important;bottom:auto!important;width:var(--home-pair-item,min(38vw,150px))!important;height:var(--home-pair-height,auto)!important;transform:none!important;}
 #sLogin>#bDiniGunler .dgd-button{height:100%;min-height:0;box-sizing:border-box;padding:6px 5px;font-size:clamp(9px,2.7vw,12px)}
 @media(max-width:420px){#sLogin>#bDiniGunler .dgd-button span{font-size:17px}}
 </style>
 <script id="dini-gunler-next-to-quran-fix-js">
 (function(){
  function place(){
-  var home=document.getElementById('sLogin'),q=document.getElementById('bQuranRead'),d=document.getElementById('bDiniGunler');
-  if(!home||!q||!d)return;
-  var hr=home.getBoundingClientRect(),qr=q.getBoundingClientRect();
-  var item=Math.min(hr.width*.36,150),gap=8,total=item*2+gap,left=Math.max(5,(hr.width-total)/2);
-  var top=Math.max(0,qr.top-hr.top);
-  if(top+item*383/520>hr.height-8)top=Math.max(0,hr.height-item*383/520-8);
+  var home=document.getElementById('sLogin'),q=document.getElementById('bQuranRead'),d=document.getElementById('bDiniGunler'),online=document.getElementById('bOnline');
+  if(!home||!q||!d||!online||!home.classList.contains('on'))return;
+  var hr=home.getBoundingClientRect(),or=online.getBoundingClientRect();
+  var gap=8,pad=8,ratio=383/520;
+  var left=5,availableWidth=(hr.width-2*left-gap)/2;
+  var item=Math.min(hr.width*.36,150,availableWidth);
+  var top=Math.max(0,or.bottom-hr.top+gap);
+  var maxHeight=hr.height-top-pad;
+  if(item*ratio>maxHeight)item=Math.max(58,maxHeight/ratio);
+  var total=item*2+gap;left=Math.max(5,(hr.width-total)/2);
   home.style.setProperty('--home-pair-item',item+'px');
+  home.style.setProperty('--home-pair-height',(item*ratio)+'px');
   home.style.setProperty('--home-pair-left',left+'px');
   home.style.setProperty('--home-pair-dini-left',(left+item+gap)+'px');
   home.style.setProperty('--home-pair-top',top+'px');
@@ -7742,6 +7747,7 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
  window.addEventListener('load',function(){place();setTimeout(place,500);setTimeout(place,1600)});
  window.addEventListener('resize',later);window.addEventListener('orientationchange',later);
  var home=document.getElementById('sLogin');if(home&&window.MutationObserver)new MutationObserver(later).observe(home,{attributes:true,attributeFilter:['class']});
+ var online=document.getElementById('bOnline');if(online&&window.ResizeObserver)new ResizeObserver(later).observe(online);
  later();
 })();
 </script>

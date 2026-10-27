@@ -7031,7 +7031,24 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     var box=$('dpJmBtns');box.innerHTML='';
     btns.forEach(function(d){var b=document.createElement('button');b.type='button';b.className='dp-btn show '+(d.c||'');b.textContent=d.t;b.onclick=d.f;box.appendChild(b)});
     $('dpJm').classList.add('on')}
+  /* Ana oyundaki joker pencereleri günlük oyunda da aynen kullanılır: #jt (Feraset / Çift Cevap), #hc (Mollaya Sor), #au (Cemaat) + #veil (bulanık arka plan) */
+  var mOpen=false,audT=null;
+  function mHide(){
+    if(!mOpen)return;
+    if(audT){clearInterval(audT);audT=null}
+    ['jt','hc','au','veil'].forEach(function(id){var n=$(id);if(n)n.classList.remove('on')});
+    document.body.classList.remove('dp-jk');mOpen=false}
+  function mOpenJ(id){pauseT();jOpen=true;mOpen=true;document.body.classList.add('dp-jk');$('veil').classList.add('on');$(id).classList.add('on')}
+  function mToast(ic,main,sub){
+    $('jt').classList.remove('hoca');
+    $('jtI').textContent=ic;$('jtT').textContent='';$('jtA').textContent=main;$('jtB').textContent=sub;$('jtH').innerHTML='';
+    mOpenJ('jt')}
+  /* X butonu veya boş alana tıklayınca kapat (ana oyun / ilim yolculuğu kapatma işleyicileri çalışmasın diye capture aşamasında yakalanır) */
+  document.addEventListener('click',function(e){
+    if(!mOpen)return;var t=e.target;if(!t||!t.closest)return;
+    if(t.id==='veil'||t.closest('#jtX,#auX,#hcX')){e.stopImmediatePropagation();e.preventDefault();closeJm()}},true);
   function closeJm(silent){
+    mHide();
     var m=$('dpJm');if(m)m.classList.remove('on');var was=jOpen;jOpen=false;
     if(!silent&&was)resumeT()}
   function buyJ(k){
@@ -7043,19 +7060,33 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   function jFeraset(){
     var bs=[].slice.call($('dpO').children).filter(function(b){return+b.dataset.oi!==cur.a&&!b.disabled});
     sh(bs).slice(0,2).forEach(function(b){b.classList.add('off');b.disabled=true});
-    jToast('✨ Feraset: iki yanlış şık elendi')}
-  function jCift(){dbl=true;jToast('✌️ Çift Cevap: ilk cevabın yanlışsa bir hakkın daha var')}
+    mToast('✨','Feraset','İki yanlış şık elendi, kalan iki şıktan birini seç.')}
+  function jCift(){dbl=true;mToast('✌️','Çift Cevap','İlk cevabın yanlışsa bir hakkın daha var, tekrar seçebilirsin.')}
   function jMolla(){
     var L='ABCD'[order.indexOf(cur.a)],V=['Evladım, bence cevap '+L+' şıkkı.','Bismillah, '+L+' şıkkını işaretle derim.','Bunu biliyorum! '+L+' şıkkı bence.','Maşallah, sağlam soru! Cevap '+L+' şıkkı.'];
-    openJm('🧕','Mollaya Sordun','<div class="dp-mola"><b>'+L+'</b>“'+esc(V[Math.floor(Math.random()*V.length)])+'”</div>',[{t:'Tamam',c:'',f:function(){closeJm()}}])}
+    $('hcL').textContent=L;$('hcQ').textContent='“'+V[Math.floor(Math.random()*V.length)]+'”';mOpenJ('hc')}
   function jSeyirci(){
-    var bs=[].slice.call($('dpO').children),ok=order.indexOf(cur.a),raw=[],sum=0,i;
-    bs.forEach(function(b,k){var off=b.disabled;raw[k]=off?0:(k===ok?55+Math.random()*20:Math.random()*20);sum+=raw[k]});
+    var bs=[].slice.call($('dpO').children),ok=order.indexOf(cur.a),off=bs.map(function(b){return b.disabled}),raw=[],sum=0;
+    bs.forEach(function(b,k){raw[k]=off[k]?0:(k===ok?55+Math.random()*20:Math.random()*20);sum+=raw[k]});
     var p=raw.map(function(x){return Math.round(x/sum*100)}),tot=p.reduce(function(a,b){return a+b},0);
     p[ok]+=100-tot;
-    var h='<div class="dp-au">'+bs.map(function(b,k){var off=b.disabled;return'<div class="dp-aur'+(off?' off':'')+'"><span class="l">'+'ABCD'[k]+'</span><div class="b"><i data-w="'+p[k]+'"></i></div><span class="p">'+(off?'—':p[k]+'%')+'</span></div>'}).join('')+'</div>';
-    openJm('👥','Cemaatin Cevabı',h,[{t:'Tamam',c:'',f:function(){closeJm()}}]);
-    setTimeout(function(){var rows=$('dpJmB').querySelectorAll('.dp-aur');Array.prototype.forEach.call(rows,function(r,k){var bar=r.querySelector('i');if(bar)bar.style.width=bar.getAttribute('data-w')+'%'});if(rows[ok])setTimeout(function(){rows[ok].classList.add('top')},1000)},80)}
+    $('auRows').innerHTML=p.map(function(x,n){return'<div class="aur'+(off[n]?' off':'')+'"><span class="aul">'+'ABCD'[n]+'</span><div class="aub"><i></i></div><span class="aup">'+(off[n]?'—':'0%')+'</span></div>'}).join('');
+    var rows=[].slice.call(document.querySelectorAll('#auRows .aur'));
+    mOpenJ('au');
+    /* 1-2 sn: çubuklar rastgele uzayıp kısalır, sonra gerçek sonuç + doğru şık vurgusu */
+    var T0=Date.now(),DUR=1500+Math.random()*500;
+    function setBars(vals,tr){rows.forEach(function(r,n){if(off[n])return;var bar=r.querySelector('i');bar.style.transition='width '+tr+'ms ease-in-out';bar.style.width=vals[n]+'%';r.querySelector('.aup').textContent=Math.round(vals[n])+'%'})}
+    function rnd(){return p.map(function(x,n){return off[n]?0:6+Math.random()*88})}
+    requestAnimationFrame(function(){requestAnimationFrame(function(){setBars(rnd(),170)})});
+    if(audT)clearInterval(audT);
+    audT=setInterval(function(){
+      if(!$('au').classList.contains('on')){clearInterval(audT);audT=null;return}
+      if(Date.now()-T0>=DUR){
+        clearInterval(audT);audT=null;
+        setBars(p,500);
+        setTimeout(function(){if(!$('au').classList.contains('on'))return;if(rows[ok])rows[ok].classList.add('top');try{vib([40,30,80])}catch(e){}try{playUiClick()}catch(e){}},500);
+        return}
+      setBars(rnd(),170)},180)}
   function useJ(k){
     var x=jInv();
     if(x[k]<1){buyJ(k);return}
@@ -7113,8 +7144,11 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 <style id="dp-toast-cfm">
 #dailyPlay .dp-bank{top:50%;z-index:6;padding:16px 18px;font-size:16px;transform:translate(-50%,-42%)}
 #dailyPlay .dp-bank.on{transform:translate(-50%,-50%)}
-#dailyPlay .dp-cfm{z-index:5;align-items:center;justify-content:center;padding:22px;background:rgba(1,12,8,.55);-webkit-backdrop-filter:none;backdrop-filter:none}
+#dailyPlay .dp-cfm{z-index:5;align-items:center;justify-content:center;padding:22px;background:rgba(1,12,8,.4);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 #dailyPlay .dp-blur{z-index:6;background:rgba(1,12,8,.38);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+/* günlük oyunda ana oyundaki joker pencereleri (#jt, #hc, #au, #veil) günlük oyunun üstünde açılır */
+body.dp-jk #veil{z-index:2147483001}
+body.dp-jk #jt,body.dp-jk #hc,body.dp-jk #au{z-index:2147483002}
 #dailyPlay .dp-o.sel{box-shadow:0 6px 0 #6b5720,0 0 0 3px #ffe08a,0 0 20px rgba(255,224,138,.6),inset 0 2px 0 rgba(255,255,255,.32)}
 </style>
 

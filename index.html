@@ -7069,7 +7069,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     pauseT();jOpen=true;
     $('dpJmIc').textContent=ic;$('dpJmT').textContent=title;$('dpJmB').innerHTML=body||'';
     var box=$('dpJmBtns');box.innerHTML='';
-    btns.forEach(function(d){var b=document.createElement('button');b.type='button';b.className='dp-btn show '+(d.c||'');b.textContent=d.t;b.onclick=d.f;box.appendChild(b)});
+    btns.forEach(function(d){var b=document.createElement('button');b.type='button';b.className='dp-btn show '+(d.c||'');if(d.html)b.innerHTML=d.html;else b.textContent=d.t;b.onclick=d.f;box.appendChild(b)});
     $('dpJm').classList.add('on')}
   /* Ana oyundaki joker pencereleri günlük oyunda da aynen kullanılır: #jt (Feraset / Çift Cevap), #hc (Mollaya Sor), #au (Cemaat) + #veil (bulanık arka plan) */
   var mOpen=false,audT=null;
@@ -7092,18 +7092,32 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     var m=$('dpJm');if(m)m.classList.remove('on');var was=jOpen;jOpen=false;
     if(!silent&&was)resumeT()}
   function buyJ(k){
-    openJm('🪙',JN[k]+' hakkın bitti','<p>'+JP[k]+' coin ile 1 adet satın alabilirsin.<br>Bakiyen: <b>'+scVal()+'</b> coin</p>',[
-      {t:'Satın al · '+JP[k]+' coin',c:'',f:function(){
+    var src=coinSrc(),canAd=adsUsed<MAX_ADS&&!!window.__adReward;
+    openJm('',JN[k]+' hakkın bitti','<p>Bu jokerin kalmadı. Nasıl devam etmek istersin?</p><p>Bakiyen: <b>'+scVal()+'</b> coin</p>',[
+      {html:'<img class="dp-coin" alt="" src="'+esc(src)+'"> Coin ile al · '+JP[k]+' coin',c:'',f:function(){
         if(!spend(JP[k])){$('dpJmB').innerHTML='<p><b>Yeterli coin yok.</b> Soruları doğru cevaplayarak coin kazanabilirsin.</p>';return}
-        var x=jInv();x[k]++;jSave(x);paintJ();closeJm()}},
-      {t:'Vazgeç',c:'glass',f:function(){closeJm()}}])}
+        var x=jInv();x[k]++;jSave(x);paintJ();closeJm();useJ(k)}},
+      ...(canAd?[{t:'📺 Reklam izle · 1 joker kazan',c:'blue',f:function(){window.__adReward(function(){adsUsed++;saveLives();var x=jInv();x[k]++;jSave(x);paintJ();closeJm();useJ(k)},function(){},$('dailyPlay'))}}]:[]),
+      {t:'Vazgeç',c:'glass',f:function(){closeJm()}}]);
+    if(src)$('dpJmIc').innerHTML='<img class="dp-coin" alt="" src="'+esc(src)+'">';
+  }
   function jFeraset(){
     var bs=[].slice.call($('dpO').children).filter(function(b){return+b.dataset.oi!==cur.a&&!b.disabled});
     sh(bs).slice(0,2).forEach(function(b){b.classList.add('off');b.disabled=true});
     mToast('✨','Feraset','İki yanlış şık elendi, kalan iki şıktan birini seç.')}
   function jCift(){dbl=true;mToast('✌️','Çift Cevap','İlk cevabın yanlışsa bir hakkın daha var, tekrar seçebilirsin.')}
   function jMolla(){
-    var L='ABCD'[order.indexOf(cur.a)],V=['Evladım, bence cevap '+L+' şıkkı.','Bismillah, '+L+' şıkkını işaretle derim.','Bunu biliyorum! '+L+' şıkkı bence.','Maşallah, sağlam soru! Cevap '+L+' şıkkı.'];
+    var answerIndex=order.indexOf(cur.a);
+    var L='ABCD'[answerIndex],V=['Evladım, bence cevap '+L+' şıkkı.','Bismillah, '+L+' şıkkını işaretle derim.','Bunu biliyorum! '+L+' şıkkı bence.','Maşallah, sağlam soru! Cevap '+L+' şıkkı.'];
+    /* Günlük sorularda da doğru şıkkın sesini çal. Dosyalar index.html ile aynı klasörde olmalı. */
+    try{
+      if(window.dailyMollaAudio){window.dailyMollaAudio.pause();window.dailyMollaAudio.currentTime=0}
+      window.dailyMollaAudio=new Audio(new URL(['a.mp3','b.mp3','c.mp3','d.mp3'][answerIndex]||'a.mp3',document.baseURI).href);
+      window.dailyMollaAudio.preload='auto';
+      var playPromise=window.dailyMollaAudio.play();
+      if(playPromise&&playPromise.catch)playPromise.catch(function(err){console.warn('Mollaya Sor ses dosyası çalınamadı:',err)});
+      window.dailyMollaAudio.addEventListener('error',function(){console.warn('Mollaya Sor ses dosyası yüklenemedi:',window.dailyMollaAudio.src)});
+    }catch(err){console.warn('Mollaya Sor ses hatası:',err)}
     $('hcL').textContent=L;$('hcQ').textContent='“'+V[Math.floor(Math.random()*V.length)]+'”';mOpenJ('hc')}
   function jSeyirci(){
     var bs=[].slice.call($('dpO').children),ok=order.indexOf(cur.a),off=bs.map(function(b){return b.disabled}),raw=[],sum=0;

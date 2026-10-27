@@ -7716,3 +7716,32 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #dpWrongs .dpw-e{margin-top:4px;font-size:12px;line-height:1.4;color:#d6f5e4;opacity:.9}
 #dpWrongs .dp-btn{margin-top:0}
 </style>
+
+<style id="dini-gunler-next-to-quran-fix">
+/* Dini Günler butonu Kur'an Okuma butonunun yanına alınır. */
+#sLogin>#bQuranRead.qrbtn{left:var(--home-pair-left,5px)!important;right:auto!important;top:var(--home-pair-top,81%)!important;bottom:auto!important;width:var(--home-pair-item,min(38vw,170px))!important;height:auto!important;aspect-ratio:520/383!important;transform:none!important;margin:0!important;}
+#sLogin>#bDiniGunler{left:var(--home-pair-dini-left,calc(5px + min(38vw,170px) + 8px))!important;top:var(--home-pair-top,81%)!important;bottom:auto!important;width:var(--home-pair-item,min(38vw,170px))!important;transform:none!important;}
+#sLogin>#bDiniGunler .dgd-button{height:100%;min-height:0;box-sizing:border-box;padding:6px 5px;font-size:clamp(9px,2.7vw,12px)}
+@media(max-width:420px){#sLogin>#bDiniGunler .dgd-button span{font-size:17px}}
+</style>
+<script id="dini-gunler-next-to-quran-fix-js">
+(function(){
+ function place(){
+  var home=document.getElementById('sLogin'),q=document.getElementById('bQuranRead'),d=document.getElementById('bDiniGunler');
+  if(!home||!q||!d)return;
+  var hr=home.getBoundingClientRect(),qr=q.getBoundingClientRect();
+  var item=Math.min(hr.width*.36,150),gap=8,total=item*2+gap,left=Math.max(5,(hr.width-total)/2);
+  var top=Math.max(0,qr.top-hr.top);
+  if(top+item*383/520>hr.height-8)top=Math.max(0,hr.height-item*383/520-8);
+  home.style.setProperty('--home-pair-item',item+'px');
+  home.style.setProperty('--home-pair-left',left+'px');
+  home.style.setProperty('--home-pair-dini-left',(left+item+gap)+'px');
+  home.style.setProperty('--home-pair-top',top+'px');
+ }
+ var timer;function later(){clearTimeout(timer);timer=setTimeout(place,80)}
+ window.addEventListener('load',function(){place();setTimeout(place,500);setTimeout(place,1600)});
+ window.addEventListener('resize',later);window.addEventListener('orientationchange',later);
+ var home=document.getElementById('sLogin');if(home&&window.MutationObserver)new MutationObserver(later).observe(home,{attributes:true,attributeFilter:['class']});
+ later();
+})();
+</script>

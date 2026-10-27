@@ -2375,7 +2375,7 @@ const RANKS=['Talebe','Yolcu','Çırak','Mütefekkir','Muallim','Üstad'];
 function rankIdx(){let p=0;try{p=Math.max(+localStorage.getItem('islamibilgi_pts')||0,+localStorage.getItem('ilimJourneyPointsV1')||0)}catch(e){}const N=[2500,5000,10000,20000,30000,40000];let r=-1;for(let i=0;i<N.length;i++)if(p>=N[i])r=i;return r}
 function homePts(){let p=0;try{p=Math.max(+localStorage.getItem('islamibilgi_pts')||0,+localStorage.getItem('ilimJourneyPointsV1')||0)}catch(e){}return p}
 function rankName(){const i=rankIdx();return i>=0?RANKS[i]:''}
-function homeUpd(){let n='';try{n=(localStorage.getItem('islamibilgi_name')||'').trim()}catch(e){}const r=rankName();$('hName').textContent=n?(r?r:'✨ '+homePts()+' P'):''}setInterval(function(){try{homeUpd()}catch(e){}},1200);
+function homeUpd(){let n='';try{n=(localStorage.getItem('islamibilgi_name')||'').trim()}catch(e){}const r=rankName(),h=n?'<span class="hn-r">'+(r||'Rütbesiz')+'</span><span class="hn-p">✨ '+homePts().toLocaleString('tr-TR')+' P</span>':'',e=$('hName');if(e.dataset.h!==h){e.dataset.h=h;e.innerHTML=h}}setInterval(function(){try{homeUpd()}catch(e){}},1200);
 
 
 function tick(){el++;draw()}
@@ -2652,7 +2652,7 @@ const PTS_KEY='islamibilgi_pts';
 const RK_NEED=[2500,5000,10000,20000,30000,40000];
 function ptsGet(){let v=0;try{v=Math.max(+localStorage.getItem(PTS_KEY)||0,+localStorage.getItem('ilimJourneyPointsV1')||0)}catch(e){}return v>0?v:0}
 function ptsAdd(n){/* eski mod puanı kapalı: tek kaynak ilimJourneyPointsV1 */}
-function rkOpen(i){return ptsGet()>=RK_NEED[i]}
+function rkOpen(i){return true}/* rütbe avatarları artık kilitsiz: puan şartı yok, hepsi seçilebilir */
 function rkLockUpd(){document.querySelectorAll('#profm .pmr').forEach((el,i)=>{const o=rkOpen(i);el.classList.toggle('lock',!o);el.setAttribute('aria-disabled',o?'false':'true');let t=el.querySelector('.pmk');if(!t){t=document.createElement('div');t.className='pmk';el.querySelector('.pmc').appendChild(t)}t.innerHTML=o?'':'<b>🔒</b><span>'+fmt(RK_NEED[i])+' P</span>'})}
 function rkHint(i){const h=document.querySelector('#profm .pmh');if(!h)return;if(!h.dataset.t)h.dataset.t=h.textContent;h.textContent='Açmak için '+fmt(RK_NEED[i])+' puan gerekli';h.classList.add('msg');clearTimeout(rkHint.t);rkHint.t=setTimeout(()=>{h.textContent=h.dataset.t;h.classList.remove('msg')},2600);try{vib(40)}catch(e){}}
 function rkGet(){let v=-1;try{const t=localStorage.getItem(RK_KEY);if(t!==null)v=+t}catch(e){}return v>=0&&v<6&&rkOpen(v)?v:-1}
@@ -6287,6 +6287,22 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .dgd-note{text-align:center;color:#9fb8ca;font-size:10px;line-height:1.45;margin:14px auto 0;max-width:700px}
 @media(max-width:480px){.dgd-grid{gap:7px}.dgd-row{padding:7px 6px;grid-template-columns:minmax(0,1fr);gap:3px}.dgd-date{font-size:10px}.dgd-month h3{font-size:12px;padding:8px 3px}.dgd-name{font-size:11px}.dgd-hijri{font-size:9px}}
 </style>
+<style id="home-rank-label">
+/* Ana sayfa sol üst: gerçek rütbe (ilim puanına göre) + puan, iki satır */
+#sLogin .hb .hn{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:2px;line-height:1.05!important;padding:5px 12px!important;border-radius:16px!important}
+#sLogin .hb .hn .hn-r,#sLogin .hb .hn .hn-p{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#sLogin .hb .hn .hn-r{font-size:13px;font-weight:900}
+#sLogin .hb .hn .hn-p{font-size:10.5px;font-weight:800;color:#ffe08a}
+</style>
+<style id="home-rank-avatar-fit">
+/* Ana sayfa sol üst: rütbe avatarı seçilince rozetin boş kenarları kesilir, görsel yuvarlak içinde büyük ve net görünür */
+#sLogin .hb .hav.rkav{width:46px!important;height:46px!important;border-radius:50%!important;object-fit:cover;object-view-box:inset(32px 60px 154px 60px);box-sizing:border-box;border:2px solid #f2cf6a;box-shadow:0 0 0 1px #7a560f,0 3px 8px rgba(0,0,0,.6);filter:none!important}
+@media(min-width:601px){#sLogin .hb .hav.rkav{width:49px!important;height:49px!important}}
+</style>
+<style id="profile-rank-avatar-fit">
+/* Profilde rütbe avatarı seçilince: rozetin çerçevesi/saydam kenarları gizlenir, görsel daireyi tam doldurur (rütbesiz fotoğraf gibi) */
+#profm .pm-av.pmon img{position:absolute;display:block;width:166.7%;height:auto;max-width:none;left:-33.3%;top:-17.8%;object-fit:fill;object-position:50% 50%}
+</style>
 <style id="dini-gunler-onescreen">
 /* Dini Gün ve Geceler: kaydırma yok, boş aylar gizli, tüm boşluk tek ekranda kullanılır */
 #diniGunlerScreen{overflow:hidden!important;height:100vh;height:100dvh;padding:calc(8px + env(safe-area-inset-top)) 10px calc(8px + env(safe-area-inset-bottom))!important}
@@ -6304,6 +6320,13 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #diniGunlerScreen .dgd-date{font-size:calc(10.5px*var(--s,1))}
 #diniGunlerScreen .dgd-hijri{font-size:calc(9px*var(--s,1));margin-top:0}
 #diniGunlerScreen .dgd-note{flex:none;margin:6px auto 0;font-size:clamp(7.5px,1.25vh,10px);line-height:1.3}
+#diniGunlerScreen .dgd-row.dgd-next{position:relative;z-index:1;background:linear-gradient(90deg,rgba(255,214,102,.16),rgba(255,214,102,.05));animation:dgdNeon 1.5s ease-in-out infinite alternate}
+#diniGunlerScreen .dgd-row.dgd-next .dgd-name,#diniGunlerScreen .dgd-row.dgd-next .dgd-date{color:#fff6cf;animation:dgdNeonTx 1.5s ease-in-out infinite alternate}
+#diniGunlerScreen .dgd-row.dgd-next .dgd-hijri{color:#ffe9a6}
+#diniGunlerScreen .dgd-row.dgd-next .dgd-hijri b{color:#fff;text-shadow:0 0 6px #ffd45a,0 0 12px #ff9f1c}
+@keyframes dgdNeon{from{box-shadow:inset 0 0 4px 1px rgba(255,205,80,.45),inset 0 0 12px rgba(255,170,40,.18);outline:1px solid rgba(255,214,102,.55);outline-offset:-1px}to{box-shadow:inset 0 0 9px 2px rgba(255,225,120,.95),inset 0 0 26px rgba(255,160,30,.5);outline:1px solid rgba(255,236,150,1);outline-offset:-1px}}
+@keyframes dgdNeonTx{from{text-shadow:0 0 3px rgba(255,214,102,.6)}to{text-shadow:0 0 5px #ffe58a,0 0 12px #ffb62e,0 0 20px #ff8a00}}
+@media(prefers-reduced-motion:reduce){#diniGunlerScreen .dgd-row.dgd-next,#diniGunlerScreen .dgd-row.dgd-next .dgd-name,#diniGunlerScreen .dgd-row.dgd-next .dgd-date{animation:none}}
 </style>
 <div id="diniGunlerScreen" aria-hidden="true">
  <div class="dgd-wrap">
@@ -6331,8 +6354,14 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   const grouped=Array.from({length:12},()=>[]);
   list.forEach(e=>{const parts=e[0].split(' '),mi=months.findIndex(m=>m===({'Ocak':'OCAK','Şubat':'ŞUBAT','Mart':'MART','Nisan':'NİSAN','Mayıs':'MAYIS','Haziran':'HAZİRAN','Temmuz':'TEMMUZ','Ağustos':'AĞUSTOS','Eylül':'EYLÜL','Ekim':'EKİM','Kasım':'KASIM','Aralık':'ARALIK'}[parts[1]]));if(mi>=0)grouped[mi].push(e)});
   const grid=document.getElementById('dgdGrid');
+  const TR=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+  const dOf=e=>{const p=e[0].split(' ');return new Date(year,TR.indexOf(p[1]),+p[0]).getTime()};
+  const t0=new Date();t0.setHours(0,0,0,0);
+  let nextT=null;list.forEach(e=>{const t=dOf(e);if(t>=t0.getTime()&&(nextT===null||t<nextT))nextT=t});
+  const left=nextT===null?0:Math.round((nextT-t0.getTime())/864e5);
+  const leftTxt=left===0?'Bugün':left===1?'Yarın':left+' gün kaldı';
   const shown=grouped.map((arr,i)=>({arr:arr,i:i})).filter(o=>o.arr.length);
-  grid.innerHTML=shown.map((o,n)=>'<section class="dgd-month"'+((n===shown.length-1&&shown.length%2===1)?' style="grid-column:1/-1"':'')+'><h3>'+months[o.i]+'</h3>'+o.arr.map(e=>'<div class="dgd-row"><div class="dgd-name">'+e[1]+'</div><div class="dgd-date">'+e[0]+'</div><div class="dgd-hijri">'+e[2]+'</div></div>').join('')+'</section>').join('');
+  grid.innerHTML=shown.map((o,n)=>'<section class="dgd-month"'+((n===shown.length-1&&shown.length%2===1)?' style="grid-column:1/-1"':'')+'><h3>'+months[o.i]+'</h3>'+o.arr.map(e=>{const nx=nextT!==null&&dOf(e)===nextT;return '<div class="dgd-row'+(nx?' dgd-next':'')+'"><div class="dgd-name">'+e[1]+'</div><div class="dgd-date">'+e[0]+'</div><div class="dgd-hijri">'+e[2]+(nx?' · <b>'+leftTxt+'</b>':'')+'</div></div>'}).join('')+'</section>').join('');
   const w=[];for(let r=0;r<Math.ceil(shown.length/2);r++){const x=shown[2*r],y=shown[2*r+1];w.push(Math.max(x?x.arr.length:0,y?y.arr.length:0)+.9)}
   grid.style.gridTemplateRows=w.map(v=>'minmax(0,'+v+'fr)').join(' ');
   fitOne()

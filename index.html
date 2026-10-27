@@ -6950,7 +6950,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     var q=cur,ok=oi===q.a,btns=$('dpO').children;
     for(var i=0;i<btns.length;i++){var b=btns[i],v=+b.dataset.oi;b.disabled=true;
       if(v===q.a)b.classList.add('ok');else if(v===oi)b.classList.add('no');else b.classList.add('dim')}
-    answered++;if(ok){eC+=COIN;rightN++}else{lives=Math.max(0,lives-1);wrongs.push({q:q.q,a:q.o[q.a],e:q.e||''});paintHearts()}
+    answered++;if(ok){eC+=COIN;rightN++}else{lives=Math.max(0,lives-1);saveLives();wrongs.push({q:q.q,a:q.o[q.a],e:q.e||''});paintHearts()}
     if(banked){if(ok)add(WK,COIN);if(answered%MIN_Q===0){justBanked=true;bankedAmt=0}}
     else if(answered>=MIN_Q){banked=true;bankedAmt=eC;justBanked=true;if(eC>0)add(WK,eC)}
     var my=sess,from=$('dpO').querySelector('.dp-o.ok'),went=false;
@@ -6980,6 +6980,11 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
       a.onfinish=(function(c){return function(){if(c.parentNode)c.parentNode.removeChild(c);if(my===sess)bump();if(--left===0)done()}})(c)}}
 
   /* ---- 3 can sistemi ---- */
+  /* Canlar günün sonuna kadar kayıtlı kalır: oyundan çıkıp girmek can yenilemez (gece 00:00'da 3'e döner) */
+  var LK='islamibilgiDailyLivesV1';
+  function today(){var d=new Date();return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate()}
+  function loadLives(){try{var x=JSON.parse(localStorage.getItem(LK)||'{}');if(x.d===today())return{l:Math.max(0,Math.min(3,+x.l)),a:Math.max(0,+x.a||0)}}catch(e){}return{l:3,a:0}}
+  function saveLives(){try{localStorage.setItem(LK,JSON.stringify({d:today(),l:lives,a:adsUsed}))}catch(e){}}
   function paintHearts(){var h=$('dpHearts');if(!h)return;var t='';for(var i=0;i<3;i++)t+='<span class="dp-heart'+(i<lives?'':' lost')+'">'+(i<lives?'\u2764\ufe0f':'\ud83d\udda4')+'</span>';h.innerHTML=t}
   function hideGo(){var g=$('irGoModal');if(g)g.classList.remove('show');var d=$('dpGo');if(d)d.classList.remove('on');var w=$('dpWrongs');if(w)w.classList.remove('on')}
   function showWrongs(){
@@ -6987,7 +6992,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     p.innerHTML='<div class="dpw-card"><h3>Yanlışlarım</h3><div class="dpw-list">'+wrongs.map(function(w,i){return'<div class="dpw-item"><div class="dpw-q">'+(i+1)+'. '+esc(w.q)+'</div><div class="dpw-a"><b>Doğru cevap:</b> '+esc(w.a)+'</div>'+(w.e?'<div class="dpw-e">'+esc(w.e)+'</div>':'')+'</div>'}).join('')+'</div><button type="button" class="dp-btn gold show" id="dpwBack">Geri</button></div>';
     p.classList.add('on');$('dpwBack').onclick=function(){p.classList.remove('on')}}
   /* ---- Canlar bitince: reklam izle YA DA 50 coin ile kaldığın yerden devam ---- */
-  function continueGame(){lives=3;hideGo();paintHearts();paintSc();ask()}
+  function continueGame(){lives=3;saveLives();hideGo();paintHearts();paintSc();ask()}
   function showGo(){
     var box=$('dpGoBtns'),bal=num(WK);
     $('dpGoP').innerHTML='Bu oyunda <b>'+rightN+'</b> doğru yaptın. Kazandığın coinler hesabında duruyor. Kaldığın yerden devam edebilirsin.';
@@ -6998,7 +7003,6 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
       if(num(WK)<CONT){$('dpGoP').innerHTML='<b>Yeterli coin yok.</b> Bakiyen: '+num(WK)+' coin. Reklam izleyerek devam edebilirsin.';return}
       add(WK,-CONT);continueGame()});
     if(wrongs.length)mk('glass','❌ Yanlışlarımı gör ('+wrongs.length+')',showWrongs);
-    mk('glass','🔄 Yeni oyun',function(){hideGo();start()});
     mk('red','🏠 Ana sayfa',function(){hideGo();close()});
     $('dpGo').classList.add('on')}
   function gameOver(){
@@ -7010,9 +7014,11 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   function start(){
     if(!bank.length){alert('Soru bankası yüklenemedi.');return false}
     sess++;hideCfm();pendingNext=false;s=load();queue=[];eC=0;lastText='';answered=0;banked=false;justBanked=false;bankedAmt=0;hideBank();clearTimeout(fbTimer);
-    lives=3;adsUsed=0;rightN=0;wrongs=[];dbl=false;jUsed={};closeJm(true);hideGo();paintHearts();setJokerImgs();paintJ();
+    var lv=loadLives();lives=lv.l;adsUsed=lv.a;rightN=0;wrongs=[];dbl=false;jUsed={};closeJm(true);hideGo();paintHearts();setJokerImgs();paintJ();
     $('dpFb').classList.remove('on');$('dpExit').classList.remove('on');
-    setCoinImgs();$('dpGame').classList.add('on');ask();return true}
+    setCoinImgs();$('dpGame').classList.add('on');
+    if(lives<=0){banked=true;paintSc();showGo();return true}
+    ask();return true}
   function close(){sess++;closeJm(true);hideGo();hideCfm();pendingNext=false;hideBank();clearInterval(tmr);clearTimeout(fbTimer);stopCd();Array.prototype.forEach.call(document.querySelectorAll('.dp-fly'),function(n){n.remove()});$('dpFb').classList.remove('on');$('dpExit').classList.remove('on');$('dailyPlay').classList.remove('on')}
 
   /* ---- Jokerler (ana oyundaki stok + fiyatlarla aynı: islamQuizJokersV1) ---- */

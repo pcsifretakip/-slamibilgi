@@ -4767,7 +4767,7 @@ function savedIlimLives(){try{const n=Number(localStorage.getItem(ILIM_LIVES_KEY
 function saveIlimLives(){try{localStorage.setItem(ILIM_LIVES_KEY,String(Math.max(0,Math.min(3,lives))))}catch(e){}}
 let lives=savedIlimLives(),streak=0,bestStreak=0,adsRound=0;
 const MAX_ROUND_ADS=3,AD_DAY_MAX=5,ADK='ilimAdJokerDayV1';
-function streakBonus(n){return n>=7?10:n>=5?7:n>=3?5:0}
+function streakBonus(n){return 0}/* seri bonusu kaldırıldı */
 function adToday(){try{const x=JSON.parse(localStorage.getItem(ADK)||'{}');const d=new Date().toISOString().slice(0,10);return x.d===d?(x.n||0):0}catch(e){return 0}}
 function adCount(){try{localStorage.setItem(ADK,JSON.stringify({d:new Date().toISOString().slice(0,10),n:adToday()+1}))}catch(e){}}
 (function(){if(document.getElementById('irLsStyle'))return;const st=document.createElement('style');st.id='irLsStyle';st.textContent=`
@@ -4826,9 +4826,8 @@ function irModal(icon,title,sub,btns){
  const box=m.querySelector('.am-btns');
  btns.filter(Boolean).forEach(b=>{const e=document.createElement('button');e.type='button';e.className='am-'+b.c;e.textContent=b.t;e.onclick=b.f;box.appendChild(e)});
  m.classList.add('show')}
-function updateStatus(){saveIlimLives();const el=$('irStatus');if(!el)return;let h='';for(let i=0;i<3;i++)h+='<span class="ir-heart">'+(i<lives?'❤️':'🖤')+'</span>';
- const nb=streakBonus(streak+1);
- el.innerHTML='<div class="ir-hearts">'+h+'</div><div class="ir-streak'+(streak>=3?' hot':'')+'">🔥 Seri <b>'+streak+'</b>'+(nb?'<small>Sonraki doğru +'+nb+' puan</small>':'<small>3 seri = bonus puan</small>')+'</div>'}
+function updateStatus(brk){saveIlimLives();const el=$('irStatus');let h='';for(let i=0;i<3;i++)h+=(i===brk?'<span class="ir-heart brk"><i class="hl">❤️</i><i class="hr">❤️</i></span>':'<span class="ir-heart">'+(i<lives?'❤️':'🖤')+'</span>');const hb=$('irHearts');if(hb)hb.innerHTML=h;if(!el)return;
+ el.innerHTML=''}
 function advance(delay){setTimeout(()=>{at++;loadQuestion()},delay)}
 function gameOver(){
  stop();
@@ -4841,7 +4840,7 @@ function gameOver(){
   home:()=>{hideIrModal();close()}})}
 function handleWrong(){
  const had=streak;
- const proceed=saved=>{if(!saved){streak=0;lives=Math.max(0,lives-1)}updateStatus();if(lives<=0&&!saved){gameOver();return}advance(850)};
+ const proceed=saved=>{let lost=-1;if(!saved){streak=0;const old=lives;lives=Math.max(0,lives-1);if(lives<old)lost=lives;try{navigator.vibrate&&navigator.vibrate(140)}catch(e){}}updateStatus(lost);if(lives<=0&&!saved){setTimeout(gameOver,1100);return}advance(lost>=0?1100:850)};
  if(had>=3){
   const ask=()=>irModal('🔥','Serin bozuluyor!',had+' seri kaybolacak ve bir canın gidecek.',[
    adsRound<MAX_ROUND_ADS?{t:'📺 Reklam izle · Seriyi ve canı kurtar',c:'ad',f:()=>adReward(()=>{adsRound++;hideIrModal();proceed(true)},()=>{})}:null,
@@ -5008,7 +5007,7 @@ hideConfirm();hideIrModal();stop();locked=false;if(at>=10){results();return}
 resumeSave();const q=questions[at];time=30;left=time;jokerQuestion=false;doubleActive=false;doubleAttempted=false;used={};/* joker kilidi tur boyunca değil, soru başına: her yeni soruda joker yeniden kullanılabilir/satın alınabilir */
 const dirhemSrc=(document.getElementById('dirhemIc')||{}).src||'';
  const jokerAsset=k=>{const ids={feraset:'#l5 img',seyirci:'#la img',molla:'#lp img',ciftcevap:'#l2 img'};const el=document.querySelector(ids[k]);return el?el.src:''};
- content.innerHTML='<div class="ir-toprow"><button type="button" class="ir-back" id="irQHome">‹ Ana Sayfa</button><div class="ir-wallet"><img class="ir-dirhem-img" src="'+dirhemSrc+'" alt=""><b id="irWalletValue">'+wallet()+'</b></div></div><div class="ir-topbar"><button type="button" class="ir-profile" id="irProfile" aria-label="Profil"><img src="'+escape((document.getElementById("hAv")||{}).src||"")+'" alt="Profil"><span class="ir-profile-points">✨ <b id="irProfilePoints">'+points()+'</b></span></button><div class="ir-rank-mini ir-rank-next-profile" id="irRankMini">'+rankProgressHTML()+'</div></div><div class="ir-status" id="irStatus"></div><div class="ir-hud"><div class="ir-progress-shell"><div class="ir-progress-label" id="irQLabel"><span class="ir-pill ir-pill-round">BÖLÜM '+roundNo+' / '+(cat==='fikih'?fkRounds():30)+'</span><span class="ir-pill ir-pill-q">SORU '+(at+1)+' / 10</span></div><div class="ir-progress"><i id="irQuestionProgress" style="width:'+((at+1)/10*100)+'%"></i></div></div><div class="ir-countdown" id="irCountdown"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ir-ring-bg" cx="32" cy="32" r="25"></circle><circle class="ir-ring" id="irTimer" cx="32" cy="32" r="25"></circle></svg><b id="irClock">'+left+'</b><small>SN</small></div></div><div class="ir-question">'+escape(q.q)+'</div><div class="ir-options">'+q.o.map((o,i)=>'<button class="ir-opt" data-answer="'+i+'">'+('ABCDE'[i])+'. '+escape(o)+'</button>').join('')+'</div><div class="ir-jokers"><button class="ir-joker" data-joker="feraset"><img src="'+jokerAsset('feraset')+'" alt=""><span>Feraset</span><b class="ir-stock" id="irStock-feraset">0</b></button><button class="ir-joker" data-joker="seyirci"><img src="'+jokerAsset('seyirci')+'" alt=""><span>Cemaat</span><b class="ir-stock" id="irStock-seyirci">0</b></button><button class="ir-joker" data-joker="molla"><img src="'+jokerAsset('molla')+'" alt=""><span>Mollaya Sor</span><b class="ir-stock" id="irStock-molla">0</b></button><button class="ir-joker" data-joker="ciftcevap"><img src="'+jokerAsset('ciftcevap')+'" alt=""><span>Çift Cevap</span><b class="ir-stock" id="irStock-ciftcevap">0</b></button></div><div class="ir-note" id="irNote"></div>';
+ content.innerHTML='<div class="ir-toprow"><div class="ir-tl"><button type="button" class="ir-profile" id="irProfile" aria-label="Profil"><img src="'+escape((document.getElementById("hAv")||{}).src||"")+'" alt="Profil"><span class="ir-profile-points">✨ <b id="irProfilePoints">'+points()+'</b></span></button><div class="ir-hearts" id="irHearts"></div></div><div class="ir-tr"><button type="button" class="ir-homebtn" id="irQHome" aria-label="Ana Sayfa"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h4.5v-5.5h4v5.5h4.5V10"/></svg></button><div class="ir-wallet"><img class="ir-dirhem-img" src="'+dirhemSrc+'" alt=""><b id="irWalletValue">'+wallet()+'</b></div></div></div><div class="ir-topbar"><div class="ir-rank-mini ir-rank-next-profile" id="irRankMini">'+rankProgressHTML()+'</div></div><div class="ir-status" id="irStatus"></div><div class="ir-hud"><div class="ir-hud-main"><div class="ir-progress-label" id="irQLabel"><span class="ir-pill ir-pill-round">BÖLÜM '+roundNo+' / '+(cat==='fikih'?fkRounds():30)+'</span><span class="ir-pill ir-pill-q">SORU '+(at+1)+' / 10</span></div><div class="ir-progress-shell ir-bar-only"><div class="ir-progress"><i id="irQuestionProgress" style="width:'+((at+1)/10*100)+'%"></i></div></div></div><div class="ir-countdown" id="irCountdown"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ir-ring-bg" cx="32" cy="32" r="25"></circle><circle class="ir-ring" id="irTimer" cx="32" cy="32" r="25"></circle></svg><b id="irClock">'+left+'</b><small>SN</small></div></div><div class="ir-question">'+escape(q.q)+'</div><div class="ir-options">'+q.o.map((o,i)=>'<button class="ir-opt" data-answer="'+i+'">'+('ABCDE'[i])+'. '+escape(o)+'</button>').join('')+'</div><div class="ir-jokers"><button class="ir-joker" data-joker="feraset"><img src="'+jokerAsset('feraset')+'" alt=""><span>Feraset</span><b class="ir-stock" id="irStock-feraset">0</b></button><button class="ir-joker" data-joker="seyirci"><img src="'+jokerAsset('seyirci')+'" alt=""><span>Cemaat</span><b class="ir-stock" id="irStock-seyirci">0</b></button><button class="ir-joker" data-joker="molla"><img src="'+jokerAsset('molla')+'" alt=""><span>Mollaya Sor</span><b class="ir-stock" id="irStock-molla">0</b></button><button class="ir-joker" data-joker="ciftcevap"><img src="'+jokerAsset('ciftcevap')+'" alt=""><span>Çift Cevap</span><b class="ir-stock" id="irStock-ciftcevap">0</b></button></div><div class="ir-note" id="irNote"></div>';
  $('irProfile').onclick=()=>{const h=$('hProf');if(h)h.click()};$('irQHome').onclick=close;
  content.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>askConfirm(+b.dataset.answer));
  content.querySelectorAll('[data-joker]').forEach(b=>{const k=b.dataset.joker;b.onclick=()=>joker(k)});
@@ -6507,6 +6506,35 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .lsc #dAgain{left:19.8%;top:70.4%;width:60.3%;height:10.4%}
 .lsc #dClose{left:23.5%;top:82.9%;width:52.9%;height:8.2%}
 .lsc #dAgain,.wsc #dAgain{font-size:4.4cqw;font-weight:900;color:#2b1705;text-shadow:0 1px 0 rgba(255,236,160,.6);letter-spacing:.01em;white-space:nowrap}
+/* kalp kırılma animasyonu: yanlış cevapta kalp titrer, ikiye ayrılıp düşer, yerinde kara kalp kalır */
+#ilimRound .ir-heart{display:inline-block;position:relative}
+#ilimRound .ir-heart.brk{width:1.25em;height:1.1em;animation:irHbShake .9s ease both}
+#ilimRound .ir-heart.brk::before{content:'🖤';position:absolute;left:0;top:0;opacity:0;animation:irHbBlack .9s ease forwards}
+#ilimRound .ir-heart.brk i{position:absolute;left:0;top:0;font-style:normal;line-height:1.1}
+#ilimRound .ir-heart.brk .hl{clip-path:inset(0 50% 0 0);animation:irHbL .9s cubic-bezier(.4,0,.8,.6) forwards}
+#ilimRound .ir-heart.brk .hr{clip-path:inset(0 0 0 50%);animation:irHbR .9s cubic-bezier(.4,0,.8,.6) forwards}
+#ilimRound .ir-heart.brk::after{content:'';position:absolute;left:50%;top:8%;width:2px;height:80%;background:#fff;box-shadow:0 0 8px 2px #fff,0 0 14px 4px #ff5a7a;transform:translateX(-50%) scaleY(0);opacity:0;border-radius:2px;animation:irHbCrack .9s ease forwards}
+@keyframes irHbShake{0%{transform:scale(1)}12%{transform:scale(1.45) rotate(-8deg)}24%{transform:scale(1.45) rotate(8deg)}36%{transform:scale(1.4) rotate(-6deg)}48%{transform:scale(1.3) rotate(0)}100%{transform:scale(1)}}
+@keyframes irHbCrack{0%,30%{opacity:0;transform:translateX(-50%) scaleY(0)}42%{opacity:1;transform:translateX(-50%) scaleY(1)}60%{opacity:.9}100%{opacity:0;transform:translateX(-50%) scaleY(1)}}
+@keyframes irHbL{0%,42%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(-13px,20px) rotate(-38deg);opacity:0}}
+@keyframes irHbR{0%,42%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(13px,20px) rotate(38deg);opacity:0}}
+@keyframes irHbBlack{0%,55%{opacity:0;transform:scale(.6)}100%{opacity:1;transform:scale(1)}}
+</style>
+<style id="ilim-top-layout-v4">
+/* İlim oyunu üst düzen: profil + kalpler solda, ev ikonu (yazısız) + dirhem sağda; ilerleme çubuğu bölüm/soru etiketlerinden ayrı */
+#ilimRound .ir-toprow{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin:0 0 6px}
+#ilimRound .ir-tl,#ilimRound .ir-tr{display:flex;align-items:center;gap:8px;min-width:0}
+#ilimRound .ir-tl{flex:1 1 auto}#ilimRound .ir-tr{flex:0 0 auto}
+#ilimRound .ir-toprow .ir-profile{flex:0 1 auto;margin:0}
+#ilimRound .ir-toprow .ir-hearts{display:flex;gap:2px;font-size:18px;line-height:1;flex:0 0 auto;padding:5px 8px;border-radius:999px;background:rgba(0,0,0,.3);border:1px solid #f2d58355}
+#ilimRound .ir-homebtn{flex:0 0 auto;width:42px;height:42px;display:grid;place-items:center;padding:0;border-radius:50%;cursor:pointer;color:#ffeeb0;background:linear-gradient(180deg,#0d4a35,#052a1e);border:2px solid #e1c26a;box-shadow:0 2px 0 #02120c,0 3px 8px #0006;-webkit-tap-highlight-color:transparent}
+#ilimRound .ir-homebtn:active{transform:scale(.94)}
+#ilimRound .ir-topbar{margin:0 0 8px}
+#ilimRound .ir-status{display:none!important}
+#ilimRound .ir-hud-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:9px}
+#ilimRound .ir-hud-main .ir-progress-label{margin:0!important}
+#ilimRound .ir-hud-main .ir-progress-shell.ir-bar-only{flex:none;padding:8px 10px!important}
+@media(max-width:380px){#ilimRound .ir-toprow{gap:5px}#ilimRound .ir-tl,#ilimRound .ir-tr{gap:5px}#ilimRound .ir-toprow .ir-profile img{width:34px;height:34px}#ilimRound .ir-toprow .ir-profile-points{font-size:10.5px}#ilimRound .ir-toprow .ir-hearts{font-size:15px;padding:4px 6px}#ilimRound .ir-homebtn{width:36px;height:36px}#ilimRound .ir-homebtn svg{width:20px;height:20px}}
 </style>
 </body>
 </html><style>

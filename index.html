@@ -2371,7 +2371,7 @@ function showLb(from,nf){
   const ini=n=>((String(n||'?').trim().charAt(0))||'?').toLocaleUpperCase('tr'),fmt=v=>(Number(v)||0).toLocaleString('tr-TR');
   /* Oyuncunun toplam puanına göre derece avatarı (2500 P altında derece yok: baş harf görünür) */
   const rkI=p=>{p=Number(p)||0;let k=-1;for(let i=0;i<RK_NEED.length;i++)if(p>=RK_NEED[i])k=i;return k};
-  const fillAv=(el,r,tag)=>{let src=null;try{const k=rkI(r&&r.p);if(k>=0)src=RK_AV[(r&&r.me&&avGet()===1)?1:0][k]}catch(e){}
+  const fillAv=(el,r,tag)=>{let src=null;try{const k=rkI(r&&r.p);if(k>=0)src=RK_AV[(r&&r.me&&avGet()===1)?1:0][k];else src=AVS[(r&&r.me&&avGet()===1)?1:0]}catch(e){}
     if(src){const w=mk('span','lbrk'),im=document.createElement('img');im.alt='';im.src=src;w.appendChild(im);el.appendChild(w)}
     else el.appendChild(tag==='b'?mk('b','',ini(r?r.n:'?')):document.createTextNode(ini(r?r.n:'')))};
   const animate=!nf||window.__lbLastTab!==tb;window.__lbLastTab=tb;
@@ -6524,10 +6524,10 @@ radial-gradient(110% 55% at 50% 0%,#1d3370 0%,#0000 62%),linear-gradient(180deg,
 .hc-cta b{display:block;font-size:clamp(22px,3.4vh,28px);font-weight:900;line-height:1.1}
 .hc-cta small{display:block;margin-top:3px;font-size:clamp(12px,1.7vh,14px);font-weight:700;opacity:.75}
 .hc-cta:active{transform:translateY(4px);box-shadow:0 1px 0 #8a6414,0 0 18px #ffb84a77}
-.hc-row{flex:none;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:repeat(3,68px);gap:8px}
+.hc-row{flex:none;min-height:0;display:grid;grid-template-columns:1fr;grid-template-rows:repeat(4,74px);gap:8px}
 .hc-card,.hc-tile{border:1.5px solid rgba(var(--rgb),.75);background:linear-gradient(180deg,rgba(var(--rgb),.16),rgba(10,18,48,.82));box-shadow:0 0 14px rgba(var(--rgb),.38),inset 0 0 18px rgba(var(--rgb),.14)}
 .hc-card{display:flex;flex-direction:row;align-items:center;justify-content:flex-start;gap:12px;padding:0 14px;border-radius:14px;text-align:left}
-.hc-card svg{width:26px;height:26px;flex:none;color:rgb(var(--rgb));filter:drop-shadow(0 0 5px rgba(var(--rgb),.8))}
+.hc-card svg{width:30px;height:30px;flex:none;color:rgb(var(--rgb));filter:drop-shadow(0 0 5px rgba(var(--rgb),.8))}
 .hc-card b{font-size:15px;font-weight:900;line-height:1.1}
 .hc-card small{font-size:10px;font-weight:700;color:#c5d0f0}
 .hc-tiles{flex:1.2 1 0;min-height:0;display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:1fr 1fr;gap:10px}
@@ -6907,7 +6907,48 @@ home.insertBefore(bg,home.firstChild);home.insertBefore(root,bg.nextSibling);
 @keyframes dailyNoticeIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
 @media(max-width:430px){#dailyFirstNotice{grid-template-columns:32px minmax(0,1fr);gap:8px;padding:13px 12px}#dailyFirstNotice .daily-notice-icon{width:31px;height:31px;border-radius:10px}#dailyFirstNotice .daily-notice-icon svg{width:19px;height:19px}#dailyFirstNotice .daily-notice-copy>b{font-size:12px}#dailyFirstNotice .daily-notice-copy>p{font-size:11px;line-height:1.4}#dailyFirstNotice .daily-notice-ok{grid-column:2;justify-self:end;min-width:86px;margin-top:2px;padding:9px 15px}}
 @media(prefers-reduced-motion:reduce){#dailyFirstNotice{animation:none}}
-</style></body>
+</style>
+<style id="shop-title-top-center-final">
+/* Mağaza ekranı: başlık en üstte ve yatayda tam ortada */
+#quranShopScreen .qx{
+  display:flex!important;
+  flex-direction:column!important;
+}
+#quranShopScreen .qx-banner{
+  order:-999!important;
+  position:relative!important;
+  inset:auto!important;
+  align-self:stretch!important;
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  margin:0!important;
+  padding:calc(2px + env(safe-area-inset-top,0px)) 0 10px!important;
+  text-align:center!important;
+}
+#quranShopScreen .qx-btext{
+  width:100%!important;
+  flex:1 1 100%!important;
+  text-align:center!important;
+}
+#quranShopScreen .qx-title{
+  display:flex!important;
+  justify-content:center!important;
+  align-items:center!important;
+  width:100%!important;
+  margin:0 auto!important;
+  text-align:center!important;
+}
+#quranShopScreen .qx-sub{
+  width:100%!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  text-align:center!important;
+}
+</style>
+
+</body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */
 .tx2{position:absolute;left:50%;bottom:-20px;margin-left:-19px;width:38px;height:38px;padding:0;border:0;border-radius:50%;cursor:pointer;background:linear-gradient(180deg,#fff0b8,var(--gold2) 35%,var(--gold));box-shadow:0 3px 0 #6b5720,0 6px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.8);display:grid;place-items:center}
@@ -6924,7 +6965,16 @@ home.insertBefore(bg,home.firstChild);home.insertBefore(root,bg.nextSibling);
 <style id="online-duel-image-integration">
 /* ÇEVRİM İÇİ DÜELLO ekranı: ge
 
-rçek HTML/CSS. Tüm ölçüler panel genişliğine (cqw) bağlı, her ekranda aynı oranda küçülür/büyür. */
+rçek HTML/CSS. 
+<style id="shop-title-at-very-top-final">
+/* Yalnızca mağaza ekranında başlığı ekranın en üstüne taşı */
+#quranShopScreen .qx-banner{order:-2!important;margin-top:0!important;padding-top:0!important}
+#quranShopScreen .qx-top{order:-1!important}
+#quranShopScreen .qx-btext{top:4%!important;bottom:auto!important;justify-content:flex-start!important}
+#quranShopScreen .qx-title{margin-top:0!important}
+</style>
+<style>
+/* Tüm ölçüler panel genişliğine (cqw) bağlı, her ekranda aynı oranda küçülür/büyür. */
 #frm{overflow-y:auto;align-items:flex-start;padding:46px 12px 22px;-webkit-overflow-scrolling:touch}
 #frm .frp{--arch:polygon(50% 0,59% 4.5%,80% 11%,100% 19%,100% 90%,91% 95%,62% 95%,50% 100%,38% 95%,9% 95%,0 90%,0 19%,20% 11%,41% 4.5%);--pill:polygon(9% 0,91% 0,100% 50%,91% 100%,9% 100%,0 50%);--rib:polygon(4% 0,96% 0,100% 50%,96% 100%,4% 100%,0 50%);
  position:relative;box-sizing:border-box;container-type:inline-size;width:min(94vw,460px,calc((100dvh - 96px)/1.08));max-width:none;max-height:none;height:auto;aspect-ratio:auto;margin:auto;overflow:visible;padding:0;
@@ -9127,13 +9177,14 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 @media(prefers-reduced-motion:reduce){#lbm #lb.anim .lbr,#lbm #lb.anim .lbpb{animation:none}}
 </style>
 <style id="home-cards-smaller-and-lb-rank-avatars">
-/* Ana sayfa: ortadaki 4 buton daha küçük */
-#hcHome .hc-row{grid-template-rows:repeat(4,50px)!important;gap:8px!important;flex:none!important;min-height:0!important;width:100%!important;max-width:340px!important;margin:0 auto!important}
-#hcHome .hc-card{padding:0 12px!important;gap:10px!important;border-radius:12px!important}
-#hcHome .hc-card svg{width:22px!important;height:22px!important}
-#hcHome .hc-card b{font-size:13px!important}
-#hcHome .hc-card small{font-size:9px!important;line-height:1.15!important}
-@media(max-height:620px){#hcHome .hc-row{grid-template-rows:repeat(4,46px)!important;gap:6px!important}}
+/* Ana sayfa: ortadaki 4 buton biraz daha büyük */
+#hcHome .hc-row{grid-template-rows:repeat(4,68px)!important;gap:10px!important;flex:none!important;min-height:0!important;width:100%!important;max-width:400px!important;margin:0 auto!important}
+#hcHome .hc-card{padding:0 14px!important;gap:12px!important;border-radius:15px!important}
+#hcHome .hc-card svg{width:28px!important;height:28px!important}
+#hcHome .hc-card b{font-size:15.5px!important}
+#hcHome .hc-card small{font-size:10.5px!important;line-height:1.2!important}
+@media(max-height:740px){#hcHome .hc-row{grid-template-rows:repeat(4,60px)!important;gap:8px!important}}
+@media(max-height:620px){#hcHome .hc-row{grid-template-rows:repeat(4,52px)!important;gap:6px!important}#hcHome .hc-card svg{width:24px!important;height:24px!important}#hcHome .hc-card b{font-size:14px!important}#hcHome .hc-card small{font-size:9.5px!important}}
 /* Sıralama: oyuncunun derecesine göre rütbe avatarı */
 #lbm .lbpa,#lbm .lbra{position:relative}
 #lbm .lbrk{position:absolute;inset:0;border-radius:50%;overflow:hidden;display:block}
@@ -9167,4 +9218,19 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #profm .pm .pmr .pmc{grid-column:1!important;grid-row:1/3!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;margin:0!important}
 #profm .pm .pmr:before{content:attr(aria-label)!important;display:block!important;grid-column:2!important;grid-row:1!important;align-self:end!important;max-width:100%!important;font-size:12px!important;font-weight:900!important;line-height:1.2!important;color:#eef3ff!important;white-space:nowrap!important;overflow:visible!important}
 #profm .pm .pmr:after{content:attr(data-need)!important;display:block!important;grid-column:2!important;grid-row:2!important;align-self:start!important;max-width:100%!important;font-size:11px!important;font-weight:800!important;line-height:1.2!important;color:#ffd36a!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
+
+/* Yalnızca ana sayfanın ortasındaki butonları biraz daha büyüt */
+#sLogin .hgrid{width:96%!important;max-width:400px!important;gap:10px 6px!important}
+</style>
+<style id="shop-title-top-center-v3">
+/* Mağaza: başlık sayfanın en üstünde ve tam ortada. Geri / dirhem butonları iki yanda üst üste biner (satır açmaz).
+   Eski banner görsel kutusu (aspect-ratio) ve absolute .qx-btext kayması burada sıfırlanır. */
+#quranShopScreen .qx{position:relative!important}
+#quranShopScreen .qx-top{position:absolute!important;top:calc(10px + env(safe-area-inset-top,0px))!important;left:12px!important;right:12px!important;height:42px!important;z-index:5!important;display:flex!important;flex-direction:row-reverse!important;justify-content:space-between!important;align-items:center!important;pointer-events:none!important}
+#quranShopScreen .qx-top>*{pointer-events:auto!important}
+#quranShopScreen .qx-banner{order:-1!important;position:relative!important;inset:auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;max-width:none!important;height:auto!important;aspect-ratio:auto!important;margin:0!important;padding:5px 0 0!important;background:none!important;filter:none!important;text-align:center!important}
+#quranShopScreen .qx-btext{position:static!important;inset:auto!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;width:100%!important;flex:none!important;gap:2px!important;overflow:visible!important;text-align:center!important}
+#quranShopScreen .qx-title{margin:0!important;width:auto!important;justify-content:center!important;text-align:center!important;font-size:clamp(22px,6vw,28px)!important;line-height:1.1!important;letter-spacing:.05em!important;white-space:nowrap!important}
+#quranShopScreen .qx-title-icon{width:22px!important;height:22px!important}
+#quranShopScreen .qx-sub{margin:0!important;text-align:center!important;font-size:12px!important;white-space:nowrap!important}
 </style>

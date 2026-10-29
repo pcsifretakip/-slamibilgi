@@ -1328,7 +1328,7 @@ transition:opacity 2.6s ease-in-out,transform 2.6s ease-in-out,visibility 0s lin
   <button class="lbx" id="lbX" aria-label="Kapat">✕</button>
   <h2 class="lbtt">Sıralama</h2>
   <p class="lbcap" id="lbCap">İlim Puanı en yüksek olanlar</p>
-  <div class="lbtabs" id="lbTabs" role="tablist"><button type="button" role="tab" data-tb="g" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16h3v4H6zM10.5 11h3v9h-3zM15 6h3v14h-3z"/><path d="m5 10 4-4 3 2 6-5"/></svg><span>Genel</span></button><button type="button" role="tab" data-tb="d"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M4 9.5h16"/><path d="m8 14 2.2 2.2 5-5"/></svg><span>Günlük</span></button></div>
+  <div class="lbtabs" id="lbTabs" role="tablist"><button type="button" role="tab" data-tb="g" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16h3v4H6zM10.5 11h3v9h-3zM15 6h3v14h-3z"/><path d="m5 10 4-4 3 2 6-5"/></svg><span>Genel</span></button><button type="button" role="tab" data-tb="d"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M4 9.5h16"/><path d="m8 14 2.2 2.2 5-5"/></svg><span>Günlük</span></button><button type="button" role="tab" data-tb="w"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M4 9.5h16"/><path d="M7.5 13h9M7.5 16.5h5"/></svg><span>Haftalık</span></button></div>
   <div class="lbo" id="lb"></div>
    <div class="lbme" id="lbMe"></div>
 </div></div></div>
@@ -2637,7 +2637,7 @@ function finish(win,why,quit){
   else{$('eTm').style.display='none';$('svBox').style.display='none'}
   show('sEnd');if(win&&!quit)showWin(amt,bankedC);
 }
-function startDailyQuiz(){CURRENT_CAT=null;CURRENT_LEVEL=null;start('play')}
+function startDailyQuiz(){CURRENT_CAT=null;CURRENT_LEVEL=null;if(typeof window.openDailyPlay==='function'){window.openDailyPlay();return}start('play')}
 const DAILY_INTRO_KEY='islamibilgi_daily_test_intro_seen_v1';
 function openDailyIntroToast(){
  let toast=document.getElementById('dailyFirstNotice');if(toast)return;

@@ -2361,7 +2361,7 @@ function lbRows(all){/* Sıralama yalnızca İlim Puanına göre; sekmeye göre 
   let n='Misafir';try{n=(localStorage.getItem(NM_KEY)||'Misafir').trim().slice(0,14)||'Misafir'}catch(e){}
   const tb=(window.lbTab==='d'||window.lbTab==='w')?window.lbTab:'g',pp=periodPts(),mine=tb==='d'?pp.d:tb==='w'?pp.w:pp.g,src=tb==='d'?window.__lbRemoteD:tb==='w'?window.__lbRemoteW:window.__lbRemote;
   let rows=(Array.isArray(src)?src:[]).filter(r=>!r.me).map(r=>Object.assign({},r));
-  rows.push({id:'me',n:n,c:mine,t:0,me:true});
+  rows.push({id:'me',n:n,c:mine,p:pp.g,t:0,me:true});
   if(tb!=='g')rows=rows.filter(r=>(Number(r.c)||0)>0);
   rows.sort((x,y)=>(Number(y.c)||0)-(Number(x.c)||0));return all?rows:rows.slice(0,10)}
 function showLb(from,nf){
@@ -2369,6 +2369,11 @@ function showLb(from,nf){
   const tb=(window.lbTab==='d'||window.lbTab==='w')?window.lbTab:'g',full=lbRows(true),a=full.slice(0,10),box=$('lb'),meBox=$('lbMe');
   const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
   const ini=n=>((String(n||'?').trim().charAt(0))||'?').toLocaleUpperCase('tr'),fmt=v=>(Number(v)||0).toLocaleString('tr-TR');
+  /* Oyuncunun toplam puanına göre derece avatarı (2500 P altında derece yok: baş harf görünür) */
+  const rkI=p=>{p=Number(p)||0;let k=-1;for(let i=0;i<RK_NEED.length;i++)if(p>=RK_NEED[i])k=i;return k};
+  const fillAv=(el,r,tag)=>{let src=null;try{const k=rkI(r&&r.p);if(k>=0)src=RK_AV[(r&&r.me&&avGet()===1)?1:0][k]}catch(e){}
+    if(src){const w=mk('span','lbrk'),im=document.createElement('img');im.alt='';im.src=src;w.appendChild(im);el.appendChild(w)}
+    else el.appendChild(tag==='b'?mk('b','',ini(r?r.n:'?')):document.createTextNode(ini(r?r.n:'')))};
   const animate=!nf||window.__lbLastTab!==tb;window.__lbLastTab=tb;
   document.querySelectorAll('#lbTabs [data-tb]').forEach(b=>{const on=b.dataset.tb===tb;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false')});
   box.innerHTML='';box.classList.toggle('anim',animate);box.scrollTop=animate?0:box.scrollTop;
@@ -2378,7 +2383,7 @@ function showLb(from,nf){
     [[1,'p2'],[0,'p1'],[2,'p3']].forEach(([ix,cls])=>{
       const r=a[ix],c=mk('div','lbpc '+cls+(r&&r.me?' me':'')+(r?'':' void')),av=mk('div','lbpa');
       if(ix===0&&r)av.appendChild(mk('span','lbcrown','👑'));
-      av.appendChild(mk('b','',r?ini(r.n):'?'));c.appendChild(av);
+      fillAv(av,r,'b');c.appendChild(av);
       c.appendChild(mk('div','lbpn',r?r.n:'—'));
       c.appendChild(mk('div','lbpp',r?fmt(r.c)+' P':'—'));
       const bl=mk('div','lbpb');bl.appendChild(mk('i','',String(ix+1)));c.appendChild(bl);pod.appendChild(c)});
@@ -2388,7 +2393,7 @@ function showLb(from,nf){
       a.slice(3).forEach((r,k)=>{
         const row=mk('div','lbr'+(r.me?' me':''));row.style.setProperty('--i',k);
         row.appendChild(mk('span','lbrn',String(k+4)));
-        row.appendChild(mk('span','lbra',ini(r.n)));
+        {const e=mk('span','lbra');fillAv(e,r);row.appendChild(e)}
         const nm=mk('span','lbrnm');nm.appendChild(mk('span','lbrt',r.n||'Misafir'));if(r.me)nm.appendChild(mk('small','','Sen'));row.appendChild(nm);
         const pt=mk('span','lbrp',fmt(r.c));pt.appendChild(mk('small','',' P'));row.appendChild(pt);
         list.appendChild(row)});
@@ -2399,7 +2404,7 @@ function showLb(from,nf){
   meBox.appendChild(mk('span','lbmk','SENİN SIRAN'));
   const mr=mk('div','lbmr');
   mr.appendChild(mk('span','lbmn',me&&(Number(me.c)||0)>0?'#'+(mi+1):'—'));
-  mr.appendChild(mk('span','lbra',ini(me?me.n:'')));
+  {const e=mk('span','lbra');fillAv(e,me);mr.appendChild(e)}
   mr.appendChild(mk('span','lbrnm',me?me.n:'Misafir'));
   const mp=mk('span','lbrp',fmt(me?me.c:0));mp.appendChild(mk('small','',' P'));mr.appendChild(mp);meBox.appendChild(mr);
   $('lbCap').textContent=tb==='d'?'Günlük İlim Puanı':tb==='w'?'Haftalık İlim Puanı':'Genel İlim Puanı';
@@ -5683,7 +5688,7 @@ let lastLb=0;
 async function syncPts(){if(!db||!uid)return;try{await F.setDoc(F.doc(db,'users',uid),{name:nm(),pts:+(window.homePts?window.homePts():0)||0,...pdoc(),t:F.serverTimestamp()},{merge:true})}catch(e){}}
 setInterval(()=>{if(db)syncPts()},20000);
 window.lbFetch=async()=>{try{if(Date.now()-lastLb<8000)return;lastLb=Date.now();if(!await boot())return;await syncPts();const pp=window.periodPts(),U=F.collection(db,'users');
-  const map=(sn,f)=>sn.docs.map(d=>{const x=d.data();return{id:d.id,n:String(x.name||'Oyuncu').slice(0,14),c:+x[f]||0,me:d.id===uid}}).filter(r=>r.c>0).sort((x,y)=>y.c-x.c).slice(0,10);
+  const map=(sn,f)=>sn.docs.map(d=>{const x=d.data();return{id:d.id,n:String(x.name||'Oyuncu').slice(0,14),c:+x[f]||0,p:+x.pts||0,me:d.id===uid}}).filter(r=>r.c>0).sort((x,y)=>y.c-x.c).slice(0,10);
   const R=await Promise.allSettled([F.getDocs(F.query(U,F.orderBy('pts','desc'),F.limit(10))),F.getDocs(F.query(U,F.where('dk','==',pp.dk),F.limit(200))),F.getDocs(F.query(U,F.where('wk','==',pp.wk),F.limit(200)))]);
   if(R[0].status==='fulfilled')window.__lbRemote=map(R[0].value,'pts');if(R[1].status==='fulfilled')window.__lbRemoteD=map(R[1].value,'dpts');if(R[2].status==='fulfilled')window.__lbRemoteW=map(R[2].value,'wpts');
   R.forEach(r=>{if(r.status==='rejected')console.warn('lb',r.reason)});
@@ -9120,4 +9125,46 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #lbm #lb.anim .lbpc.p3 .lbpb{animation-delay:.2s}
 @media(max-height:660px){#lbm .lbpc.p1{--h:78px;--av:64px}#lbm .lbpc.p2{--h:58px;--av:52px}#lbm .lbpc.p3{--h:46px;--av:52px}#lbm .lbpod{padding-top:26px}#lbm .lbr{padding:7px 10px;margin-top:6px}}
 @media(prefers-reduced-motion:reduce){#lbm #lb.anim .lbr,#lbm #lb.anim .lbpb{animation:none}}
+</style>
+<style id="home-cards-smaller-and-lb-rank-avatars">
+/* Ana sayfa: ortadaki 4 buton daha küçük */
+#hcHome .hc-row{grid-template-rows:repeat(4,50px)!important;gap:8px!important;flex:none!important;min-height:0!important;width:100%!important;max-width:340px!important;margin:0 auto!important}
+#hcHome .hc-card{padding:0 12px!important;gap:10px!important;border-radius:12px!important}
+#hcHome .hc-card svg{width:22px!important;height:22px!important}
+#hcHome .hc-card b{font-size:13px!important}
+#hcHome .hc-card small{font-size:9px!important;line-height:1.15!important}
+@media(max-height:620px){#hcHome .hc-row{grid-template-rows:repeat(4,46px)!important;gap:6px!important}}
+/* Sıralama: oyuncunun derecesine göre rütbe avatarı */
+#lbm .lbpa,#lbm .lbra{position:relative}
+#lbm .lbrk{position:absolute;inset:0;border-radius:50%;overflow:hidden;display:block}
+#lbm .lbrk img{position:absolute;display:block;width:166.7%;height:auto;max-width:none;left:-33.3%;top:-17.8%}
+#lbm .lbcrown{z-index:3}
+</style>
+<style id="profile-id-next-to-rank-stat-colors-rank-tiles-fix">
+/* Profil: ID, derecenin yanında */
+#profm .pm .pm-head{grid-template-columns:62px max-content max-content minmax(0,1fr)!important;grid-template-rows:auto auto!important;column-gap:8px!important;row-gap:6px!important;align-items:center!important;padding:3px 0 5px 2px!important}
+#profm .pm .pm-av{grid-column:1!important;grid-row:1/3!important;margin-right:4px!important}
+#profm .pm .pm-nm{grid-column:2/-1!important;grid-row:1!important;padding:0 38px 0 0!important;min-width:0!important}
+#profm .pm .pm-rk{grid-column:2!important;grid-row:2!important;font-size:11px!important;min-height:25px!important;padding:3px 10px!important;white-space:nowrap!important}
+#profm .pm .pm-id{grid-column:3!important;grid-row:2!important;min-height:25px!important;padding:3px 9px!important;gap:5px!important;white-space:nowrap!important}
+#profm .pm .pm-id small,#profm .pm .pm-id b{font-size:11px!important}
+/* Profil: oyun/kazanılan/kaybedilen/berabere tek satırda, renkli */
+#profm .pm{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+#profm .pm .pm-sv{background-clip:border-box!important;-webkit-background-clip:border-box!important;padding:7px 2px!important}
+#profm .pm #pfW{border-color:rgba(53,229,122,.7)!important;background:linear-gradient(145deg,rgba(22,130,72,.55),rgba(8,40,34,.92))!important;color:#5dff9d!important}
+#profm .pm #pfL{border-color:rgba(255,84,100,.75)!important;background:linear-gradient(145deg,rgba(165,32,52,.55),rgba(46,12,24,.92))!important;color:#ff6b7d!important}
+#profm .pm #pfD{border-color:rgba(255,211,106,.75)!important;background:linear-gradient(145deg,rgba(140,108,22,.5),rgba(46,36,10,.92))!important;color:#ffd75e!important}
+#profm .pm #pfW:after{color:#a6ffc9!important;font-size:8px!important;letter-spacing:0!important}
+#profm .pm #pfL:after{color:#ffb6bf!important;font-size:8px!important;letter-spacing:0!important}
+#profm .pm #pfD:after{color:#ffeaa6!important;font-size:8px!important;letter-spacing:0!important}
+#profm .pm #profCnt:after{font-size:8px!important;letter-spacing:0!important}
+#profm .pm .pm-wl .w{background:#2ee07a!important;box-shadow:none!important}
+#profm .pm .pm-wl .l{background:#f0384a!important}
+#profm .pm .pm-wl .d{background:#ffd24a!important}
+/* Profil: dereceler, ad ve puan alt alta, üst üste binmez */
+#profm .pm .pm-ranks{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:auto!important;gap:8px!important;padding:10px!important;width:100%!important;height:auto!important;overflow:visible!important}
+#profm .pm .pmr{display:grid!important;grid-template-columns:34px minmax(0,1fr)!important;grid-template-rows:auto auto!important;column-gap:9px!important;row-gap:1px!important;align-items:center!important;align-content:center!important;justify-items:start!important;min-height:54px!important;height:auto!important;padding:7px 9px!important;overflow:visible!important}
+#profm .pm .pmr .pmc{grid-column:1!important;grid-row:1/3!important;width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;margin:0!important}
+#profm .pm .pmr:before{content:attr(aria-label)!important;display:block!important;grid-column:2!important;grid-row:1!important;align-self:end!important;max-width:100%!important;font-size:12px!important;font-weight:900!important;line-height:1.2!important;color:#eef3ff!important;white-space:nowrap!important;overflow:visible!important}
+#profm .pm .pmr:after{content:attr(data-need)!important;display:block!important;grid-column:2!important;grid-row:2!important;align-self:start!important;max-width:100%!important;font-size:11px!important;font-weight:800!important;line-height:1.2!important;color:#ffd36a!important;white-space:nowrap!important;overflow:visible!important;text-overflow:clip!important}
 </style>

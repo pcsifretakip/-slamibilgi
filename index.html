@@ -1328,7 +1328,7 @@ transition:opacity 2.6s ease-in-out,transform 2.6s ease-in-out,visibility 0s lin
   <button class="lbx" id="lbX" aria-label="Kapat">✕</button>
   <h2 class="lbtt">Sıralama</h2>
   <p class="lbcap" id="lbCap">İlim Puanı en yüksek olanlar</p>
-  <div class="lbtabs" id="lbTabs" role="tablist"><button type="button" role="tab" data-tb="g" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3"/><path d="M12 14v4M8 20h8"/></svg><span>Genel</span></button><button type="button" role="tab" data-tb="d"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9 7 7M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1"/></svg><span>Günlük</span></button><button type="button" role="tab" data-tb="w"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3v4M16 3v4"/></svg><span>Haftalık</span></button></div>
+  <div class="lbtabs" id="lbTabs" role="tablist"><button type="button" role="tab" data-tb="g" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6 16h3v4H6zM10.5 11h3v9h-3zM15 6h3v14h-3z"/><path d="m5 10 4-4 3 2 6-5"/></svg><span>Genel</span></button><button type="button" role="tab" data-tb="d"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M4 9.5h16"/><path d="m8 14 2.2 2.2 5-5"/></svg><span>Günlük</span></button></div>
   <div class="lbo" id="lb"></div>
 </div></div></div>
 <div class="lbm" id="abm"><div class="lbw"><div class="lbc" role="dialog" aria-label="Hakkımızda">
@@ -2358,7 +2358,7 @@ function periodPts(){/* Günün / haftanın (pazartesi başlar) kazanılan İlim
 window.periodPts=periodPts;try{periodPts()}catch(e){}setInterval(function(){try{periodPts()}catch(e){}},30000);
 function lbRows(){/* Sıralama yalnızca İlim Puanına göre; sekmeye göre genel / günlük / haftalık */
   let n='Misafir';try{n=(localStorage.getItem(NM_KEY)||'Misafir').trim().slice(0,14)||'Misafir'}catch(e){}
-  const tb=window.lbTab||'g',pp=periodPts(),mine=tb==='d'?pp.d:tb==='w'?pp.w:pp.g,src=tb==='d'?window.__lbRemoteD:tb==='w'?window.__lbRemoteW:window.__lbRemote;
+  const tb=(window.lbTab==='d'||window.lbTab==='w')?window.lbTab:'g',pp=periodPts(),mine=tb==='d'?pp.d:tb==='w'?pp.w:pp.g,src=tb==='d'?window.__lbRemoteD:tb==='w'?window.__lbRemoteW:window.__lbRemote;
   let rows=(Array.isArray(src)?src:[]).filter(r=>!r.me).map(r=>Object.assign({},r));
   rows.push({id:'me',n:n,c:mine,t:0,me:true});
   if(tb!=='g')rows=rows.filter(r=>(Number(r.c)||0)>0);
@@ -2376,8 +2376,7 @@ function showLb(from,nf){
     const sc=document.createElement('span');sc.className='lbpt';sc.textContent=(Number(r.c)||0).toLocaleString('tr-TR');const u=document.createElement('small');u.textContent=' P';sc.appendChild(u);row.appendChild(sc);
     box.appendChild(row);
   });
-  {const tb=window.lbTab||'g';document.querySelectorAll('#lbTabs [data-tb]').forEach(function(b){b.classList.toggle('on',b.dataset.tb===tb)});
-  $('lbCap').textContent=tb==='g'?'İlim Puanı en yüksek olanlar':(tb==='d'?'🏆 Günün birincisi: ':'🏆 Haftanın birincisi: ')+(a[0]?a[0].n+' · ✨ '+a[0].c:'henüz yok')}
+  $('lbCap').textContent=window.lbTab==='d'?'🏆 Günlük İlim Puanı':window.lbTab==='w'?'🏆 Haftalık İlim Puanı':'Genel İlim Puanı';
   $('lbm').classList.add('on');if(!nf&&window.lbFetch)window.lbFetch();
 }
 function closeLb(){$('lbm').classList.remove('on')}
@@ -2612,7 +2611,16 @@ function finish(win,why,quit){
   else{$('eTm').style.display='none';$('svBox').style.display='none'}
   show('sEnd');if(win&&!quit)showWin(amt,bankedC);
 }
-$('bStart').onclick=function(){CURRENT_CAT=null;CURRENT_LEVEL=null;start('play')};homeUpd();document.body.classList.add('home');
+function startDailyQuiz(){CURRENT_CAT=null;CURRENT_LEVEL=null;start('play')}
+const DAILY_INTRO_KEY='islamibilgi_daily_test_intro_seen_v1';
+function openDailyIntroToast(){
+ let toast=document.getElementById('dailyFirstNotice');if(toast)return;
+ toast=document.createElement('section');toast.id='dailyFirstNotice';toast.setAttribute('role','alertdialog');toast.setAttribute('aria-label','Günlük soru testi hakkında');
+ toast.innerHTML='<div class="daily-notice-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 2.8v4M16 2.8v4M4 9.5h16M8 14l2.2 2.2 5-5"/></svg></div><div class="daily-notice-copy"><b>GÜNLÜK SORU TESTİ</b><p>Testi erken sonlandırmanız durumunda kazandığınız dirhemler hesabınıza aktarılmayacaktır. Lütfen <strong>20 sorunun tamamını</strong> bitiriniz. Yanlış yaptığınız sorular, testin sonunda detaylı olarak gösterilecektir.</p></div><button type="button" class="daily-notice-ok">TAMAM</button>';
+ document.body.appendChild(toast);
+ toast.querySelector('.daily-notice-ok').addEventListener('click',function(){try{localStorage.setItem(DAILY_INTRO_KEY,'1')}catch(e){}toast.remove();startDailyQuiz()},{once:true});
+}
+$('bStart').onclick=function(){let seen=false;try{seen=localStorage.getItem(DAILY_INTRO_KEY)==='1'}catch(e){}if(!seen){openDailyIntroToast();return}startDailyQuiz()};homeUpd();document.body.classList.add('home');
 $('bAgain').onclick=()=>start('again');
 /* ---- baraj bildirimi / çekiliyorum / bölüm sonu ---- */
 let brT=0;
@@ -6394,7 +6402,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
   const shown=grouped.map((arr,i)=>({arr:arr,i:i})).filter(o=>o.arr.length);
   grid.innerHTML=shown.map((o,n)=>'<section class="dgd-month"'+((n===shown.length-1&&shown.length%2===1)?' style="grid-column:1/-1"':'')+'><h3><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="16" rx="3"/><path d="M8 3v4M16 3v4M4 10h16M8 14h3M8 17h6"/></svg><span>'+months[o.i]+'</span></h3>'+o.arr.map(e=>{const nx=nextT!==null&&dOf(e)===nextT;return '<div class="dgd-row'+(nx?' dgd-next':'')+'"><div class="dgd-name">'+e[1]+'</div><div class="dgd-date">'+e[0]+'</div><div class="dgd-hijri">'+e[2]+(nx?' · <b>'+leftTxt+'</b>':'')+'</div></div>'}).join('')+'</section>').join('');
   const w=[];for(let r=0;r<Math.ceil(shown.length/2);r++){const x=shown[2*r],y=shown[2*r+1];w.push(Math.max(x?x.arr.length:0,y?y.arr.length:0)+.9)}
-  grid.style.gridTemplateRows=w.map(v=>'minmax(0,'+v+'fr)').join(' ');
+  grid.style.setProperty('--dgd-rows',w.map(v=>'minmax(0,'+v+'fr)').join(' '));
   fitOne()
  }
  function fit(){if(!home.classList.contains('on'))return;const r=q.getBoundingClientRect(),hr=home.getBoundingClientRect();btn.style.left=(r.left+r.width/2-hr.left)+'px';btn.style.top=(r.bottom-hr.top+8)+'px';btn.style.width=getComputedStyle(q).width;btn.style.transform='translateX(-50%)';btn.style.setProperty('--qr-w',getComputedStyle(q).width)}
@@ -6548,6 +6556,7 @@ var row=document.createElement('div');row.className='hc-row';
 row.appendChild(btn('hc-card',ic('daily')+'<b>Günlük sorular</b><small>(Her hafta güncellenen sorular ile bilgilerini test et ve dirhem kazan)</small>','#bStart','53,224,255'));
 row.appendChild(btn('hc-card',ic('points')+'<b>İlim puanı topla</b><small>(Seviye seviye ilerle ve kilitli derece avatarlarına ulaş)</small>','#sLogin .hgrid .hm[aria-label="Kategoriler"]','199,125,255'));
 row.appendChild(btn('hc-card',ic('online')+'<b>Online oyna</b><small>(Arkadaşlarınla veya rastgele rakiplerle yarış, dirhem kazan)</small>','#bOnline','255,191,76'));
+row.appendChild(btn('hc-card hc-rank-card',ic('rank')+'<b>Sıralama</b><small>(Oyuncular arasındaki yerini gör)</small>','#bLbL','255,191,76'));
 main.appendChild(row);
 
 var nav=document.createElement('nav');nav.className='hc-nav';nav.setAttribute('aria-label','Ana menü');
@@ -6563,7 +6572,7 @@ ml.appendChild(mItem('qibla','Kıble','Kıble yönünü bul','#openQibla','255,1
 more.addEventListener('click',function(e){if(e.target===more)closeMore()});
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeMore()});
 
-[['rank','Sıralama','#bLbL'],['shop','Mağaza','#bShop'],['friends','Arkadaşlar','#openFriendsManage'],['more','Daha Fazla',null],['gear','Ayarlar','#bSetT']].forEach(function(a){
+[['shop','Mağaza','#bShop'],['friends','Arkadaşlar','#openFriendsManage'],['more','Daha Fazla',null],['gear','Ayarlar','#bSetT']].forEach(function(a){
 var b=a[2]?btn('',ic(a[0])+'<span>'+a[1]+'</span>',a[2]):(function(){var x=document.createElement('button');x.type='button';x.className='hc-more-trigger';x.setAttribute('aria-expanded','false');x.innerHTML=ic(a[0])+'<span>'+a[1]+'</span>';x.addEventListener('click',function(e){e.stopPropagation();var opening=!more.classList.contains('on');more.classList.toggle('on',opening);x.setAttribute('aria-expanded',String(opening))});return x})();
 var colors={rank:'#ffd166',shop:'#59f5ae',friends:'#52dfff',more:'#c795ff',gear:'#89aaff'};var svg=b.querySelector('svg');if(svg){svg.style.fill='none';svg.style.stroke=colors[a[0]];svg.setAttribute('stroke-width','1.8');svg.setAttribute('stroke-linecap','round');svg.setAttribute('stroke-linejoin','round')}nav.appendChild(b)});
 nav.appendChild(more);document.addEventListener('click',function(e){if(!more.contains(e.target)&&!e.target.closest('.hc-more-trigger')){more.classList.remove('on');var t=nav.querySelector('.hc-more-trigger');if(t)t.setAttribute('aria-expanded','false')}});root.appendChild(main);root.appendChild(nav);
@@ -6813,6 +6822,60 @@ home.insertBefore(bg,home.firstChild);home.insertBefore(root,bg.nextSibling);
 .lsc #dClose{position:relative!important;overflow:hidden;color:transparent!important;font-size:0!important}
 @media(max-width:360px){.wsc,.lsc{width:94vw!important;padding:21px 16px 16px!important;border-radius:23px!important;gap:0 8px!important}.wsc .result-icon,.lsc .result-icon{width:64px;height:64px;border-radius:20px}.wsc .result-icon svg,.lsc .result-icon svg{width:41px;height:41px}.wsc .result-caption,.lsc .result-caption{margin-bottom:16px}}
 @media(prefers-reduced-motion:reduce){.wsc *,.lsc *{animation:none!important;transition:none!important}}
+</style><style id="settings-inline-svg-icons">
+/* Ayarlar: her seçeneğin başında lacivert-altın SVG simgesi */
+#setm #tSnd::after,#setm #tMus::after,#setm #tVib::after,#setm #tNtf::after,#setm #bPriv::after,#setm #bCont::after,#setm #bHow::after,#setm #bAbout::after,#setm #acctLogout::after,#setm #acctDelete::after{content:""!important;position:absolute!important;left:15px!important;top:50%!important;transform:translateY(-50%)!important;display:block!important;width:19px!important;height:19px!important;background-position:center!important;background-repeat:no-repeat!important;background-size:contain!important;filter:drop-shadow(0 0 5px rgba(255,211,106,.38));pointer-events:none}
+#setm #tSnd::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd36a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H3v6h3l5 4V5Z'/%3E%3Cpath d='M15.5 8.5a5 5 0 0 1 0 7M18 5.5a9 9 0 0 1 0 13'/%3E%3C/svg%3E")}
+#setm #tMus::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd36a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 18V5l12-2v13'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='18' cy='16' r='3'/%3E%3C/svg%3E")}
+#setm #tVib::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235be3f4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='7' y='3' width='10' height='18' rx='2'/%3E%3Cpath d='M3 8v8M21 8v8M11 17h2'/%3E%3C/svg%3E")}
+#setm #tNtf::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd36a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4'/%3E%3C/svg%3E")}
+#setm #bPriv::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd36a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E")}
+#setm #bCont::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d7a7ff' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E")}
+#setm #bHow::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235be3f4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-.5-6-2-8-1.5zM12 6v13'/%3E%3C/svg%3E")}
+#setm #bAbout::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffd36a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v5M12 7.5v.1'/%3E%3C/svg%3E")}
+#setm #acctLogout::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23182b40' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M10 17l5-5-5-5M15 12H3'/%3E%3Cpath d='M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7'/%3E%3C/svg%3E");filter:none}
+#setm #acctDelete::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffe5e5' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6'/%3E%3C/svg%3E");filter:drop-shadow(0 0 4px rgba(255,140,150,.42))}
+#setm #tSnd,#setm #tMus,#setm #tVib,#setm #tNtf,#setm #bPriv,#setm #bCont,#setm #bHow,#setm #bAbout{padding-left:45px!important}
+#setm #bHow,#setm #bAbout{justify-content:flex-start!important;padding:0 12px 0 45px!important;border:1px solid rgba(35,216,240,.28)!important;border-radius:15px!important;background:linear-gradient(110deg,rgba(27,67,112,.62),rgba(14,26,59,.95))!important;box-shadow:0 4px 12px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)!important;color:#f3f6ff!important;text-align:left!important}
+#setm #bAbout{height:46px!important}
+#setm #acctLogout,#setm #acctDelete{justify-content:flex-start!important;text-align:left!important;padding:0 8px 0 37px!important;font-size:11px!important;white-space:nowrap!important}
+#setm .srw[id]::before{max-width:100%;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:360px){#setm #tSnd::after,#setm #tMus::after,#setm #tVib::after,#setm #tNtf::after,#setm #bPriv::after,#setm #bCont::after,#setm #bHow::after,#setm #bAbout::after{left:12px!important;width:17px!important;height:17px!important}#setm #tSnd,#setm #tMus,#setm #tVib,#setm #tNtf,#setm #bPriv,#setm #bCont,#setm #bHow,#setm #bAbout{padding-left:39px!important}}
+</style><style id="rank-card-under-online-and-profile-rank-grid-fit">
+/* Sıralama kartı, ana sayfada Online Oyna'nın altında aynı kart ölçüsüyle */
+#hcHome .hc-row{grid-template-rows:repeat(4,minmax(60px,1fr))!important;gap:8px!important;flex:1 1 auto!important;min-height:0!important}
+#hcHome .hc-nav{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+#hcHome .hc-rank-card{--rgb:255,191,76!important}
+@media(max-height:620px){#hcHome .hc-row{grid-template-rows:repeat(4,minmax(54px,1fr))!important;gap:6px!important}#hcHome .hc-card{padding:0 11px;gap:10px}#hcHome .hc-card small{font-size:9px}}
+/* Profil penceresi tüm içeriği kaydırılabilir tutar; derece adları ve puan eşikleri iki satırda tam görünür */
+#profm{align-items:flex-start!important;justify-content:center!important;overflow-y:auto!important;overflow-x:hidden!important;padding:12px 12px max(18px,env(safe-area-inset-bottom))!important}
+#profm .pm{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;align-content:start!important;gap:9px!important;width:min(100%,480px)!important;max-height:none!important;height:auto!important;min-height:0!important;overflow:visible!important;padding:18px 14px 14px!important}
+#profm .pm-head,#profm .pm-ilim,#profm .pm-rate,#profm .pm-wl,#profm .pm-ranks,#profm .pm-yl{grid-column:1/-1!important}
+#profm .pm-ranks{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-template-rows:auto!important;gap:8px!important;width:100%!important;height:auto!important;margin:0!important;padding:12px!important;overflow:visible!important}
+#profm .pmh{grid-column:1/-1!important;margin:0 0 2px!important;padding:5px!important;font-size:13px!important;color:#ffe18a!important}
+#profm .pmr{display:grid!important;grid-template-columns:38px minmax(0,1fr)!important;grid-template-rows:minmax(40px,auto)!important;align-items:center!important;justify-items:start!important;column-gap:9px!important;width:100%!important;min-width:0!important;min-height:60px!important;height:auto!important;margin:0!important;padding:7px 9px!important;border:1px solid rgba(144,174,222,.32)!important;border-radius:13px!important;background:linear-gradient(145deg,rgba(28,43,75,.86),rgba(10,20,42,.96))!important;opacity:1!important;overflow:visible!important}
+#profm .pmc{display:grid!important;grid-column:1!important;grid-row:1!important;position:relative!important;inset:auto!important;width:36px!important;height:36px!important;min-width:36px!important;min-height:36px!important;margin:0!important;border-radius:50%!important;visibility:visible!important;overflow:hidden!important}
+#profm .pmc img{display:block!important;width:100%!important;height:100%!important;object-fit:cover!important;filter:grayscale(1)!important;opacity:.55!important}
+#profm .pmc:after{font-size:10px!important}
+#profm .pmr:after{grid-column:2!important;grid-row:1!important;display:block!important;min-width:0!important;max-width:100%!important;overflow:visible!important;content:attr(aria-label) "\A" attr(data-need)!important;white-space:pre-line!important;text-overflow:clip!important;text-align:left!important;line-height:1.3!important;font-size:clamp(10px,2.8vw,12px)!important;font-weight:850!important;color:#eaf0ff!important}
+#profm .pmr.lock:after,#profm .pmr:after{color:#d6e2f4!important}
+#profm .pmr[aria-disabled="true"]{cursor:default!important}
+#profm .pm-yl{grid-column:1/-1!important;width:100%!important;height:auto!important;margin:0!important;text-align:center!important}
+@media(max-width:360px){#profm .pm{gap:7px!important;padding:14px 10px 12px!important}#profm .pm-ranks{gap:6px!important;padding:8px!important}#profm .pmr{grid-template-columns:30px minmax(0,1fr)!important;column-gap:6px!important;min-height:56px!important;padding:6px!important}#profm .pmc{width:28px!important;height:28px!important;min-width:28px!important;min-height:28px!important}#profm .pmr:after{font-size:10px!important}}
+</style><style id="daily-first-entry-toast-style">
+#dailyFirstNotice{position:fixed;z-index:100500;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:grid;grid-template-columns:38px minmax(0,1fr) auto;align-items:center;gap:10px;width:min(92vw,520px);box-sizing:border-box;padding:15px 16px;border:1px solid rgba(255,211,106,.78);border-radius:20px;background:radial-gradient(120% 120% at 0 0,rgba(48,110,158,.32),transparent 70%),linear-gradient(145deg,#102a44,#08182b 76%);color:#eef5ff;box-shadow:0 0 0 1px rgba(68,202,238,.2),0 0 25px rgba(39,174,220,.18),0 14px 38px rgba(0,0,0,.62),inset 0 1px rgba(255,255,255,.08);font-family:"Nunito",system-ui,sans-serif;animation:dailyNoticeIn .22s ease-out both}
+#dailyFirstNotice:before{content:"";position:absolute;left:14px;right:14px;top:0;height:1px;background:linear-gradient(90deg,transparent,#f4ce70,#51d5ee,transparent);filter:drop-shadow(0 0 5px #55d8ef)}
+#dailyFirstNotice .daily-notice-icon{display:grid;place-items:center;width:36px;height:36px;border:1px solid rgba(255,211,106,.6);border-radius:12px;background:rgba(255,211,106,.1);box-shadow:0 0 12px rgba(255,211,106,.14)}
+#dailyFirstNotice .daily-notice-icon svg{width:22px;height:22px;fill:none;stroke:#ffd66f;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#dailyFirstNotice .daily-notice-copy{min-width:0}
+#dailyFirstNotice .daily-notice-copy>b{display:block;margin:0 0 4px;color:#ffe093;font-size:13px;line-height:1.2;letter-spacing:.07em}
+#dailyFirstNotice .daily-notice-copy>p{margin:0;color:#d9e5f1;font-size:12px;font-weight:650;line-height:1.45}
+#dailyFirstNotice .daily-notice-copy strong{color:#fff0bc;font-weight:950}
+#dailyFirstNotice .daily-notice-ok{align-self:center;min-width:70px;padding:10px 12px;border:1px solid #ffe19a;border-radius:12px;background:linear-gradient(180deg,#ffe49b,#e4b345);color:#17273a;font:950 12px/1 "Nunito",system-ui,sans-serif;letter-spacing:.04em;box-shadow:0 3px 0 #82611f,0 0 13px rgba(255,211,106,.2);cursor:pointer}
+#dailyFirstNotice .daily-notice-ok:active{transform:translateY(2px);box-shadow:0 1px 0 #82611f}
+@keyframes dailyNoticeIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@media(max-width:430px){#dailyFirstNotice{grid-template-columns:32px minmax(0,1fr);gap:8px;padding:13px 12px}#dailyFirstNotice .daily-notice-icon{width:31px;height:31px;border-radius:10px}#dailyFirstNotice .daily-notice-icon svg{width:19px;height:19px}#dailyFirstNotice .daily-notice-copy>b{font-size:12px}#dailyFirstNotice .daily-notice-copy>p{font-size:11px;line-height:1.4}#dailyFirstNotice .daily-notice-ok{grid-column:2;justify-self:end;min-width:86px;margin-top:2px;padding:9px 15px}}
+@media(prefers-reduced-motion:reduce){#dailyFirstNotice{animation:none}}
 </style></body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */
@@ -7175,7 +7238,7 @@ rçek HTML/CSS. Tüm ölçüler panel genişliğine (cqw) bağlı, her ekranda a
   document.addEventListener('click',function(e){
     const target=e.target;if(!target||!target.closest)return;
     /* Oyna geçici olarak Yakında ekranını açar; Kategoriler mevcut bölüm listesini açar. */
-    if(target.closest('#bStart, .play-only-hit')){if(typeof window.openDailyPlay==='function')window.openDailyPlay(e);else showYakinda(e)}
+    if(target.closest('#bStart, .play-only-hit')){e.preventDefault();e.stopPropagation();if(e.stopImmediatePropagation)e.stopImmediatePropagation();let seen=false;try{seen=localStorage.getItem(DAILY_INTRO_KEY)==='1'}catch(err){}if(!seen){openDailyIntroToast();return}startDailyQuiz()}
     else if(target.closest('button[aria-label="Kategoriler"], [data-category], #sCats .cat-b, #categoryModal [data-category]'))showIlimMenu(e);
   },true);
   try{window.openIlimJourney=function(initialCat){if(topicOpen(initialCat)&&typeof openIlimJourneyCore==='function')return openIlimJourneyCore(initialCat);showIlimMenu()}}catch(e){}
@@ -8927,4 +8990,50 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 
 <style id="daily-correct-answer-green-final">
 #dailyPlay #dpO>button.dp-o.ok,#dailyPlay #dpO>.dp-o.ok{background:linear-gradient(180deg,#6be19b 0%,#24a95f 58%,#14733f 100%)!important;background-color:#24a95f!important;border:1px solid #9affbd!important;color:#062916!important;box-shadow:0 6px 0 #0b4b2c,0 0 22px rgba(73,225,140,.55),inset 0 2px 0 rgba(255,255,255,.4)!important}
+</style>
+<style id="leaderboard-single-table-and-shop-title-top">
+/* Sıralama: aynı tek tablo, Genel/Günlük filtreleri */
+#lbm .lbtabs{display:flex!important;width:min(100%,440px)!important;gap:9px!important;margin:0 auto 12px!important}
+#lbm .lbtabs [data-tb]{flex:1 1 0!important;min-width:0!important}
+#lbm .lbtabs svg{width:19px!important;height:19px!important;fill:none!important;stroke:currentColor!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+/* Mağaza başlığı sayfanın en üstünde ve ortada */
+#quranShopScreen .qx-banner{order:-1!important;align-self:stretch!important;width:100%!important;margin:0!important;padding:calc(4px + env(safe-area-inset-top,0px)) 0 8px!important;text-align:center!important}
+#quranShopScreen .qx-btext{width:100%!important;text-align:center!important}
+#quranShopScreen .qx-title{display:flex!important;align-items:center!important;justify-content:center!important;gap:9px!important;width:100%!important;margin:0!important;text-align:center!important;color:#ffe18a!important;font:950 clamp(25px,6vw,32px)/1.15 "Nunito",system-ui,sans-serif!important;letter-spacing:.06em!important}
+#quranShopScreen .qx-title-icon{display:block!important;width:25px!important;height:25px!important;flex:none!important;color:#ffd36a!important;stroke:#ffd36a!important}
+#quranShopScreen .qx-sub{text-align:center!important}
+</style><style id="leaderboard-single-table-weekly-row-layout-shop-swap">
+#lbm .lbtabs [data-tb]{flex:1 1 0!important}
+#lbm .lbo{display:flex!important;flex-direction:column!important;gap:0!important;padding:0!important;overflow:hidden!important;border:1px solid rgba(151,168,255,.64)!important;border-radius:15px!important;background:linear-gradient(180deg,rgba(22,36,72,.96),rgba(8,17,42,.98))!important;box-shadow:0 0 18px rgba(90,128,255,.13)!important}
+#lbm .lbo .lbrow{display:grid!important;grid-template-columns:48px minmax(0,1fr) minmax(76px,auto)!important;align-items:stretch!important;gap:0!important;min-height:52px!important;margin:0!important;padding:0!important;overflow:hidden!important;border:0!important;border-bottom:1px solid rgba(190,207,255,.24)!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+#lbm .lbo .lbrow:last-child{border-bottom:0!important}
+#lbm .lbo .lbrow:nth-child(even){background:rgba(99,133,204,.075)!important}
+#lbm .lbo .lbrow .lbrk,#lbm .lbo .lbrow .lbnm,#lbm .lbo .lbrow .lbpt{display:flex!important;align-items:center!important;min-width:0!important;padding:8px 10px!important}
+#lbm .lbo .lbrow .lbnm,#lbm .lbo .lbrow .lbpt{border-left:1px solid rgba(190,207,255,.24)!important}
+#lbm .lbo .lbrow .lbpt{justify-content:flex-end!important;white-space:nowrap!important}
+#lbm .lbo .lbrow.me{background:rgba(255,211,106,.13)!important}
+#quranShopScreen .qx-top{flex-direction:row!important}
+</style><style id="dgd-one-screen-final-layout">
+/* Dini Günler: tüm takvim tek görünüm alanında, dışarıda kaydırma yok */
+#diniGunlerScreen{position:fixed!important;inset:0!important;box-sizing:border-box!important;display:none;overflow:hidden!important;width:100vw!important;height:100vh!important;height:100dvh!important;padding:calc(6px + env(safe-area-inset-top,0px)) 12px calc(6px + env(safe-area-inset-bottom,0px))!important}
+#diniGunlerScreen.on{display:flex!important;flex-direction:column!important}
+#diniGunlerScreen .dgd-wrap{width:min(100%,1120px)!important;height:100%!important;min-height:0!important;flex:1 1 auto!important;margin:0 auto!important;display:flex!important;flex-direction:column!important;gap:0!important;overflow:hidden!important}
+#diniGunlerScreen .dgd-top{flex:0 0 auto!important;min-height:0!important;margin:0 0 4px!important;padding:0 0 5px!important}
+#diniGunlerScreen .dgd-back{flex:0 0 36px!important;width:36px!important;height:36px!important;border-radius:12px!important}
+#diniGunlerScreen .dgd-top>div:last-child{flex:0 0 36px!important;width:36px!important}
+#diniGunlerScreen .dgd-heading{font-size:clamp(15px,3.1vh,25px)!important;line-height:1.08!important}
+#diniGunlerScreen .dgd-sub{flex:0 0 auto!important;margin:0 auto 5px!important;font-size:clamp(8px,1.45vh,11px)!important;line-height:1.22!important}
+#diniGunlerScreen .dgd-grid{flex:1 1 0!important;min-height:0!important;width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:unset!important;align-content:stretch!important;gap:clamp(4px,1vh,9px)!important;overflow:hidden!important}
+#diniGunlerScreen .dgd-month{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;height:auto!important;overflow:hidden!important;border-radius:13px!important}
+#diniGunlerScreen .dgd-month h3{flex:0 0 auto!important;justify-content:center!important;gap:6px!important;padding:calc(4px*var(--s,1)) 5px!important;font-size:calc(11px*var(--s,1))!important;line-height:1.05!important;letter-spacing:.1em!important}
+#diniGunlerScreen .dgd-month h3 svg{width:14px!important;height:14px!important}
+#diniGunlerScreen .dgd-row{flex:1 1 0!important;min-height:0!important;grid-template-columns:minmax(0,1fr) auto!important;gap:1px 4px!important;padding:calc(2px*var(--s,1)) calc(5px*var(--s,1))!important}
+#diniGunlerScreen .dgd-name{font-size:calc(10px*var(--s,1))!important;line-height:1.12!important;overflow-wrap:anywhere!important}
+#diniGunlerScreen .dgd-date{padding:3px 5px!important;font-size:calc(9px*var(--s,1))!important;line-height:1!important}
+#diniGunlerScreen .dgd-hijri{font-size:calc(8px*var(--s,1))!important;line-height:1.05!important}
+#diniGunlerScreen .dgd-note{flex:0 0 auto!important;margin:4px auto 0!important;padding-top:4px!important;font-size:clamp(7px,1.05vh,9px)!important;line-height:1.15!important;text-align:center!important}
+@media(max-width:680px){#diniGunlerScreen{padding-left:8px!important;padding-right:8px!important}#diniGunlerScreen .dgd-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:5px!important}#diniGunlerScreen .dgd-month[style*="grid-column"]{grid-column:1/-1!important}#diniGunlerScreen .dgd-month h3{justify-content:center!important;padding:calc(4px*var(--s,1)) 3px!important}#diniGunlerScreen .dgd-row{padding:calc(2px*var(--s,1)) 4px!important}}
+@media(max-width:360px){#diniGunlerScreen .dgd-heading{font-size:14px!important}#diniGunlerScreen .dgd-sub{font-size:7.5px!important}#diniGunlerScreen .dgd-grid{gap:3px!important}#diniGunlerScreen .dgd-name{font-size:calc(9px*var(--s,1))!important}#diniGunlerScreen .dgd-date{font-size:calc(8px*var(--s,1))!important;padding:2px 3px!important}}
+@media(max-height:620px){#diniGunlerScreen{padding-top:calc(3px + env(safe-area-inset-top,0px))!important;padding-bottom:calc(3px + env(safe-area-inset-bottom,0px))!important}#diniGunlerScreen .dgd-top{margin-bottom:2px!important;padding-bottom:3px!important}#diniGunlerScreen .dgd-sub{margin-bottom:3px!important}#diniGunlerScreen .dgd-note{margin-top:2px!important;padding-top:2px!important}}
+#diniGunlerScreen .dgd-grid{grid-template-rows:var(--dgd-rows)!important}
 </style>

@@ -1067,7 +1067,11 @@ transition:opacity 2.6s ease-in-out,transform 2.6s ease-in-out,visibility 0s lin
 @media(max-width:380px){#ilimRound .ir-joker img{width:46px!important;height:46px!important}#ilimRound .ir-joker{font-size:10px!important}#ilimRound .ir-countdown{flex-basis:68px!important;width:68px!important;height:68px!important}}
 
 </style>
-</head>
+</
+<style id="wrong-answers-label-bold">
+#irGoModal .go-wr span{font-weight:900!important}
+</style>
+head>
 <body class="introOn">
 <!-- AÇILIŞ VİDEOSU: oyun açılırken giriş ekranından önce oynar, bitmeden önce yavaşça kaybolur.
      Dosya index.html ile aynı klasörde olmalı. Adı farklıysa aşağıdaki OPENING_FILES listesini değiştir. -->
@@ -8802,6 +8806,11 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 </style><style id="settings-how-about-boxes">
 #setm #bHow,#setm #bAbout{display:flex!important;flex:0 0 100%!important;align-items:center!important;justify-content:flex-start!important;width:100%!important;height:46px!important;box-sizing:border-box!important;margin:0!important;padding:0 15px!important;border:1px solid rgba(35,216,240,.32)!important;border-radius:15px!important;background:linear-gradient(110deg,rgba(27,67,112,.62),rgba(14,26,59,.95))!important;box-shadow:0 4px 12px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)!important;color:#f3f6ff!important;text-align:left!important;font-size:14px!important;font-weight:850!important}
 #setm #bHow:active,#setm #bAbout:active{background:linear-gradient(110deg,rgba(27,67,112,.75),rgba(14,26,59,.98))!important;box-shadow:0 4px 12px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04)!important;opacity:.8!important}
+</style><style id="settings-how-about-icon-spacing-fix">
+/* Yalnızca Ayarlar içindeki Nasıl Oynanır ve Hakkımızda: ikon ile yazı arasını aç */
+#setm #bHow,#setm #bAbout{padding-left:45px!important;padding-right:12px!important;justify-content:flex-start!important}
+#setm #bHow::after,#setm #bAbout::after{left:15px!important;width:19px!important;height:19px!important}
+@media(max-width:360px){#setm #bHow,#setm #bAbout{padding-left:39px!important}#setm #bHow::after,#setm #bAbout::after{left:12px!important;width:17px!important;height:17px!important}}
 </style><style id="profile-hide-current-rank-line">
 #profm .pm-yl{display:none!important}
 </style><style id="more-inline-crescent-menu">
@@ -9233,4 +9242,49 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #quranShopScreen .qx-title{margin:0!important;width:auto!important;justify-content:center!important;text-align:center!important;font-size:clamp(22px,6vw,28px)!important;line-height:1.1!important;letter-spacing:.05em!important;white-space:nowrap!important}
 #quranShopScreen .qx-title-icon{width:22px!important;height:22px!important}
 #quranShopScreen .qx-sub{margin:0!important;text-align:center!important;font-size:12px!important;white-space:nowrap!important}
+</style>
+<style id="round-completion-match-app-palette">
+/* Bölüm tamamlandı ekranı: uygulamanın mevcut lacivert-mavi ve altın paleti */
+.ir-overlay.r3 .r3-card{background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.025) 35%,rgba(0,0,0,.22)),linear-gradient(180deg,#14307a,#0a1a4d 68%,#061236)!important;border-color:#e2b24a!important;box-shadow:inset 0 3px 0 rgba(255,230,160,.3),inset 0 -6px 0 #0006,0 8px 0 #7a4f0c,0 14px 18px #0008!important}
+.ir-overlay.r3 .r3-ribbon,.ir-overlay.r3 .r3-rank{background:linear-gradient(180deg,#fff0b8 0%,#f0dc9e 35%,#c9ab5e 100%)!important;color:#2a1f05!important;box-shadow:inset 0 2px 0 #fff9,inset 0 -3px 0 #0003,0 5px 0 #6b5720,0 9px 12px #0005!important}
+.ir-overlay.r3 .r3-tile{background:linear-gradient(180deg,rgba(74,140,245,.42),rgba(20,48,122,.86) 55%,rgba(6,18,54,.97))!important;border-color:#e2b24a!important;box-shadow:inset 0 3px 0 rgba(255,230,160,.35),inset 0 -5px 0 #0005,0 7px 0 #7a4f0c,0 12px 18px #0007!important}
+.ir-overlay.r3 .r3-panel{background:linear-gradient(180deg,#0a1a4d,#061236)!important;border:1px solid rgba(226,178,74,.35)!important}
+.ir-overlay.r3 .r3-num,.ir-overlay.r3 .r3-row b,.ir-overlay.r3 .r3-lab b{color:#f0dc9e!important;text-shadow:0 2px 0 #5a4410,0 0 10px rgba(240,220,158,.22)!important}
+.ir-overlay.r3 .r3-bar{background:#061236!important;border-color:#e2b24a!important}
+.ir-overlay.r3 .r3-bar i{background:linear-gradient(180deg,#b9d8ff,#4a8cf5 45%,#0e4fb0)!important;box-shadow:inset 0 2px 0 #fffc,0 0 8px rgba(74,140,245,.35)!important}
+.ir-overlay.r3 .r3-bar2 i{background:linear-gradient(180deg,#fff0b8,#f0dc9e 35%,#c9ab5e 70%,#8a6a2c)!important;box-shadow:inset 0 2px 0 #fffc,0 0 8px rgba(201,171,94,.3)!important}
+.ir-overlay.r3 .r3-wbtn{background:linear-gradient(180deg,#ff8294,#ff4d6a 52%,#a91e3c)!important;box-shadow:inset 0 2px 0 #ffffff80,inset 0 -3px 0 #0004,0 5px 0 #65152a,0 10px 14px #0006!important}
+.ir-overlay.r3 .ir-ov-foot .ir-action{background:linear-gradient(180deg,#fff0b8 0%,#f0dc9e 30%,#c9ab5e 100%)!important;color:#2a1f05!important;box-shadow:inset 0 2px 0 #fff9,0 4px 0 #6b5720!important}
+.ir-overlay.r3 .ir-ov-foot .ir-ov-home{background:linear-gradient(180deg,#4a8cf5 0%,#1877f2 45%,#0e4fb0 100%)!important;border-color:#e2b24a!important;box-shadow:inset 0 3px 0 #ffffff45,inset 0 -5px 0 #0004,0 7px 0 #082f6b,0 12px 14px #0009!important}
+</style>
+<style id="profile-stat-rank-press-effect">
+/* Yalnızca profil istatistikleri ve derece kutularına basma efekti */
+#profm .pm .pm-sv{
+  pointer-events:auto!important;
+  cursor:pointer;
+  transform:translateY(0) scale(1);
+  transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;
+  -webkit-user-select:none;
+  user-select:none;
+}
+#profm .pm .pm-sv:active{
+  transform:translateY(3px) scale(.98)!important;
+  filter:brightness(1.15)!important;
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25)!important;
+}
+#profm .pm .pmr{
+  cursor:pointer;
+  transform:translateY(0) scale(1);
+  transition:transform .12s ease,filter .12s ease,box-shadow .12s ease;
+  -webkit-user-select:none;
+  user-select:none;
+}
+#profm .pm .pmr:active{
+  transform:translateY(3px) scale(.98)!important;
+  filter:brightness(1.2)!important;
+  box-shadow:inset 0 3px 7px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.25)!important;
+}
+@media(prefers-reduced-motion:reduce){
+  #profm .pm .pm-sv,#profm .pm .pmr{transition:none!important}
+}
 </style>

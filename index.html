@@ -9710,52 +9710,14 @@ html body #hcHome .hc-scene .hq2.hq-sky p em{font-size:12px!important;font-weigh
     }).join('');
     status.textContent=rows.length+' cami bulundu · En yakından uzağa sıralandı.';
   }
-  const ENDPOINTS=[
-    'https://overpass.private.coffee/api/interpreter',
-    'https://overpass.kumi.systems/api/interpreter',
-    'https://overpass-api.de/api/interpreter'
-  ];
-  const buildQuery=(r,lat,lon)=>'[out:json][timeout:20];('
-    +'nwr(around:'+r+','+lat+','+lon+')["amenity"="place_of_worship"]["religion"~"muslim|islam",i];'
-    +'nwr(around:'+r+','+lat+','+lon+')["building"="mosque"];'
-    +');out center tags;';
-  async function fetchOverpass(query){
-    const ctrls=[];
-    const tasks=ENDPOINTS.map(async ep=>{
-      const c=new AbortController();ctrls.push(c);
-      const t=setTimeout(()=>c.abort(),18000);
-      try{
-        const res=await fetch(ep+'?data='+encodeURIComponent(query),{method:'GET',headers:{'Accept':'application/json'},signal:c.signal,cache:'no-store'});
-        if(!res.ok)throw new Error('Harita sunucusu HTTP '+res.status+' yanıtı verdi.');
-        const data=await res.json();
-        if(!data||!Array.isArray(data.elements))throw new Error('Harita sunucusundan geçersiz veri geldi.');
-        return data;
-      }finally{clearTimeout(t)}
-    });
-    try{
-      const data=await Promise.any(tasks);
-      ctrls.forEach(c=>{try{c.abort()}catch(e){}});
-      return data;
-    }catch(e){
-      const errs=(e&&e.errors)||[e];
-      const real=errs.find(x=>x&&x.name!=='AbortError');
-      throw new Error(real?real.message:'Harita sunucularının yanıtı zaman aşımına uğradı.');
-    }
-  }
-  async function findMosques(lat,lon){
-    status.textContent='Yakındaki camiler aranıyor…';
-    list.innerHTML='<div class="ms-empty">Konumun alındı. Yakındaki camiler harita kayıtlarından aranıyor…</div>';
-    try{
-      let data=await fetchOverpass(buildQuery(5000,lat,lon));
-      if(!data.elements.length){
-        status.textContent='Yakında bulunamadı, arama alanı genişletiliyor…';
-        data=await fetchOverpass(buildQuery(12000,lat,lon));
-      }
-      render(data.elements,lat,lon);
-    }catch(e){
-      status.textContent='Cami listesi şu anda alınamadı.';
-      list.innerHTML='<div class="ms-empty">'+esc((e&&e.message)||'Bağlantı hatası')+'<br><br>Konum iznin açık. Sorun konumda değil, harita veri sunucusuna erişimde olabilir. İnternet bağlantını kontrol edip “Tekrar Dene”ye bas.</div>';
-    }
+  const mapsBtn=(href,txt)=>'<a class="ms-refresh" href="'+href+'" target="_blank" rel="noopener" style="display:block;text-align:center;text-decoration:none">'+txt+'</a>';
+  function findMosques(lat,lon){
+    const la=lat.toFixed(6),lo=lon.toFixed(6);
+    const embed='https://maps.google.com/maps?q='+encodeURIComponent('cami near '+la+','+lo)+'&ll='+la+','+lo+'&z=15&output=embed';
+    const open='https://www.google.com/maps/search/'+encodeURIComponent('cami')+'/@'+la+','+lo+',15z';
+    status.textContent='Yakındaki camiler Google Haritalar’da gösteriliyor.';
+    list.innerHTML='<iframe title="Yakındaki camiler" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allow="geolocation" src="'+embed+'" style="width:100%;height:56vh;min-height:300px;border:1px solid rgba(153,183,242,.48);border-radius:14px;background:#1c3567;flex:none"></iframe>'
+      +mapsBtn(open,'Google Haritalar’da Aç · Liste, mesafe ve yol tarifi');
   }
   function locate(){
     if(!navigator.geolocation){status.textContent='Bu tarayıcı konum özelliğini desteklemiyor.';return}
@@ -9765,6 +9727,7 @@ html body #hcHome .hc-scene .hq2.hq-sky p em{font-size:12px!important;font-weigh
       e=>{
         const msg=e.code===1?'Konum izni verilmedi. Tarayıcı ayarlarından bu siteye konum izni ver.':e.code===2?'Konum belirlenemedi. GPS’i açıp tekrar dene.':'Konum isteği zaman aşımına uğradı. Tekrar deneyebilirsin.';
         status.textContent=msg;
+        list.innerHTML=mapsBtn('https://www.google.com/maps/search/'+encodeURIComponent('yakınımdaki cami'),'Yine de Google Haritalar’da ara');
       },
       {enableHighAccuracy:true,timeout:15000,maximumAge:120000}
     );

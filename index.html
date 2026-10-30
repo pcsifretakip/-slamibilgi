@@ -8525,7 +8525,9 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
   },()=>{$('qiblaBearing').textContent='—';status('Konum alınamadı. Konum iznini kontrol edip tekrar dene.');retry(true)},{enableHighAccuracy:true,timeout:12000,maximumAge:300000});
  }
  build();
- const qiblaTopBtn=$('openQibla');if(qiblaTopBtn)qiblaTopBtn.addEventListener('click',()=>{showQibla();start()});
+ let qiblaTopBtn=$('openQibla');
+ if(!qiblaTopBtn){qiblaTopBtn=document.createElement('button');qiblaTopBtn.type='button';qiblaTopBtn.id='openQibla';qiblaTopBtn.setAttribute('aria-label','Kıble pusulası');qiblaTopBtn.tabIndex=-1;qiblaTopBtn.style.setProperty('display','none','important');document.body.appendChild(qiblaTopBtn)}
+ qiblaTopBtn.addEventListener('click',()=>{showQibla();start()});
  $('closeQibla').addEventListener('click',back);
  $('qiblaLocate').addEventListener('click',start);
 })();
@@ -9700,44 +9702,60 @@ html body #hcHome .hc-scene .hq2.hq-sky p em{font-size:12px!important;font-weigh
       if(!Number.isFinite(la)||!Number.isFinite(lo))return null;
       const name=t.name||t['name:tr']||t['name:en']||'İsimsiz cami';
       return {name,lat:la,lon:lo,km:distance(lat,lon,la,lo),address:[t['addr:street'],t['addr:housenumber'],t['addr:suburb'],t['addr:city']].filter(Boolean).join(', '),photo:photoFrom(t)};
-    }).filter(Boolean).sort((a,b)=>a.km-b.km);
-    if(!rows.length){list.innerHTML='<div class="ms-empty">Bu konumun 10 km çevresinde harita verilerinde kayıtlı cami bulunamadı. Daha sonra tekrar deneyebilirsin.</div>';return}
+    }).filter(Boolean).sort((a,b)=>a.km-b.km).filter((m,i,arr)=>!arr.slice(0,i).some(p=>p.name===m.name&&Math.abs(p.km-m.km)<0.06));
+    if(!rows.length){list.innerHTML='<div class="ms-empty">Bu konumun 12 km çevresinde harita verilerinde kayıtlı cami bulunamadı. Daha sonra tekrar deneyebilirsin.</div>';return}
     list.innerHTML=rows.map(m=>{
       const map='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(m.name+' '+m.lat+','+m.lon);
       return '<article class="ms-card">'+showPhoto(m.photo,m.name)+'<div class="ms-detail"><b>'+esc(m.name)+'</b><span class="ms-distance">'+(m.km<1?Math.round(m.km*1000)+' m':m.km.toFixed(1).replace('.',',')+' km')+' uzaklıkta</span>'+(m.address?'<small>'+esc(m.address)+'</small>':'')+'<a class="ms-map" href="'+map+'" target="_blank" rel="noopener">Google Haritalar’da Aç ↗</a></div></article>';
     }).join('');
     status.textContent=rows.length+' cami bulundu · En yakından uzağa sıralandı.';
   }
-  async function findMosques(lat,lon){
-    status.textContent='Yakındaki camiler aranıyor…';
-    list.innerHTML='<div class="ms-empty">Konumun alındı. Yakındaki camiler harita kayıtlarından aranıyor…</div>';
-    const query='[out:json][timeout:45];(nwr(around:12000,'+lat+','+lon+')["amenity"="place_of_worship"]["religion"~"muslim|islam",i];nwr(around:12000,'+lat+','+lon+')["building"="mosque"];nwr(around:12000,'+lat+','+lon+')["name"~"cami|camii|mescit|mosque",i];);out center tags;';
-    const endpoints=[
-      'https://overpass.private.coffee/api/interpreter',
-      'https://overpass.kumi.systems/api/interpreter',
-      'https://overpass-api.de/api/interpreter'
-    ];
-    let lastError='Harita sunucularına ulaşılamadı.';
-    for(const endpoint of endpoints){
-      let timer;
+  const ENDPOINTS=[
+    'https://overpass.private.coffee/api/interpreter',
+    'https://overpass.kumi.systems/api/interpreter',
+    'https://overpass-api.de/api/interpreter'
+  ];
+  const buildQuery=(r,lat,lon)=>'[out:json][timeout:20];('
+    +'nwr(around:'+r+','+lat+','+lon+')["amenity"="place_of_worship"]["religion"~"muslim|islam",i];'
+    +'nwr(around:'+r+','+lat+','+lon+')["building"="mosque"];'
+    +');out center tags;';
+  async function fetchOverpass(query){
+    const ctrls=[];
+    const tasks=ENDPOINTS.map(async ep=>{
+      const c=new AbortController();ctrls.push(c);
+      const t=setTimeout(()=>c.abort(),18000);
       try{
-        const controller=new AbortController();
-        timer=setTimeout(()=>controller.abort(),40000);
-        // GET isteği, mobil tarayıcılarda POST kaynaklı CORS/preflight sorunlarını önler.
-        const res=await fetch(endpoint+'?data='+encodeURIComponent(query),{
-          method:'GET',headers:{'Accept':'application/json'},signal:controller.signal,cache:'no-store'
-        });
+        const res=await fetch(ep+'?data='+encodeURIComponent(query),{method:'GET',headers:{'Accept':'application/json'},signal:c.signal,cache:'no-store'});
         if(!res.ok)throw new Error('Harita sunucusu HTTP '+res.status+' yanıtı verdi.');
         const data=await res.json();
         if(!data||!Array.isArray(data.elements))throw new Error('Harita sunucusundan geçersiz veri geldi.');
-        render(data.elements,lat,lon);
-        return;
-      }catch(e){
-        lastError=e&&e.name==='AbortError'?'Harita sunucusunun yanıtı zaman aşımına uğradı.':(e&&e.message)||'Bağlantı hatası';
-      }finally{if(timer)clearTimeout(timer)}
+        return data;
+      }finally{clearTimeout(t)}
+    });
+    try{
+      const data=await Promise.any(tasks);
+      ctrls.forEach(c=>{try{c.abort()}catch(e){}});
+      return data;
+    }catch(e){
+      const errs=(e&&e.errors)||[e];
+      const real=errs.find(x=>x&&x.name!=='AbortError');
+      throw new Error(real?real.message:'Harita sunucularının yanıtı zaman aşımına uğradı.');
     }
-    status.textContent='Cami listesi şu anda alınamadı.';
-    list.innerHTML='<div class="ms-empty">'+esc(lastError)+'<br><br>Konum iznin açık. Sorun konumda değil, harita veri sunucusuna erişimde olabilir. İnternet bağlantını kontrol edip “Tekrar Dene”ye bas.</div>';
+  }
+  async function findMosques(lat,lon){
+    status.textContent='Yakındaki camiler aranıyor…';
+    list.innerHTML='<div class="ms-empty">Konumun alındı. Yakındaki camiler harita kayıtlarından aranıyor…</div>';
+    try{
+      let data=await fetchOverpass(buildQuery(5000,lat,lon));
+      if(!data.elements.length){
+        status.textContent='Yakında bulunamadı, arama alanı genişletiliyor…';
+        data=await fetchOverpass(buildQuery(12000,lat,lon));
+      }
+      render(data.elements,lat,lon);
+    }catch(e){
+      status.textContent='Cami listesi şu anda alınamadı.';
+      list.innerHTML='<div class="ms-empty">'+esc((e&&e.message)||'Bağlantı hatası')+'<br><br>Konum iznin açık. Sorun konumda değil, harita veri sunucusuna erişimde olabilir. İnternet bağlantını kontrol edip “Tekrar Dene”ye bas.</div>';
+    }
   }
   function locate(){
     if(!navigator.geolocation){status.textContent='Bu tarayıcı konum özelliğini desteklemiyor.';return}

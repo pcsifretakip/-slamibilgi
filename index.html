@@ -6753,7 +6753,7 @@ try{if(typeof vib==='function')vib(12)}catch(_){}
 #yakindaOnlyScreen .ilim-unlocked .ilim-topic-copy b{color:#ffe184!important}
 #yakindaOnlyScreen .ilim-topic-state{color:#c5d7f3!important}
 #yakindaOnlyScreen .ilim-unlocked .ilim-topic-state:before{content:'Konuya başla'}
-#yakindaOnlyScreen .ilim-locked .ilim-topic-state:before{content:'Önceki konuyu tamamla'}
+#yakindaOnlyScreen .ilim-locked .ilim-topic-state:before{content:''}
 #yakindaOnlyScreen .yk-home{border-color:#fff0b8!important;background:linear-gradient(180deg,#fff0b8,#f0c24a 55%,#c99a22)!important;color:#302200!important;box-shadow:0 5px 0 #704b12,0 9px 18px #0007!important}
 #yakindaOnlyScreen .yk-home svg{stroke:#302200!important}
 #yakindaOnlyScreen .yk-fade{background:linear-gradient(180deg,rgba(5,12,32,0),rgba(5,12,32,.96) 70%)!important}
@@ -7084,13 +7084,6 @@ try{if(typeof vib==='function')vib(12)}catch(_){}
   fill();
  }
  window.hcShowTour=function(){try{localStorage.removeItem(KEY)}catch(e){}run()};
- var tries=0;
- (function wait(){
-  if(seen()||++tries>240)return;
-  var h=document.getElementById('sLogin'),t=document.getElementById('hcTools');
-  if(h&&h.classList.contains('on')&&t&&t.getBoundingClientRect().width>0&&!document.querySelector('.lbm.on'))setTimeout(function(){if(!seen()&&h.classList.contains('on'))run()},900);
-  else setTimeout(wait,1500);
- })();
 })();
 </script>
 </body>
@@ -7942,7 +7935,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   function choose(oi){
     if(locked)return;
     /* Çift Cevap: ilk cevap yanlışsa can gitmez, süre akmaya devam eder, bir hak daha var */
-    if(dbl&&oi>=0&&oi!==cur.a){dbl=false;hideCfm();var wb=$('dpO').querySelector('.dp-o[data-oi="'+oi+'"]');if(wb){wb.classList.add('no');wb.disabled=true}jToast('✌️ Yanlış! Bir hakkın daha var, tekrar seç.');return}
+    if(dbl&&oi>=0&&oi!==cur.a){dbl=false;hideCfm();var wb=$('dpO').querySelector('.dp-o[data-oi="'+oi+'"]');if(wb){wb.classList.add('no');wb.disabled=true}jToast('Yanlış! Bir hakkın daha var, tekrar seç.');return}
     locked=true;paintJ();clearInterval(tmr);stopCd();hideCfm();
     var q=cur,ok=oi===q.a,btns=$('dpO').children;
     for(var i=0;i<btns.length;i++){var b=btns[i],v=+b.dataset.oi;b.disabled=true;
@@ -9054,9 +9047,16 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #yakindaOnlyScreen .ilim-unlocked .ilim-topic-copy b{color:#ffe18a!important}
 #yakindaOnlyScreen .ilim-topic-state{display:block!important;color:#9eb5de!important;font:700 10px/1.2 "Nunito",system-ui,sans-serif!important}
 #yakindaOnlyScreen .ilim-topic-state:before{content:'Konuya başla'}
-#yakindaOnlyScreen .ilim-locked .ilim-topic-state:before{content:'Önceki konuyu tamamla'}
-#yakindaOnlyScreen .ilim-lock-icon{display:none!important;flex:none;width:19px!important;height:19px!important;fill:none!important;stroke:#aab8d2!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
+#yakindaOnlyScreen .ilim-locked .ilim-topic-state:before{content:''}
+#yakindaOnlyScreen .ilim-lock-icon{display:none!important;flex:none;width:24px!important;height:24px!important;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))!important;fill:none!important;stroke:#aab8d2!important;stroke-width:1.8!important;stroke-linecap:round!important;stroke-linejoin:round!important}
 #yakindaOnlyScreen .ilim-locked .ilim-lock-icon{display:block!important}
+#yakindaOnlyScreen .ilim-locked .ilim-topic-state{display:none!important}
+#yakindaOnlyScreen .ilim-locked .ilim-topic-copy{gap:0!important}
+#yakindaOnlyScreen .ilim-topic.ilim-unlocked{border-color:rgba(255,211,106,.95)!important;background:linear-gradient(145deg,rgba(78,58,16,.96),rgba(28,20,8,.98))!important;box-shadow:inset 0 0 0 1px rgba(255,225,138,.22),0 0 14px rgba(255,200,70,.35)!important}
+#yakindaOnlyScreen .ilim-unlocked .ilim-topic-icon{stroke:#ffd86b!important;filter:drop-shadow(0 0 5px rgba(255,200,70,.7))!important}
+#yakindaOnlyScreen .ilim-unlocked .ilim-topic-copy b{color:#ffe18a!important}
+#yakindaOnlyScreen .ilim-unlocked .ilim-topic-state{color:#ffe18a!important}
+#yakindaOnlyScreen .ilim-unlocked .ilim-topic-progress-track{box-shadow:inset 0 1px 2px #000b,0 0 0 1px rgba(255,211,106,.5)!important}
 #yakindaOnlyScreen .ilim-topic.ilim-forced-lock:after{content:none!important;display:none!important}
 #yakindaOnlyScreen .ilim-topic:active:not(.ilim-locked){transform:scale(.98)!important}
 @media(max-width:350px){#yakindaOnlyScreen .yk-scroll{padding-left:8px!important;padding-right:8px!important}#yakindaOnlyScreen .ilim-buttons{gap:7px!important}#yakindaOnlyScreen .ilim-topic{gap:7px!important;padding:8px!important;min-height:58px!important}#yakindaOnlyScreen .ilim-topic-icon{width:27px!important;height:27px!important}#yakindaOnlyScreen .ilim-topic-copy b{font-size:11px!important}#yakindaOnlyScreen .ilim-topic-state{font-size:9px!important}}
@@ -9069,7 +9069,7 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
  h.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-1.1 5.5-.7 8 1.2v13c-2.5-1.9-5.2-2.3-8-1.2z"/><path d="M20 5.5c-2.8-1.1-5.5-.7-8 1.2v13c2.5-1.9 5.2-2.3 8-1.2z"/><path d="M12 6.7v13"/></svg><div><h1>İLİM PUANI TOPLA</h1><p>Bir konu seç, bilgini geliştir</p></div>';
  menu.insertBefore(h,menu.firstChild);
  var book='<svg class="ilim-topic-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5c2.8-1.1 5.5-.7 8 1.2v13c-2.5-1.9-5.2-2.3-8-1.2z"/><path d="M20 5.5c-2.8-1.1-5.5-.7-8 1.2v13c2.5-1.9 5.2-2.3 8-1.2z"/><path d="M12 6.7v13"/></svg>';
- var lock='<svg class="ilim-lock-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>';
+ var lock='<svg class="ilim-lock-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.6 10.6V7.9a4.4 4.4 0 0 1 8.8 0v2.7" fill="none" stroke="#d3e0f5" stroke-width="2.3" stroke-linecap="round"/><rect x="4.4" y="10.4" width="15.2" height="10.8" rx="3.4" fill="#8da4cc" stroke="#d3e0f5" stroke-width="1.2"/><circle cx="12" cy="14.8" r="1.8" fill="#0b1630" stroke="none"/><path d="M12 15.4v2.8" fill="none" stroke="#0b1630" stroke-width="2" stroke-linecap="round"/></svg>';
  screen.querySelectorAll('.ilim-topic').forEach(function(b){var label=(b.getAttribute('aria-label')||'Konu').replace(/\s*\(kilitli\)$/i,'');b.setAttribute('data-label',label);b.innerHTML=book+'<span class="ilim-topic-copy"><b>'+label+'</b><small class="ilim-topic-state"></small>'+(b.dataset.topic==='namaz'?'<span class="ilim-topic-progress"><span class="ilim-topic-progress-label"><span class="ilim-progress-done">0</span><span class="ilim-progress-sep">/</span><span class="ilim-progress-total">25</span></span><i class="ilim-topic-progress-track"><b></b></i></span>':'')+'</span>'+lock});
  function updateNamazProgress(){
    var b=screen.querySelector('.ilim-topic[data-topic="namaz"]');if(!b)return;
@@ -9193,6 +9193,29 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 })();
 </script>
 
+<style id="molla-buy-modal-balance-chip-red-cancel">
+#dailyPlay #dpMb .mb-scene{padding-top:58px!important}
+#dailyPlay #dpMb .mb-bal:not(.bad){display:none!important}
+#dailyPlay #dpMb .mb-chip{position:absolute;top:14px;right:14px;z-index:2;display:flex;align-items:center;gap:6px;padding:6px 12px 6px 9px;border:1.5px solid rgba(255,225,132,.9);border-radius:999px;background:linear-gradient(145deg,#294b88,#10254d);box-shadow:0 3px 10px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.14);color:#ffe184;font:900 16px/1 "Nunito",system-ui,sans-serif}
+#dailyPlay #dpMb .mb-chip svg{flex:none;width:20px;height:20px;fill:none;stroke:#ffe184;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#dailyPlay #dpMb #dpMbNo{border-color:#ff9aa9!important;background:linear-gradient(145deg,#e0344f,#8f1027)!important;color:#fff!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 5px 12px rgba(120,10,30,.45)!important}
+#dailyPlay #dpMb #dpMbNo svg{stroke:#fff!important}
+#dailyPlay #dpMb #dpMbNo span{color:#fff!important}
+</style>
+<script id="molla-buy-modal-balance-chip-js">
+(function(){
+ var root=document.getElementById('dpMb'),scene=root&&root.querySelector('.mb-scene'),bal=document.getElementById('dpMbBal');
+ if(!scene||!bal||scene.querySelector('.mb-chip'))return;
+ var chip=document.createElement('div');chip.className='mb-chip';chip.setAttribute('aria-label','Dirhem bakiyen');
+ chip.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 9h8M8 12h8M8 15h5"/><path d="M12 3v2M12 19v2"/></svg><b>0</b>';
+ scene.appendChild(chip);
+ function sync(){var b=bal.querySelector('b');if(!b)return;var m=(b.textContent||'').match(/\d+/);if(m)chip.querySelector('b').textContent=m[0]}
+ new MutationObserver(sync).observe(bal,{childList:true,characterData:true,subtree:true});sync();
+})();
+</script>
+<style id="daily-toast-blue-glass">
+#dailyPlay .dp-jt{background:linear-gradient(145deg,rgba(27,58,115,.58),rgba(8,20,52,.66))!important;-webkit-backdrop-filter:blur(12px) saturate(1.25)!important;backdrop-filter:blur(12px) saturate(1.25)!important;border:1.5px solid rgba(255,211,106,.78)!important;box-shadow:0 0 0 3px rgba(81,170,255,.14),0 12px 28px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.16)!important;color:#ffe9a8!important;text-shadow:0 1px 2px rgba(0,0,0,.55)}
+</style>
 <style id="lost-life-red-breaking-heart">
 .lf-h{position:relative!important;isolation:isolate!important;overflow:visible!important;filter:drop-shadow(0 0 20px rgba(255,35,75,.68))!important;background:linear-gradient(90deg,transparent 49.5%,rgba(255,247,225,.95) 49.8%,rgba(255,91,119,.95) 50.2%,transparent 50.6%) center/100% 0 no-repeat!important;animation:lfBeat 3.3s ease both,lfCrackFlash 3.3s ease both!important}
 .lf-h::before,.lf-h::after{content:'❤️'!important;position:absolute!important;inset:0!important;display:grid!important;place-items:center!important;font-family:system-ui,sans-serif!important;font-size:min(54vw,210px)!important;line-height:1!important;filter:drop-shadow(0 0 10px rgba(255,35,75,.55))!important}

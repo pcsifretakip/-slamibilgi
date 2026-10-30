@@ -6569,6 +6569,7 @@ quran:'<path d="M12 6c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-
 days:'<path d="M20.5 14.2A8.6 8.6 0 1 1 9.8 3.5a7 7 0 0 0 10.7 10.7z"/><path d="M17.4 3.2l.8 1.9 1.9.8-1.9.8-.8 1.9-.8-1.9-1.9-.8 1.9-.8z"/>',
 tesbih:'<circle cx="12" cy="5" r="1.8"/><circle cx="18" cy="9" r="1.8"/><circle cx="18" cy="16" r="1.8"/><circle cx="12" cy="20" r="1.8"/><circle cx="6" cy="16" r="1.8"/><circle cx="6" cy="9" r="1.8"/>',
 qibla:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/>',
+mosque:'<path d="M2.5 21h19"/><path d="M4.5 21V10.5L6 7.5l1.5 3V21M16.5 21V10.5L18 7.5l1.5 3V21"/><path d="M8 21v-5M16 21v-5M8 16a4 4 0 0 1 8 0"/><path d="M12 12V9.6"/><path d="M13.3 7.6a2 2 0 1 1-2.4-2.4 1.6 1.6 0 0 0 2.4 2.4z"/><path d="M10.6 21v-2.4a1.4 1.4 0 0 1 2.8 0V21M6 13.6v.1M18 13.6v.1"/>',
 help:'<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.6 2.6 0 1 1 3.6 2.4c-.8.4-1.1.9-1.1 1.8M12 17.2v.1"/>',
 rank:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8.5 20h7"/>',
 shop:'<path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9c0 2 3 2 4 0 1 2 3 2 4 0 1 2 3 2 4 0 1 2 4 2 4 0M10 20v-5h4v5"/>',
@@ -6607,7 +6608,7 @@ var colors={rank:'#ffd166',shop:'#59f5ae',friends:'#52dfff',more:'#c795ff',gear:
 nav.appendChild(more);document.addEventListener('click',function(e){if(!more.contains(e.target)&&!e.target.closest('.hc-more-trigger')){more.classList.remove('on');var t=nav.querySelector('.hc-more-trigger');if(t)t.setAttribute('aria-expanded','false')}});root.appendChild(main);root.appendChild(nav);
 home.insertBefore(bg,home.firstChild);home.insertBefore(root,bg.nextSibling);
 var tools=document.createElement('div');tools.id='hcTools';tools.setAttribute('role','group');tools.setAttribute('aria-label','Kısayollar');
-[['quran','İkra','#bQuranRead','61,255,160'],['days','Dini gün ve geceler','#bDiniGunler','255,200,87'],['qibla','Kıble','#openQibla','255,122,168']].forEach(function(a){var b=btn('hc-tool',ic(a[0]),a[2],a[3],a[1]);b.title=a[1];tools.appendChild(b)});
+[['quran','İkra','#bQuranRead','61,255,160'],['days','Dini gün ve geceler','#bDiniGunler','255,200,87'],['qibla','Kıble','#openQibla','255,122,168'],['mosque','Yakındaki camiler','#openMosques','110,200,255']].forEach(function(a){var b=btn('hc-tool',ic(a[0]),a[2],a[3],a[1]);b.title=a[1];var tl=document.createElement('span');tl.className='hc-tl';tl.textContent=({quran:'İkra',days:'Günler',qibla:'Kıble',mosque:'Camiler'})[a[0]]||a[1];b.appendChild(tl);tools.appendChild(b)});
 home.appendChild(tools);
 (function(){var chip=document.getElementById('homeWalletChip'),de=document.documentElement;
 function fit(){var w=chip?chip.getBoundingClientRect().width:0;if(!w)return;var tw=tools.getBoundingClientRect().width||0;de.style.setProperty('--hc-chipw',Math.ceil(w)+'px');de.style.setProperty('--hc-rw',Math.ceil(w+tw)+'px')}
@@ -6669,7 +6670,9 @@ box-shadow:0 2px 0 rgba(2,6,20,.85),0 0 10px rgba(var(--rgb),.45),inset 0 1px 0 
 .hc-tool svg{display:block;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px rgba(var(--rgb),.8))}
 .hc-tool:active{transform:translateY(2px) scale(.94);box-shadow:0 0 0 rgba(2,6,20,.85),0 0 8px rgba(var(--rgb),.5)}
 #sLogin.hc-ready .hc-tool{animation:hcToolPop .5s cubic-bezier(.2,1.5,.4,1) backwards}
-#sLogin.hc-ready .hc-tool:nth-child(2){animation-delay:.07s}#sLogin.hc-ready .hc-tool:nth-child(3){animation-delay:.14s}
+#sLogin.hc-ready .hc-tool:nth-child(2){animation-delay:.07s}#sLogin.hc-ready .hc-tool:nth-child(3){animation-delay:.14s}#sLogin.hc-ready .hc-tool:nth-child(4){animation-delay:.21s}
+/* eski header cami butonu: artık kısayol satırında, gizli kalır (tıklama proxy'si için DOM'da duruyor) */
+#sLogin .hb span#hFriendBtns.hfr{display:none!important}
 @keyframes hcToolPop{from{opacity:0;scale:.4}to{opacity:1;scale:1}}
 #sLogin .hb{max-width:calc(100vw - var(--hc-rw,0px) - 30px)}
 #sLogin .hb #hName{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -7028,6 +7031,68 @@ try{if(typeof vib==='function')vib(12)}catch(_){}
 @media(max-width:380px){#sLogin .hb #hFriendBtns,#sLogin .hb #hFriendBtns #openMosques{flex-basis:29px!important;width:29px!important;min-width:29px!important;max-width:29px!important;height:29px!important;min-height:29px!important;max-height:29px!important}#sLogin .hb #hFriendBtns #openMosques svg{width:19px!important;height:19px!important;min-width:19px!important;max-width:19px!important}}
 </style>
 
+
+<style id="hc-tour-css">
+.hc-tool{position:relative!important;overflow:visible!important}
+.hc-tl{position:absolute;top:calc(100% + 2px);left:50%;transform:translateX(-50%);font:800 9px/1 "Nunito",system-ui,sans-serif;color:#fff;text-shadow:0 1px 2px #000,0 0 4px #000;white-space:nowrap;pointer-events:none;letter-spacing:.2px}
+#hcTour{position:fixed;inset:0;z-index:100050}
+#hcTour .hct-ring{position:absolute;border-radius:18px;box-shadow:0 0 0 100vmax rgba(4,8,24,.8),0 0 0 2px #ffe7a0,0 0 18px 4px rgba(255,231,160,.55);transition:left .25s,top .25s,width .25s,height .25s;pointer-events:none}
+#hcTour .hct-card{position:absolute;box-sizing:border-box;padding:14px 14px 12px;border:1.5px solid #e9c66a;border-radius:16px;background:linear-gradient(160deg,#1b2f66,#0d1b45);color:#f4f6ff;font:600 13.5px/1.45 "Nunito",system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.65);transition:left .25s,top .25s}
+#hcTour .hct-card:before{content:"";position:absolute;top:-8px;left:var(--ax,50%);width:14px;height:14px;margin-left:-7px;transform:rotate(45deg);background:#1b2f66;border-left:1.5px solid #e9c66a;border-top:1.5px solid #e9c66a}
+#hcTour .hct-step{font-size:11px;font-weight:800;color:#9fb4e0}
+#hcTour .hct-card b{display:block;margin:2px 0 4px;font-size:15px;font-weight:900;color:#ffe7a0}
+#hcTour .hct-card p{margin:0 0 12px}
+#hcTour .hct-act{display:flex;justify-content:space-between;gap:8px}
+#hcTour .hct-act button{border:0;border-radius:11px;padding:9px 16px;font:900 13px "Nunito",system-ui,sans-serif;cursor:pointer}
+#hcTour .hct-skip{background:transparent;color:#9fb4e0}
+#hcTour .hct-next{background:linear-gradient(180deg,#ffe9a6,#d5a83f);color:#2b210a;box-shadow:0 3px 0 #76551b}
+</style>
+<script id="hc-tour-js">
+(function(){
+ var KEY='islami_tour_v1';
+ function seen(){try{return localStorage.getItem(KEY)==='1'}catch(e){return false}}
+ function mark(){try{localStorage.setItem(KEY,'1')}catch(e){}}
+ var steps=[
+  ['İkra','Kur’an-ı Kerim’i buradan okuyabilirsin.'],
+  ['Dini gün ve geceler','Kandil, bayram gibi önemli günlerin takvimini gör.'],
+  ['Kıble','Konumuna göre Kâbe yönünü pusulayla bul.'],
+  ['Yakındaki camiler','Çevrendeki camileri haritada gör.']
+ ];
+ function run(){
+  var tools=document.getElementById('hcTools');if(!tools||document.getElementById('hcTour'))return;
+  var btns=[].slice.call(tools.querySelectorAll('.hc-tool'));if(!btns.length)return;
+  var i=0,ov=document.createElement('div');ov.id='hcTour';
+  ov.innerHTML='<div class="hct-ring"></div><div class="hct-card"><div class="hct-step"></div><b></b><p></p><div class="hct-act"><button type="button" class="hct-skip">Atla</button><button type="button" class="hct-next">İleri</button></div></div>';
+  document.body.appendChild(ov);
+  var ring=ov.querySelector('.hct-ring'),card=ov.querySelector('.hct-card'),st=ov.querySelector('.hct-step'),tt=ov.querySelector('b'),tx=ov.querySelector('p'),nx=ov.querySelector('.hct-next');
+  function place(){
+   var b=btns[i],r=b.getBoundingClientRect(),w=Math.min(270,window.innerWidth-24);
+   ring.style.left=(r.left-5)+'px';ring.style.top=(r.top-5)+'px';ring.style.width=(r.width+10)+'px';ring.style.height=(r.height+22)+'px';
+   var left=Math.max(12,Math.min(r.left+r.width/2-w/2,window.innerWidth-w-12));
+   card.style.width=w+'px';card.style.left=left+'px';card.style.top=(r.bottom+26)+'px';
+   card.style.setProperty('--ax',(r.left+r.width/2-left)+'px');
+  }
+  function fill(){
+   var s=steps[i]||[btns[i].title||'',''];
+   st.textContent=(i+1)+' / '+btns.length;tt.textContent=s[0];tx.textContent=s[1];
+   nx.textContent=(i===btns.length-1)?'Bitti':'İleri';place();
+  }
+  function end(){mark();window.removeEventListener('resize',place);ov.remove()}
+  nx.addEventListener('click',function(){if(i>=btns.length-1)end();else{i++;fill()}});
+  ov.querySelector('.hct-skip').addEventListener('click',end);
+  window.addEventListener('resize',place);
+  fill();
+ }
+ window.hcShowTour=function(){try{localStorage.removeItem(KEY)}catch(e){}run()};
+ var tries=0;
+ (function wait(){
+  if(seen()||++tries>240)return;
+  var h=document.getElementById('sLogin'),t=document.getElementById('hcTools');
+  if(h&&h.classList.contains('on')&&t&&t.getBoundingClientRect().width>0&&!document.querySelector('.lbm.on'))setTimeout(function(){if(!seen()&&h.classList.contains('on'))run()},900);
+  else setTimeout(wait,1500);
+ })();
+})();
+</script>
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */

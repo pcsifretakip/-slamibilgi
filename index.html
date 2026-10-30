@@ -4771,7 +4771,7 @@ function watchJokerAd(k){
  adReward(()=>{adCount();const inv=inventory();inv[k]++;saveInventory(inv);renderRoundJokers();$('irNote').textContent=jokerNames[k]+' kazandın! Kullanmak için jokere dokun.';resumeAfterConfirm()},()=>{resumeAfterConfirm()})}
 let locked=false,resDone=false,roundStartPts=0;
 function currentRankName(p){const active=[...ranks].reverse().find(r=>p>=r[1]);return active?active[0]:'Acemi'}
-function rankProgressHTML(){const p=points(),next=ranks.find(r=>p<r[1]);const prev=[...ranks].reverse().find(r=>p>=r[1]);const low=prev?prev[1]:0,high=next?next[1]:low;const pct=next?Math.max(0,Math.min(100,((p-low)/Math.max(1,high-low))*100)):100;return '<span>İLİM PUANI İLERLEMESİ · '+p+' P</span><i class="ir-rank-track"><b style="width:'+pct+'%"></b></i>'+(next?'<small>Bir sonraki derece '+next[0].toLocaleUpperCase('tr-TR')+' '+high.toLocaleString('tr-TR')+' Puan topla ve kilitli '+next[0].toLocaleUpperCase('tr-TR')+' avatarına ulaş.</small>':'<small>En üst rütbeye ulaştın.</small>')}
+function rankProgressHTML(){const p=points(),next=ranks.find(r=>p<r[1]);const prev=[...ranks].reverse().find(r=>p>=r[1]);const low=prev?prev[1]:0,high=next?next[1]:low;const pct=next?Math.max(0,Math.min(100,((p-low)/Math.max(1,high-low))*100)):100;return '<span>İLİM PUANI İLERLEMESİ · '+p+' P</span><i class="ir-rank-track"><b style="width:'+pct+'%"></b></i>'+(next?'<div class="ir-rank-info"><div class="ir-ri"><em>Sonraki Derece :</em><b>'+next[0]+'</b></div><div class="ir-ri"><em>Ulaşılması gereken ilim puanı :</em><b>'+high.toLocaleString('tr-TR')+'</b></div><div class="ir-ri"><em>Kalan ilim puanı :</em><b class="ir-kalan" data-high="'+high+'">'+Math.max(0,high-p).toLocaleString('tr-TR')+'</b></div></div>':'<small>En üst rütbeye ulaştın.</small>')}
 function escape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 window.openIlimJourney=function(initialCat){stop();cat=null;level=null;showCats();root.classList.add('open');if(initialCat){cat=initialCat;startRound()}};function open(){window.openIlimJourney()}
 function goHome(){
@@ -4783,9 +4783,16 @@ else{document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));c
 }
 function close(){hideConfirm();hideIrModal();stop();hideRoundOverlay();root.classList.remove('open');const m=$('irJokerModal');if(m)m.classList.remove('show');goHome()}
 function showCats(){
+const namazTotal=QUESTION_BANK.filter(q=>q.cat==='namaz').length;
+const namazRounds=Math.max(1,Math.ceil(namazTotal/10));
+const namazResume=resAll().namaz;
+let namazDone=0;
+try{const done=JSON.parse(localStorage.getItem('ilimTopicDoneV1')||'{}')||{};namazDone=done.namaz?namazRounds:Math.max(0,Math.min(namazRounds,(namazResume&&namazResume.roundNo?namazResume.roundNo:1)-1))}catch(e){namazDone=Math.max(0,(namazResume&&namazResume.roundNo?namazResume.roundNo:1)-1)}
+const namazPct=Math.round(namazDone/namazRounds*100);
+if(!document.getElementById('irNamazProgressStyle')){const st=document.createElement('style');st.id='irNamazProgressStyle';st.textContent='#ilimRound .ir-cat[data-cat="namaz"]{display:flex;align-items:center;justify-content:space-between;gap:8px;background:linear-gradient(90deg,#168b61 var(--cat-progress),#1b3470 var(--cat-progress))!important}#ilimRound .ir-cat[data-cat="namaz"] small{font-size:12px;font-weight:900;white-space:nowrap;color:#fff5d5}';document.head.appendChild(st)}
 content.innerHTML='<button class="ir-back" id="irClose">‹ Ana Sayfa</button><h2>🕌 Kategori Seç</h2><div class="ir-cats">'+
 '<button class="ir-cat selected" data-cat="ilmihal">🕌 Namaz</button>'+
-CATS.filter(c=>c[0] && c[0]!=="ilmihal").map(c=>'<button class="ir-cat" type="button" data-cat="'+escape(c[0])+'">'+escape(c[2]||'📜')+' '+escape(c[1])+'</button>').join('')+
+CATS.filter(c=>c[0] && c[0]!=="ilmihal").map(c=>c[0]==='namaz'?'<button class="ir-cat" type="button" data-cat="namaz" style="--cat-progress:'+namazPct+'%"><span>🕌 Namaz</span><small>'+namazDone+' / '+namazRounds+'</small></button>':'<button class="ir-cat" type="button" data-cat="'+escape(c[0])+'">'+escape(c[2]||'📜')+' '+escape(c[1])+'</button>').join('')+
 '</div><button class="ir-action" id="irStart">BAŞLA ▶</button>';
 cat='ilmihal';level=null;
 content.querySelector('#irClose').onclick=close;
@@ -4917,7 +4924,7 @@ if(tr)tr.animate([{transform:'scaleY(1)',filter:'brightness(1)'},{transform:'sca
 if(pp0)pp0.animate([{transform:'scale(1)',color:'#ffffff'},{transform:'scale(1.45)',color:'#65ffd0'},{transform:'scale(1)',color:''}],{duration:650,easing:'ease-out'});
 (function step(now){const t=Math.min(1,(now-T0)/D),e=1-Math.pow(1-t,3),m=$('irRankMini'),b=m&&m.querySelector('.ir-rank-track b'),lab=m&&m.querySelector('span'),pp=$('irProfilePoints'),num=Math.round(before+(after-before)*e);
 if(b){b.style.transition='none';b.style.width=(A.pct+(endPct-A.pct)*e)+'%'}
-if(lab)lab.textContent='İLİM PUANI İLERLEMESİ · '+num+' P';if(pp)pp.textContent=num;
+if(lab)lab.textContent='İLİM PUANI İLERLEMESİ · '+num+' P';var kk=m&&m.querySelector('.ir-kalan');if(kk)kk.textContent=Math.max(0,(+kk.dataset.high)-num).toLocaleString('tr-TR');if(pp)pp.textContent=num;
 if(t<1)requestAnimationFrame(step);else if(rankUp)setTimeout(refreshProgress,400);else refreshProgress()})(T0);
 }
 }
@@ -4926,7 +4933,7 @@ hideConfirm();hideIrModal();stop();locked=false;if(at>=10){results();return}
 resumeSave();const q=questions[at];time=30;left=time;jokerQuestion=false;doubleActive=false;doubleAttempted=false;used={};/* joker kilidi tur boyunca değil, soru başına: her yeni soruda joker yeniden kullanılabilir/satın alınabilir */
 const dirhemSrc=(document.getElementById('dirhemIc')||{}).src||'';
  const jokerAsset=k=>{const ids={feraset:'#l5 img',seyirci:'#la img',molla:'#lp img',ciftcevap:'#l2 img'};const el=document.querySelector(ids[k]);return el?el.src:''};
- content.innerHTML='<div class="ir-toprow"><div class="ir-tl"><button type="button" class="ir-profile" id="irProfile" aria-label="Profil"><img src="'+escape((document.getElementById("hAv")||{}).src||"")+'" alt="Profil"><span class="ir-profile-rank" id="irProfileRank">'+currentRankName(points())+'</span><span class="ir-profile-points">✨ <b id="irProfilePoints">'+points()+'</b></span></button><div class="ir-hearts" id="irHearts"></div></div><div class="ir-tr"><button type="button" class="ir-homebtn" id="irQHome" aria-label="Ana Sayfa"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h4.5v-5.5h4v5.5h4.5V10"/></svg></button><div class="ir-wallet"><img class="ir-dirhem-img" src="'+dirhemSrc+'" alt=""><b id="irWalletValue">'+wallet()+'</b></div></div></div><div class="ir-topbar"><div class="ir-rank-mini ir-rank-next-profile" id="irRankMini">'+rankProgressHTML()+'</div></div><div class="ir-status" id="irStatus"></div><div class="ir-hud"><div class="ir-hud-main"><div class="ir-progress-label" id="irQLabel"><span class="ir-pill ir-pill-round">BÖLÜM '+roundNo+' / '+(cat==='fikih'?fkRounds():30)+'</span><span class="ir-pill ir-pill-q">SORU '+(at+1)+' / 10</span></div><div class="ir-progress-shell ir-bar-only"><div class="ir-progress"><i id="irQuestionProgress" style="width:'+((at+1)/10*100)+'%"></i></div></div></div><div class="ir-countdown" id="irCountdown"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ir-ring-bg" cx="32" cy="32" r="25"></circle><circle class="ir-ring" id="irTimer" cx="32" cy="32" r="25"></circle></svg><b id="irClock">'+left+'</b><small>SN</small></div></div><div class="ir-question">'+escape(q.q)+'</div><div class="ir-options">'+q.o.map((o,i)=>'<button class="ir-opt" data-answer="'+i+'">'+('ABCDE'[i])+'. '+escape(o)+'</button>').join('')+'</div><div class="ir-jokers"><button class="ir-joker" data-joker="feraset"><img src="'+jokerAsset('feraset')+'" alt=""><span>Feraset</span><b class="ir-stock" id="irStock-feraset">0</b></button><button class="ir-joker" data-joker="seyirci"><img src="'+jokerAsset('seyirci')+'" alt=""><span>Cemaat</span><b class="ir-stock" id="irStock-seyirci">0</b></button><button class="ir-joker" data-joker="molla"><img src="'+jokerAsset('molla')+'" alt=""><span>Mollaya Sor</span><b class="ir-stock" id="irStock-molla">0</b></button><button class="ir-joker" data-joker="ciftcevap"><img src="'+jokerAsset('ciftcevap')+'" alt=""><span>Çift Cevap</span><b class="ir-stock" id="irStock-ciftcevap">0</b></button></div><div class="ir-note" id="irNote"></div>';
+ content.innerHTML='<div class="ir-toprow"><div class="ir-tl"><button type="button" class="ir-profile" id="irProfile" aria-label="Profil"><img src="'+escape((document.getElementById("hAv")||{}).src||"")+'" alt="Profil"><span class="ir-profile-rank" id="irProfileRank">'+currentRankName(points())+'</span><span class="ir-profile-points">✨ <b id="irProfilePoints">'+points()+'</b></span></button><div class="ir-hearts" id="irHearts"></div></div><div class="ir-tr"><button type="button" class="ir-homebtn" id="irQHome" aria-label="Ana Sayfa"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h4.5v-5.5h4v5.5h4.5V10"/></svg></button><div class="ir-wallet"><img class="ir-dirhem-img" src="'+dirhemSrc+'" alt=""><b id="irWalletValue">'+wallet()+'</b></div></div></div><div class="ir-topbar"><div class="ir-rank-mini ir-rank-next-profile" id="irRankMini">'+rankProgressHTML()+'</div></div><div class="ir-status" id="irStatus"></div><div class="ir-hud"><div class="ir-hud-main"><div class="ir-progress-label" id="irQLabel"><span class="ir-pill ir-pill-q">SORU '+(at+1)+' / 10</span></div><div class="ir-progress-shell ir-bar-only"><div class="ir-progress"><i id="irQuestionProgress" style="width:'+((at+1)/10*100)+'%"></i></div></div></div><div class="ir-countdown" id="irCountdown"><svg viewBox="0 0 64 64" aria-hidden="true"><circle class="ir-ring-bg" cx="32" cy="32" r="25"></circle><circle class="ir-ring" id="irTimer" cx="32" cy="32" r="25"></circle></svg><b id="irClock">'+left+'</b><small>SN</small></div></div><div class="ir-question">'+escape(q.q)+'</div><div class="ir-options">'+q.o.map((o,i)=>'<button class="ir-opt" data-answer="'+i+'">'+('ABCDE'[i])+'. '+escape(o)+'</button>').join('')+'</div><div class="ir-jokers"><button class="ir-joker" data-joker="feraset"><img src="'+jokerAsset('feraset')+'" alt=""><span>Feraset</span><b class="ir-stock" id="irStock-feraset">0</b></button><button class="ir-joker" data-joker="seyirci"><img src="'+jokerAsset('seyirci')+'" alt=""><span>Cemaat</span><b class="ir-stock" id="irStock-seyirci">0</b></button><button class="ir-joker" data-joker="molla"><img src="'+jokerAsset('molla')+'" alt=""><span>Mollaya Sor</span><b class="ir-stock" id="irStock-molla">0</b></button><button class="ir-joker" data-joker="ciftcevap"><img src="'+jokerAsset('ciftcevap')+'" alt=""><span>Çift Cevap</span><b class="ir-stock" id="irStock-ciftcevap">0</b></button></div><div class="ir-note" id="irNote"></div>';
  $('irProfile').onclick=()=>{const h=$('hProf');if(h)h.click()};$('irQHome').onclick=close;
  content.querySelectorAll('[data-answer]').forEach(b=>b.onclick=()=>askConfirm(+b.dataset.answer));
  content.querySelectorAll('[data-joker]').forEach(b=>{const k=b.dataset.joker;b.onclick=()=>joker(k)});
@@ -7965,7 +7972,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
     var bs=[].slice.call($('dpO').children).filter(function(b){return+b.dataset.oi!==cur.a&&!b.disabled});
     sh(bs).slice(0,2).forEach(function(b){b.classList.add('off');b.disabled=true});
     mToast('✨','Feraset','İki yanlış şık elendi, kalan iki şıktan birini seç.')}
-  function jCift(){dbl=true;mToast('✌️','Çift Cevap','İlk cevabın yanlışsa bir hakkın daha var, tekrar seçebilirsin.')}
+  function jCift(){dbl=true;mToast('×2','Çift Cevap','İlk cevabın yanlışsa bir hakkın daha var, tekrar seçebilirsin.')}
   function jMolla(){
     var answerIndex=order.indexOf(cur.a);
     var L='ABCD'[answerIndex],V=['Evladım, bence cevap '+L+' şıkkı.','Bismillah, '+L+' şıkkını işaretle derim.','Bunu biliyorum! '+L+' şıkkı bence.','Maşallah, sağlam soru! Cevap '+L+' şıkkı.'];
@@ -8064,6 +8071,55 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 body.dp-jk #veil{z-index:2147483001}
 body.dp-jk #jt,body.dp-jk #hc,body.dp-jk #au{z-index:2147483002}
 #dailyPlay .dp-o.sel{box-shadow:0 6px 0 #6b5720,0 0 0 3px #ffe08a,0 0 20px rgba(255,224,138,.6),inset 0 2px 0 rgba(255,255,255,.32)}
+</style>
+<style id="dp-joker-toast">
+/* Günlük oyun: Feraset / Çift Cevap penceresi — çerçeveli görsel yerine saf CSS kart */
+body.dp-jk #jt{
+  background:radial-gradient(120% 58% at 50% 0%,#1b3a73,#0d1c40 62%,#07132e)!important;
+  border:1.5px solid rgba(255,211,106,.82);border-radius:24px;
+  width:min(calc(100% - 40px),380px);aspect-ratio:auto!important;
+  padding:26px 20px 30px;box-sizing:border-box;
+  filter:none!important;
+  box-shadow:0 0 0 3px rgba(81,170,255,.16),0 0 26px rgba(64,155,255,.2),0 22px 46px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.14)}
+body.dp-jk #jt .tbd{position:static;transform:none;display:grid;place-items:center;width:58px;height:58px;margin:0 auto 10px;border-radius:50%;font-size:30px;line-height:1;color:#ffe184;
+  background:radial-gradient(circle at 50% 35%,rgba(255,225,132,.28),rgba(255,225,132,.06) 70%);
+  border:1.5px solid rgba(255,211,106,.6);text-shadow:none;box-shadow:0 0 18px rgba(255,200,80,.25)}
+body.dp-jk #jt .tc{position:static;inset:auto;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+body.dp-jk #jt .tt2{font:900 clamp(20px,5.6vw,26px)/1.15 "Nunito",system-ui,sans-serif;color:#ffe184;text-shadow:none}
+body.dp-jk #jt .tt3{font:700 clamp(14px,3.9vw,17px)/1.45 "Nunito",system-ui,sans-serif;color:#dce9ff;text-shadow:none}
+body.dp-jk #jt .tx2{bottom:-19px}
+body.dp-jk #jt .tbd{font-weight:900;font-size:25px;letter-spacing:-.02em;font-family:"Nunito",system-ui,sans-serif}
+</style>
+<style id="dp-joker-cards">
+/* Günlük oyun: Mollaya Sor + Cemaat — çerçeveli görsel yerine CSS kart (molla figürü ve çubuk animasyonu korunur) */
+body.dp-jk #hc,body.dp-jk #au{aspect-ratio:auto;container-type:normal;border:1.5px solid rgba(255,211,106,.82);background:radial-gradient(120% 58% at 50% 0%,#1b3a73,#0d1c40 62%,#07132e);box-shadow:0 0 0 3px rgba(81,170,255,.16),0 0 26px rgba(64,155,255,.2),0 22px 46px rgba(0,0,0,.62),inset 0 1px 0 rgba(255,255,255,.14);filter:none}
+body.dp-jk #hc .tx2,body.dp-jk #au .tx2{position:absolute;left:50%;top:auto;bottom:-20px;width:38px;height:38px;aspect-ratio:auto;margin:0 0 0 -19px;border-radius:50%;background:linear-gradient(180deg,#fff0b8,var(--gold2) 35%,var(--gold));box-shadow:0 3px 0 #6b5720,0 6px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.8)}
+body.dp-jk #hc .tx2 svg,body.dp-jk #au .tx2 svg{display:block;width:16px;height:16px}
+/* Mollaya Sor */
+body.dp-jk #hc{width:min(calc(100% - 32px),340px);padding:96px 18px 38px;border-radius:26px}
+body.dp-jk #hc .hk-img{display:block}
+body.dp-jk #hc .hk-t{display:block;font-size:13px;font-weight:900;letter-spacing:.16em;color:#ffe184}
+body.dp-jk #hc .hk-a{position:static;width:auto;height:auto;margin:10px 0 16px;display:flex;align-items:center;justify-content:center;gap:12px}
+body.dp-jk #hc .hk-l{width:52px;height:52px;display:grid;place-items:center;border-radius:16px;font-size:30px;font-weight:900;color:#2a1f05;text-shadow:none;background:linear-gradient(180deg,#fff0b8,#f0c24a);box-shadow:0 0 16px rgba(240,220,158,.75),inset 0 2px 0 rgba(255,255,255,.8)}
+body.dp-jk #hc .hk-w{display:block;font-size:30px;font-weight:900;letter-spacing:.04em;color:#5bdfff;text-shadow:0 0 14px rgba(91,223,255,.7),0 2px 0 rgba(0,0,0,.4)}
+body.dp-jk #hc .hk-q{position:relative;left:auto;top:auto;width:auto;height:auto;display:block;padding:12px 14px;border-radius:16px;font-size:14.5px;line-height:1.4;font-style:italic;text-align:center;color:#dce9ff;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1.5px rgba(240,220,158,.45)}
+/* Cemaat */
+body.dp-jk #au{width:min(calc(100% - 32px),360px);padding:40px 18px 34px;border-radius:26px;text-align:center}
+body.dp-jk #au .aubadge{display:grid;border-color:#ffd36a;background:radial-gradient(#27549c,#0b1a3d)}
+body.dp-jk #au .aut{display:block;font-size:18px;font-weight:900;letter-spacing:.14em;color:#ffe184}
+body.dp-jk #au .aus{display:block;margin:3px 0 18px;font-size:12.5px;color:#b9cdf2}
+body.dp-jk #au .aur{position:relative;left:auto;right:auto;top:auto;height:auto;display:grid;grid-template-columns:36px 1fr 50px;align-items:center;gap:10px;margin:0 0 12px}
+body.dp-jk #au .aur .aul{position:static;width:36px;height:36px;aspect-ratio:auto;transform:none;display:grid;place-items:center;border-radius:12px;font-size:17px;color:#f5c84a;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px rgba(240,220,158,.6)}
+body.dp-jk #au .aur.top .aul{color:#2a1f05;background:linear-gradient(180deg,#fff0b8,#f0c24a);box-shadow:0 0 12px rgba(240,220,158,.7)}
+body.dp-jk #au .aur .aub{position:relative;left:auto;top:auto;width:auto;height:18px;border-radius:999px;overflow:hidden;background:rgba(0,0,0,.4);box-shadow:inset 0 2px 4px rgba(0,0,0,.55)}
+body.dp-jk #au .aur .aup{position:static;width:auto;height:auto;display:block;font-size:15px;text-align:right}
+body.dp-jk #au .aur.off{opacity:.35}
+body.dp-jk #au .aur.off .aub,body.dp-jk #au .aur.off .aup{opacity:1}
+body.dp-jk #au .aur.off .aul{background:rgba(255,255,255,.08)}
+body.dp-jk #au #auRows{position:static!important;inset:auto!important;display:block}
+body.dp-jk #au #auRows .aur .aub{position:relative!important;left:auto!important;right:auto!important;top:auto!important;width:auto!important;height:18px!important}
+body.dp-jk #au #auRows .aur .aup{position:static!important;left:auto!important;right:auto!important;width:auto!important;text-align:right!important;display:block!important}
+body.dp-jk #au .aucard-pad,body.dp-jk #au{min-height:0}
 </style>
 
 <style id="profile-v7">
@@ -9509,3 +9565,12 @@ html body #hcHome .hc-scene .hq2.hq-sky p em{font-size:12px!important;font-weigh
   fit();
 })();
 </script>
+
+<style id="ir-rank-info-css">
+/* İlim puanı ilerlemesi: kalın bar + sade bilgi satırları */
+#ilimRound .ir-rank-mini .ir-rank-track,#ilimRound .ir-rank-next-profile .ir-rank-track{height:16px!important;border-width:1.5px!important}
+#ilimRound .ir-rank-info{display:flex;flex-direction:column;gap:3px;margin-top:5px;text-align:left}
+#ilimRound .ir-ri{display:flex;align-items:baseline;gap:6px;font-size:13px;line-height:1.3;font-weight:800}
+#ilimRound .ir-ri em{font-style:normal;color:#dce9ff}
+#ilimRound .ir-ri b{color:#ffe184;font-weight:900}
+</style>

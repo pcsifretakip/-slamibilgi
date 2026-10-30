@@ -1250,6 +1250,7 @@ head>
   <div class="pm-wl"><i class="w" id="pfWBar"></i><i class="l" id="pfLBar"></i><i class="d" id="pfDBar"></i></div>
   <div class="pm-ranks" aria-label="Dereceler"><div class="pmh">DERECELER</div><div class="pmr r0" role="button" tabindex="0" aria-label="Talebe" data-need="2.500 P"><div class="pmc"><img alt="Talebe"></div></div><div class="pmr r1" role="button" tabindex="0" aria-label="Yolcu" data-need="5.000 P"><div class="pmc"><img alt="Yolcu"></div></div><div class="pmr r2" role="button" tabindex="0" aria-label="Çırak" data-need="10.000 P"><div class="pmc"><img alt="Çırak"></div></div><div class="pmr r3" role="button" tabindex="0" aria-label="Mütefekkir" data-need="20.000 P"><div class="pmc"><img alt="Mütefekkir"></div></div><div class="pmr r4" role="button" tabindex="0" aria-label="Muallim" data-need="30.000 P"><div class="pmc"><img alt="Muallim"></div></div><div class="pmr r5" role="button" tabindex="0" aria-label="Üstad" data-need="40.000 P"><div class="pmc"><img alt="Üstad"></div></div><div class="pm-yl">Yolcu</div></div>
 </div></div>
+<button type="button" id="openFriendsManage" hidden aria-hidden="true" tabindex="-1" style="display:none"></button>
 <div class="lbm" id="friendsManageModal" aria-hidden="true"><div class="lbw"><div class="lbc friends-manage-card" role="dialog" aria-label="Arkadaşlarım">
   <button class="lbx" id="friendsManageClose" aria-label="Kapat">✕</button>
   <h2>Arkadaşlarım</h2><p id="fmSub">Ekli arkadaşlarını yönetebilirsin.</p>
@@ -7086,6 +7087,16 @@ try{if(typeof vib==='function')vib(12)}catch(_){}
  window.hcShowTour=function(){try{localStorage.removeItem(KEY)}catch(e){}run()};
 })();
 </script>
+<style id="settings-bottom-rows">
+/* Ayarlar: Gizlilik Sözleşmesi + Bize Ulaşın diğer satırlarla aynı renk, listenin en altında (Çıkış / Hesabı Sil üstünde) */
+#setm #bPriv,#setm #bCont{border-color:rgba(35,216,240,.28)!important;background:linear-gradient(110deg,rgba(27,67,112,.62),rgba(14,26,59,.95))!important}
+#setm #bPriv::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235be3f4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E")!important}
+#setm #bCont::after{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235be3f4' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='14' rx='2'/%3E%3Cpath d='m3 7 9 6 9-6'/%3E%3C/svg%3E")!important}
+#setm #bPriv{order:1}
+#setm #bCont{order:2}
+#setm #acctLogout,#setm #acctDelete{order:3}
+#setm #sMsg{order:4}
+</style>
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */
@@ -7753,6 +7764,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
       <button type="button" class="dp-btn glass show" id="dpCfmNo">Vazgeç</button>
     </div>
   </div>
+  <div class="dp-jtbd" id="dpJtBd" aria-hidden="true"></div>
   <div class="dp-jt" id="dpJt" role="status"></div>
   <div class="dp-exit dp-jm" id="dpJm" role="alertdialog" aria-label="Joker">
     <div class="dp-card">
@@ -7820,6 +7832,8 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
 #dailyPlay .dp-o.off{opacity:.25;filter:grayscale(1);pointer-events:none}
 #dailyPlay .dp-jt{position:absolute;left:50%;top:36%;z-index:7;width:min(calc(100% - 40px),340px);transform:translate(-50%,-40%);opacity:0;pointer-events:none;padding:14px 16px;border-radius:20px;text-align:center;font-weight:900;font-size:15px;line-height:1.4;color:#fff0bd;background:linear-gradient(180deg,rgba(14,110,72,.97),rgba(4,52,34,.97));box-shadow:0 0 0 2px #e9ad3d,0 14px 30px rgba(0,0,0,.6);transition:opacity .2s,transform .2s}
 #dailyPlay .dp-jt.on{opacity:1;transform:translate(-50%,-50%)}
+#dailyPlay .dp-jtbd{position:absolute;inset:0;z-index:6;background:rgba(4,10,28,.45);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .2s}
+#dailyPlay .dp-jtbd.on{opacity:1}
 #dailyPlay .dp-jm,#dailyPlay .dp-go{z-index:6}
 #dailyPlay .dp-go .dp-card,#dailyPlay .dp-jm .dp-card{max-height:94%;overflow-y:auto}
 #dailyPlay .dp-jm .dp-btn,#dailyPlay .dp-go .dp-btn{margin:0 0 11px;padding:14px 16px;font-size:16px}
@@ -8020,7 +8034,7 @@ box-shadow:0 7px 0 #6b5720,0 14px 22px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255
   function spend(n){if(scVal()<n)return false;if(!banked){var t=Math.min(eC,n);eC-=t;n-=t}if(n>0)add(WK,-n);paintSc();return true}
   function pauseT(){clearInterval(tmr);pausedMs=Date.now()-t0;pauseCd()}
   function resumeT(){if(locked)return;t0=Date.now()-Math.min(TIME*1000-100,pausedMs);clearInterval(tmr);tmr=setInterval(tickT,100);resumeCd()}
-  function jToast(msg){var t=$('dpJt');if(!t)return;t.textContent=msg;t.classList.add('on');clearTimeout(jtT);jtT=setTimeout(function(){t.classList.remove('on')},2400)}
+  function jToast(msg){var t=$('dpJt'),bd=$('dpJtBd');if(!t)return;t.textContent=msg;t.classList.add('on');if(bd)bd.classList.add('on');clearTimeout(jtT);jtT=setTimeout(function(){t.classList.remove('on');if(bd)bd.classList.remove('on')},2400)}
   function openJm(ic,title,body,btns){
     pauseT();jOpen=true;
     $('dpJmIc').textContent=ic;$('dpJmT').textContent=title;$('dpJmB').innerHTML=body||'';
@@ -9085,7 +9099,7 @@ html:has(#profm.on),body:has(#profm.on){overflow:hidden!important;overscroll-beh
 #yakindaOnlyScreen .ilim-topic[data-topic="namaz"] .ilim-topic-copy{gap:5px!important}
 #yakindaOnlyScreen .ilim-topic[data-topic="namaz"] .ilim-topic-state{display:none!important}
 #yakindaOnlyScreen .ilim-topic-progress{display:flex!important;flex-direction:column!important;gap:4px!important;width:100%!important;min-width:0!important}
-#yakindaOnlyScreen .ilim-topic-progress-label{display:flex!important;align-items:center!important;gap:2px!important;font:900 12px/1.15 "Nunito",system-ui,sans-serif!important;white-space:nowrap!important}#yakindaOnlyScreen .ilim-progress-done{color:#35e28a!important}#yakindaOnlyScreen .ilim-progress-sep{color:#ffffff!important}#yakindaOnlyScreen .ilim-progress-total{color:#ff4b55!important}
+#yakindaOnlyScreen .ilim-topic-progress-label{display:flex!important;align-items:center!important;gap:2px!important;font:900 12px/1.15 "Nunito",system-ui,sans-serif!important;white-space:nowrap!important}#yakindaOnlyScreen .ilim-progress-done{color:#3fa9ff!important}#yakindaOnlyScreen .ilim-progress-sep{color:#ffffff!important}#yakindaOnlyScreen .ilim-progress-total{color:#ff4b55!important}
 #yakindaOnlyScreen .ilim-topic-progress-track{display:block!important;width:100%!important;height:5px!important;overflow:hidden!important;border-radius:99px!important;background:#06132d!important;box-shadow:inset 0 1px 2px #000b,0 0 0 1px #65dff855!important}
 #yakindaOnlyScreen .ilim-topic-progress-track b{display:block!important;width:0;height:100%!important;border-radius:99px!important;background:linear-gradient(90deg,#38d9f5,#48a7ff,#ffe184)!important;box-shadow:0 0 7px #48dafa99!important;transition:width .35s ease!important}
 </style><style id="daily-play-blue-gold-theme">

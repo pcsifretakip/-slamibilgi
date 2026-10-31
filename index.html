@@ -5486,7 +5486,7 @@ $('pfIn').onkeydown=e=>{if(e.key==='Enter')add()};$('pfIn').oninput=e=>{e.target
 $('frL').onclick=async e=>{const d=e.target.closest('[data-d]');if(!d||!db)return;try{await F.deleteDoc(F.doc(db,'users',uid,'friends',d.dataset.d));await list()}catch(x){msg('Silinemedi.')}};
 setId();
 /* ===== ONLINE DÜELLO: rastgele rakip + arkadaşa meydan okuma ===== */
-let mid0,M,started,shown,qi=0,score=0,tm,left,lock,oppU,scan,qU,watchU,invOn,invData,stW,mine={},advQ=-1,armQ=-1,grT,qT0=0,noTxt='';let TQ=15;
+let mid0,M,started,shown,qi=0,score=0,tm,left,lock,oppU,scan,qU,watchU,invOn,invData,stW,mine={},advQ=-1,armQ=-1,grT,qT0=0,noTxt='',hlT,ansAt={},oppLoc={},nxtAt=0;let TQ=15;
 function dShow(m,h){$('duel').classList.add('on');$('dG').style.display=m==='g'?'block':'none';$('dSt').style.display=m==='g'?'none':'flex';if(h!=null)$('dSt').innerHTML=h}
 const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.2l2.95 6.3 6.85.8-5.1 4.7 1.4 6.8L12 17.3 5.9 20.8l1.4-6.8L2.2 9.3l6.85-.8z"/></svg>';
 const TIERS=[{n:'Kolay',c:50,d:0,tq:15},{n:'Orta',c:100,d:1,tq:15},{n:'Zor',c:150,d:2,tq:15},{n:'Çok Zor',c:200,d:2,tq:10}];
@@ -5528,7 +5528,7 @@ function pick(lv){/* 10 soru: seçilen zorlukta, Namaz/Fıkıh/Siyer kategoriler
         o.push({q:x.q,o:ix.map(i=>x.o[i]),a:ix.indexOf(x.a)});break}
       if(o.length>=10)break}}
   return sh(o)}
-function reset(){clearTimeout(stW);stW=null;clearInterval(tm);clearInterval(scan);[qU,watchU].forEach(u=>u&&u());qU=watchU=scan=null;M=null;started=shown=false;qi=0;score=0;mid0=null;oppU=null;mine={};advQ=armQ=-1;clearTimeout(grT);paintBar.p=null;try{oppAv()}catch(e){}}
+function reset(){clearInterval(hlT);hlT=null;ansAt={};oppLoc={};nxtAt=0;clearTimeout(stW);stW=null;clearInterval(tm);clearInterval(scan);[qU,watchU].forEach(u=>u&&u());qU=watchU=scan=null;M=null;started=shown=false;qi=0;score=0;mid0=null;oppU=null;mine={};advQ=armQ=-1;clearTimeout(grT);paintBar.p=null;try{oppAv()}catch(e){}}
 let lastRes;
 async function settle(wu,lu){/* kazanan: bahis kadar dirhemi kaybedenin sunucudaki bakiyesinden alır (kaybedenin bakiyesi kadarıyla sınırlı), tek işlemde ve bir kez */
   const mid=mid0,st=+(M&&M.stake)||0;if(!mid||!st||!db||!wReady)return null;
@@ -5672,10 +5672,21 @@ function oppAv(rk,av){const w=$('dOav'),im=$('dOavI');if(!w||!im)return;
   const key=rk+'|'+g;if(im.dataset.k!==key){im.src=src;im.dataset.k=key}
   w.classList.toggle('rk',rk>=0);w.hidden=false;
   if(rk>=0&&typeof RANKS!=='undefined'&&RANKS[rk]){const sp=document.createElement('span');sp.className='dork';sp.textContent=String(RANKS[rk]).toLocaleUpperCase('tr');$('dOn').appendChild(sp)}}
-function watch(m){mid0=m;try{const q=myRk();F.updateDoc(F.doc(db,'matches',m),{['rk.'+uid]:q.r,['av.'+uid]:q.g}).catch(()=>{})}catch(e){}watchU=F.onSnapshot(F.doc(db,'matches',m),sn=>{const d=sn.data();if(!d)return;if(shown){if(d.paid){M=d;loserPayFb(d);updDirhem(d)}return}M=d;oppU=d.p.find(x=>x!==uid);
+function watch(m){mid0=m;clearInterval(hlT);hlT=setInterval(heal,1500);try{const q=myRk();F.updateDoc(F.doc(db,'matches',m),{['rk.'+uid]:q.r,['av.'+uid]:q.g}).catch(()=>{})}catch(e){}watchU=F.onSnapshot(F.doc(db,'matches',m),sn=>{const d=sn.data();if(!d)return;if(shown){if(d.paid){M=d;loserPayFb(d);updDirhem(d)}return}M=d;oppU=d.p.find(x=>x!==uid);
   if(d.st==='no'){reset();dShow('s','<b>Davet kabul edilmedi</b><button class="dbt" id="dClose">Kapat</button>');return}
   if(d.st==='play'&&!started){if(d.rk&&typeof d.rk[oppU]==='number'){clearTimeout(stW);stW=null;started=true;ask()}else if(!stW){stW=setTimeout(()=>{stW=null;if(!started&&!shown&&M&&M.st==='play'){started=true;ask();chk()}},2500)}}
   $('dOn').textContent=((d.names&&d.names[oppU])||'RAKİP').toUpperCase().slice(0,12);try{oppAv(d.rk&&d.rk[oppU],d.av&&d.av[oppU])}catch(e){}chk()})}
+/* Bekçi: cevabım sunucuya ulaşmadıysa yeniden yazar, geçiş takılırsa zorlar, rakip kaydı çok uzun süre gelmezse yerelde süre doldu sayar */
+function heal(){if(shown||!M||!started||!db||!mid0)return;
+  try{sync();if(shown)return;
+    const q=qi,r=mine[q],s=M.s||{};
+    if(r===undefined)return;
+    const at=ansAt[q]||Date.now();
+    if(!s['a'+q+'_'+uid]&&(!r.rs||Date.now()-r.rs>3000)){r.rs=Date.now();putAns(q,{i:r.i,ms:r.ms,ok:r.ok})}
+    const c=calcBar(M,uid,oppU);
+    if(c.fin>q){if(advQ===q&&nxtAt&&Date.now()-nxtAt>3500){nxtAt=Date.now();ask()}return}
+    if(!s['a'+q+'_'+oppU]&&!oppLoc[q]&&Date.now()-at>Math.max(0,TQ*1000-(r.ms||0))+12000){oppLoc[q]={i:-1,ms:TQ*1000,ok:false,f:1};sync()}
+  }catch(e){console.warn('heal',e)}}
 function chk(){sync()}
 function res(l){if(shown)return;shown=true;clearInterval(tm);clearTimeout(grT);const c=calcBar(M,uid,oppU),a=Math.round(50+c.live),b=100-a,ko=!l&&c.ko!==0,fr=M.r,t=fr?fr==='tie':(!l&&Math.abs(c.acc)<.05),w=fr?fr===uid:(l||c.acc>0),on=esc((M.names&&M.names[oppU])||'Rakip'),dirhemLine=M.stake?'<div class="ddirhem" id="dDirhem">'+(t?'Dirhem değişmedi':'…')+'</div>':'';
   if(w){const nm2=on.toUpperCase().slice(0,12);
@@ -5696,7 +5707,7 @@ function res(l){if(shown)return;shown=true;clearInterval(tm);clearTimeout(grT);c
 const BAR_HIT=20,BAR_REF=.4;/* tam vuruş = barın %20'si; çift doğruda vuruş = süre farkı / (soru süresi×0.4), en fazla tam vuruş */
 function barRd(A,B,D){const a=!!(A&&A.ok),b=!!(B&&B.ok);if(a&&!b)return BAR_HIT;if(b&&!a)return -BAR_HIT;
   if(a&&b){const x=Math.min(1,Math.abs(A.ms-B.ms)/D);return A.ms<B.ms?BAR_HIT*x:A.ms>B.ms?-BAR_HIT*x:0}return 0}
-function calcBar(d,a,b){const s=(d&&d.s)||{},D=(+(d&&d.tq)||15)*1000*BAR_REF,g=(q,u)=>s['a'+q+'_'+u]||(u===uid&&mine[q])||null;let acc=0,ko=0,fin=0;
+function calcBar(d,a,b){const s=(d&&d.s)||{},D=(+(d&&d.tq)||15)*1000*BAR_REF,g=(q,u)=>s['a'+q+'_'+u]||(u===uid&&mine[q])||(u!==uid&&oppLoc[q])||null;let acc=0,ko=0,fin=0;
   for(let q=0;q<10;q++){const A=g(q,a),B=g(q,b),dl=barRd(A,B,D);
     if(!(A&&B))return{acc,live:Math.max(-50,Math.min(50,acc+dl)),ko:0,fin,done:false};/* turu süren soru: bekleyen taraf yanlış sayılır (canlı) */
     acc+=dl;fin++;if(acc>=50){acc=50;ko=1;break}if(acc<=-50){acc=-50;ko=-1;break}}
@@ -5708,14 +5719,15 @@ function paintBar(c){const L=$('dTL'),R=$('dTR'),K=$('dTM'),T=$('dTug');if(!L||!
   L.className='tl'+(my<=15?' cr':my<=32?' lo':'');R.className='tr'+(op<=15?' cr':op<=32?' lo':'');
   if(Math.abs(my-pv)>=2){T.classList.remove('hitL','hitR');void T.offsetWidth;T.classList.add(my>pv?'hitR':'hitL')}
   paintBar.p=my;$('dMe').textContent=Math.round(my)+'%';$('dOp').textContent=Math.round(op)+'%'}
+const withTO=(p,ms)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(new Error('timeout')),ms))]);
 async function putAns(q,rec){const mid=mid0,k='a'+q+'_'+uid;if(!mid||!db)return;
-  try{await F.runTransaction(db,async tx=>{const r=F.doc(db,'matches',mid),sn=await tx.get(r);if(!sn.exists())return;const d=sn.data();if(d.r||(d.s&&d.s[k]))return;tx.update(r,{['s.'+k]:rec})})}
-  catch(e){console.warn('ans',e);try{F.updateDoc(F.doc(db,'matches',mid),{['s.'+k]:rec}).catch(()=>{})}catch(x){}}}
+  try{await withTO(F.runTransaction(db,async tx=>{const r=F.doc(db,'matches',mid),sn=await tx.get(r);if(!sn.exists())return;const d=sn.data();if(d.r||(d.s&&d.s[k]))return;tx.update(r,{['s.'+k]:rec})}),5000)}
+  catch(e){console.warn('ans',e);try{await F.updateDoc(F.doc(db,'matches',mid),{['s.'+k]:rec})}catch(x){console.warn('ans2',x)}}}
 async function forceOpp(q){/* rakip hiç cevap/süre kaydı yazmadıysa (bağlantı koptu) turu onun adına süre doldu say; ilk yazan kazanır */
   const mid=mid0,op=oppU;if(shown||!M||!db||!mid||!op)return;const k='a'+q+'_'+op;
   try{await F.runTransaction(db,async tx=>{const r=F.doc(db,'matches',mid),sn=await tx.get(r);if(!sn.exists())return;const d=sn.data();if(d.r||(d.s&&d.s[k]))return;tx.update(r,{['s.'+k]:{i:-1,ms:(+d.tq||15)*1000,ok:false,f:1}})})}catch(e){console.warn('force',e)}}
 function arm(){if(armQ===qi)return;armQ=qi;clearTimeout(grT);const q=qi,w=Math.max(0,TQ*1000-((mine[q]&&mine[q].ms)||0))+6000;grT=setTimeout(()=>forceOpp(q),w)}
-function nxt(){if(advQ===qi)return;advQ=qi;clearTimeout(grT);setTimeout(()=>{if(shown||!M)return;ask()},1300)}
+function nxt(){if(advQ===qi)return;advQ=qi;nxtAt=Date.now();clearTimeout(grT);setTimeout(()=>{if(shown||!M)return;ask()},1300)}
 function sync(){if(!M||shown||!started)return;
   const x=M.x||{};if(x[oppU]){res(true);return}
   const c=calcBar(M,uid,oppU);paintBar(c);
@@ -5745,7 +5757,7 @@ function ask(){if(shown||!M)return;
   lock=false;qT0=Date.now();left=TQ;clearInterval(tm);
   tm=setInterval(()=>{left=Math.max(0,TQ-(Date.now()-qT0)/1000);const s=$('dSec');if(s){const v=String(Math.ceil(left));if(s.textContent!==v)s.textContent=v;$('dNo').classList.toggle('low',left<=5)}if(left<=0)pk(-1)},100)}
 function pk(i){if(lock||shown)return;lock=true;clearInterval(tm);const q=M.q[qi],ok=i===q.a,ms=i<0?TQ*1000:Math.round(Math.min(TQ*1000,Date.now()-qT0)),rec={i:i,ms:ms,ok:ok};
-  mine[qi]=rec;putAns(qi,rec);
+  mine[qi]=rec;ansAt[qi]=Date.now();putAns(qi,rec);
   [...$('dO').children].forEach((b,j)=>{b.disabled=true;if(j===q.a)b.classList.add('ok');else if(j===i)b.classList.add('no')});
   sync()}
 function listenInv(){if(invOn||!db)return;invOn=1;F.onSnapshot(F.doc(db,'invites',uid),sn=>{const d=sn.data(),b=$('invBn');if(!d||d.ts<Date.now()-300000||mid0){b.classList.remove('on');return}invData=d;$('invT').textContent='⚔️ '+d.name+' seni '+(d.stake||0)+' dirhemlik yarışmaya çağırıyor!';b.classList.add('on')})}

@@ -5685,7 +5685,7 @@ async function walletInit(){const r=F.doc(db,'wallets',uid);
   wReady=true;wUnsub&&wUnsub();wUnsub=F.onSnapshot(r,sn=>{if(!sn.exists()||inflight||pend)return;setLoc(+sn.data().dirhems||0)});wFlush()}
 const msg=t=>{[$('frMsg'),$('pfMsg')].forEach(e=>{if(e)e.textContent=t||''})};
 const nm=()=>(localStorage.getItem('islamibilgi_name')||'Misafir').trim().slice(0,14)||'Misafir';
-const prof=()=>({name:nm(),pts:+(window.homePts?window.homePts():0)||0,av:+(window.avGet?window.avGet():0)||0,facebookUid:(localStorage.getItem('islamibilgi_fb_graph_uid')||'')||null});
+const prof=()=>({name:nm(),pts:+(window.homePts?window.homePts():0)||0,av:(function(){try{return +localStorage.getItem('islamibilgi_av')===1?1:0}catch(e){return +(window.avGet?window.avGet():0)||0}})(),facebookUid:(localStorage.getItem('islamibilgi_fb_graph_uid')||'')||null});
 let bootP=null,mking=false;
 function setId(){$('pfId').textContent=pid||(mking?'…':'—')}
 function boot(){if(db)return Promise.resolve(true);if(!bootP){mking=!pid;setId();bootP=boot0().finally(()=>{bootP=null;mking=false;setId()})}return bootP}
@@ -6079,7 +6079,7 @@ function pk(i){if(lock||shown)return;lock=true;clearInterval(tm);cdStop();const 
   sync()}
 /* ===== CİNSİYET KISITI + AİLE ODASI ===== */
 const GENDER_MSG='Erkekler yalnızca erkeklere, hanımlar yalnızca hanımlara arkadaşlık isteği gönderebilir. Aile üyenle oynamak için "Ailenle Oyna" bölümünü kullan.';
-function ibMyG(){return(typeof avGet==='function'&&avGet()===1)?1:0}
+function ibMyG(){try{return +localStorage.getItem('islamibilgi_av')===1?1:0}catch(e){return(typeof avGet==='function'&&avGet()===1)?1:0}}
 function ibGenderOK(d){return((+(d&&d.av)===1)?1:0)===ibMyG()}
 window.__ibGender=ibGenderOK;window.__ibGenderMsg=GENDER_MSG;
 let famRoom=null,famTm=null;const FAM_MS=15*60000,famT=pw=>10000+(+pw);

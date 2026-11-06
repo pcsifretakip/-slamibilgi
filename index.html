@@ -5756,7 +5756,7 @@ async function add(){
   if(!await boot())return;
   try{const i=await F.getDoc(F.doc(db,'ids',c));if(!i.exists()){msg('Bu ID ile oyuncu bulunamadı.');return}
     const fu=i.data().uid;
-    {const gs=await F.getDoc(F.doc(db,'users',fu));if(gs.exists()&&!ibGenderOK(gs.data())){msg(GENDER_MSG);return}}
+    {const gs=await F.getDoc(F.doc(db,'users',fu));if(gs.exists()&&!ibGenderOK(gs.data())){window.__showHaramBlock();return}}
     if((await F.getDoc(F.doc(db,'users',uid,'friends',c))).exists()){msg('Zaten arkadaşsınız.');return}
     const blockedByMe=await F.getDoc(F.doc(db,'users',uid,'blocked',c));const blockedMe=await F.getDoc(F.doc(db,'users',fu,'blocked',pid));if(blockedByMe.exists()||blockedMe.exists()){msg('Bu oyuncuya arkadaşlık isteği gönderilemiyor.');return}
     const u=await F.getDoc(F.doc(db,'users',fu)),fn=(u.exists()&&u.data().name)||'Oyuncu';
@@ -6156,7 +6156,7 @@ $('frRand').onclick=rand;$('frTg').onclick=e=>{const b=e.target.closest('[data-t
 $('dO').onclick=e=>{const b=e.target.closest('[data-i]');if(b)pk(+b.dataset.i)};
 $('dSt').onclick=e=>{if(e.target.closest('#dClose,.ws-x'))closeD(false);else if(e.target.closest('#dAgain')){closeD(false).then(openFr)}};
 $('frL').addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)challenge(c.dataset.c,c.dataset.n)});
-const pdoc=()=>{try{const q=window.periodPts(),ob=window.__onBase?window.__onBase():{p:0,w:0};return{dk:q.dk,dpts:q.d,wk:q.wk,wpts:q.w,onp:ob.p,onw:ob.w}}catch(e){return{}}};
+const pdoc=()=>{try{const q=window.periodPts(),ob=window.__onBase?window.__onBase():{p:0,w:0};return{dk:q.dk,dpts:q.d,wk:q.wk,wpts:q.w,onp:ob.p,onw:ob.w,rk:(typeof rkGet==='function'?rkGet():-1)}}catch(e){return{}}};
 let lastLb=0;
 async function syncPts(){if(!db||!uid)return;try{await F.setDoc(F.doc(db,'users',uid),{name:nm(),pts:+(window.homePts?window.homePts():0)||0,...pdoc(),t:F.serverTimestamp()},{merge:true})}catch(e){}}
 setInterval(()=>{if(db)syncPts()},20000);
@@ -6213,7 +6213,7 @@ async function refreshPendingRequests(){
 async function resolvePendingFriend(btn,accept){if(!await boot())return;const id=btn.dataset.fmAccept||btn.dataset.fmReject,ref=F.doc(db,'friendReqs',id);try{const sn=await F.getDoc(ref);if(!sn.exists()||sn.data().to!==uid||sn.data().st!=='pending'){fmNote('Bu istek artık beklemiyor.');await refreshPendingRequests();return}const r=sn.data();if(accept){{const gs=await F.getDoc(F.doc(db,'users',r.from));if(gs.exists()&&!ibGenderOK(gs.data())){await F.updateDoc(ref,{st:'rejected'});fmNote(GENDER_MSG);await refreshPendingRequests();return}}await F.setDoc(F.doc(db,'users',uid,'friends',r.fromPid),{uid:r.from,name:r.fromName||'Oyuncu',added:F.serverTimestamp()});await F.updateDoc(ref,{st:'accepted'});fmNote((r.fromName||'Oyuncu')+' artık arkadaşın.')}else{await F.updateDoc(ref,{st:'rejected'});fmNote('Arkadaşlık isteği reddedildi.')}await refreshPendingRequests();await refreshManagedFriends()}catch(e){console.warn('resolve friend request',e);fmNote('İstek işlenemedi. Tekrar deneyebilirsin.')}}
 window.__sendFriendRequestToUid=async function(targetUid){
  if(!targetUid)return{ok:false,message:'Oyuncu bulunamadı.'};if(!await boot())return{ok:false,message:'Bağlantı kurulamadı.'};if(targetUid===uid)return{ok:false,message:'Kendine arkadaşlık isteği gönderemezsin.'};
- try{const userSnap=await F.getDoc(F.doc(db,'users',targetUid));if(!userSnap.exists())return{ok:false,message:'Oyuncu profili bulunamadı.'};const target=userSnap.data(),targetPid=String(target.pid||'');if(!targetPid)return{ok:false,message:'Oyuncu ID bilgisi bulunamadı.'};if(!ibGenderOK(target))return{ok:false,message:GENDER_MSG};
+ try{const userSnap=await F.getDoc(F.doc(db,'users',targetUid));if(!userSnap.exists())return{ok:false,message:'Oyuncu profili bulunamadı.'};const target=userSnap.data(),targetPid=String(target.pid||'');if(!targetPid)return{ok:false,message:'Oyuncu ID bilgisi bulunamadı.'};if(!ibGenderOK(target)){window.__showHaramBlock();return{ok:false,message:''}}
   if((await F.getDoc(F.doc(db,'users',uid,'friends',targetPid))).exists())return{ok:false,message:'Zaten arkadaşsınız.'};
   const reqRef=F.doc(db,'friendReqs',uid+'_'+targetUid),old=await F.getDoc(reqRef);if(old.exists()&&old.data().st==='pending')return{ok:false,message:'Arkadaşlık isteği zaten gönderilmiş.'};
   const reverse=await F.getDoc(F.doc(db,'friendReqs',targetUid+'_'+uid));if(reverse.exists()&&reverse.data().st==='pending')return{ok:false,message:'Bu oyuncunun bekleyen isteğini arkadaşlar sekmesinden kabul edebilirsin.'};
@@ -6225,12 +6225,12 @@ window.__openPlayerFriendModal=function(targetUid,targetName){
  const old=document.getElementById('playerFriendModal');if(old)old.remove();const ov=document.createElement('div');ov.id='playerFriendModal';ov.className='player-friend-ov';ov.setAttribute('role','presentation');
  const card=document.createElement('section');card.className='player-friend-card';card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-labelledby','playerFriendTitle');
  const close=document.createElement('button');close.type='button';close.className='player-friend-close';close.setAttribute('aria-label','Kapat');close.textContent='×';
- const icon=document.createElement('div');icon.className='player-friend-icon';icon.textContent='+';
+ const icon=document.createElement('div');icon.className='player-friend-icon pfp-av';icon.textContent='+';
  const title=document.createElement('h2');title.id='playerFriendTitle';title.textContent=targetName||'Oyuncu';
- const copy=document.createElement('p');copy.textContent='Bu oyuncuyu arkadaş olarak eklemek ister misin?';
+ const copy=document.createElement('div');copy.className='pfp-stats';copy.textContent='Yükleniyor…';
  const add=document.createElement('button');add.type='button';add.className='player-friend-add';add.textContent='Arkadaş olarak ekle';
  const status=document.createElement('div');status.className='player-friend-status';status.setAttribute('role','status');
- const shut=()=>ov.remove();close.onclick=shut;ov.addEventListener('click',e=>{if(e.target===ov)shut()});add.onclick=async()=>{if(add.disabled)return;add.disabled=true;add.textContent='İstek gönderiliyor…';const r=await window.__sendFriendRequestToUid(targetUid);status.textContent=r.message;add.textContent=r.ok?'İstek gönderildi':(r.message==='Zaten arkadaşsınız.'?'Zaten arkadaşsınız':'Arkadaş olarak ekle');add.disabled=!!r.ok};card.append(close,icon,title,copy,add,status);ov.appendChild(card);document.body.appendChild(ov);close.focus();
+ const shut=()=>ov.remove();close.onclick=shut;ov.addEventListener('click',e=>{if(e.target===ov)shut()});add.onclick=async()=>{if(add.disabled)return;add.disabled=true;add.textContent='İstek gönderiliyor…';const r=await window.__sendFriendRequestToUid(targetUid);status.textContent=r.message;add.textContent=r.ok?'İstek gönderildi':(r.message==='Zaten arkadaşsınız.'?'Zaten arkadaşsınız':'Arkadaş olarak ekle');add.disabled=!!r.ok};card.append(close,icon,title,copy,add,status);ov.appendChild(card);document.body.appendChild(ov);close.focus();(async()=>{try{if(!await boot())throw 0;const sn=await F.getDoc(F.doc(db,'users',targetUid));if(!sn.exists())throw 0;window.__fillPlayerProfile(sn.data(),icon,title,copy,targetName)}catch(e){copy.textContent='Profil bilgileri alınamadı.'}})();
 };
 window.__refreshManagedFriends=refreshManagedFriends;
 const fmOpen=document.getElementById('openFriendsManage'),fmClose=document.getElementById('friendsManageClose');
@@ -8162,7 +8162,7 @@ if(fmModal)fmModal.addEventListener('click',async function(e){
   const target=fbMatches.find(x=>x.uid===add.dataset.fbAdd);if(!target||!await boot())return;
   add.disabled=true;
   try{
-    {const gs=await F.getDoc(F.doc(db,'users',target.uid));if(gs.exists()&&window.__ibGender&&!window.__ibGender(gs.data())){add.disabled=false;alert(window.__ibGenderMsg||'Aynı cinsiyet gerekli.');return}}
+    {const gs=await F.getDoc(F.doc(db,'users',target.uid));if(gs.exists()&&window.__ibGender&&!window.__ibGender(gs.data())){add.disabled=false;(window.__showHaramBlock?window.__showHaramBlock():alert(window.__ibGenderMsg||'Aynı cinsiyet gerekli.'));return}}
     if((await F.getDoc(F.doc(db,'users',uid,'friends',target.pid))).exists()){add.textContent='Zaten arkadaşsınız';return}
     const reqRef=F.doc(db,'friendReqs',uid+'_'+target.uid),old=await F.getDoc(reqRef);
     if(old.exists()&&old.data().st==='pending'){add.textContent='İstek gönderildi';return}
@@ -13119,5 +13119,58 @@ html body #hcHome #hqShareBtn:disabled{opacity:.7;cursor:progress}
   window.addEventListener('resize',all);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(all);
   all();
+})();
+</script>
+
+<style id="haram-block-styles">
+#haramBlock{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:26px;background:#000;color:#fff;text-align:center;animation:hbFade .2s ease-out}
+#haramBlock .hb-in{max-width:340px;display:flex;flex-direction:column;align-items:center;gap:16px}
+#haramBlock svg{width:128px;height:128px;filter:drop-shadow(0 0 18px rgba(255,40,40,.55))}
+#haramBlock h2{margin:0;color:#ff4a4a;font:900 22px/1.2 "Nunito",system-ui,sans-serif;letter-spacing:.5px}
+#haramBlock p{margin:0;color:#f2f2f2;font:700 16px/1.5 "Nunito",system-ui,sans-serif}
+#haramBlock small{display:block;color:#9a9a9a;font:600 13px/1.45 "Nunito",system-ui,sans-serif}
+#haramBlock button{margin-top:6px;min-width:170px;min-height:48px;padding:11px 22px;border:2px solid #ff4a4a;border-radius:14px;background:transparent;color:#fff;font:900 16px "Nunito",system-ui,sans-serif;cursor:pointer}
+#haramBlock button:active{background:#ff4a4a22}
+@keyframes hbFade{from{opacity:0}to{opacity:1}}
+.pfp-av{overflow:hidden;width:84px;height:84px;padding:0;background:#0a143b}
+.pfp-av img{width:100%;height:100%;object-fit:cover;display:block}
+.pfp-stats{display:grid;gap:8px;margin:0 0 16px;color:#c9d9ff;font:700 14px/1.4 "Nunito",system-ui,sans-serif}
+.pfp-rank{color:#ffe48a;font-weight:900;font-size:15px}
+.pfp-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 12px;border:1px solid rgba(255,240,184,.25);border-radius:12px;background:rgba(255,255,255,.06)}
+.pfp-row b{color:#fff0b8;font-weight:900}
+.pfp-on{display:inline-flex;align-items:center;gap:6px}
+.pfp-on i{width:9px;height:9px;border-radius:50%;background:#8a8f99;display:inline-block}
+.pfp-on.on i{background:#3dff8a;box-shadow:0 0 8px #3dff8a}
+.pfp-on.on{color:#7dffb3}
+</style>
+<script id="haram-block-and-player-profile">
+(function(){
+  window.__showHaramBlock=function(){
+    var old=document.getElementById('haramBlock');if(old)old.remove();
+    var o=document.createElement('div');o.id='haramBlock';o.setAttribute('role','alertdialog');o.setAttribute('aria-modal','true');o.setAttribute('aria-label','Namahremlik kuralı');
+    o.innerHTML='<div class="hb-in"><svg viewBox="0 0 128 128" aria-hidden="true"><circle cx="64" cy="64" r="52" fill="none" stroke="#ff3030" stroke-width="12"/><path d="M27 101L101 27" stroke="#ff3030" stroke-width="12" stroke-linecap="round"/></svg><h2>NAMAHREMLİK KURALLARIMIZ</h2><p>Namahremlik kurallarımıza göre erkekler yalnızca erkeklere, hanımlar yalnızca hanımlara arkadaşlık isteği gönderebilir.</p><small>Aile üyenle oynamak için “Ailenle Oyna” bölümünü kullanabilirsin.</small><button type="button">Anladım</button></div>';
+    var shut=function(){o.remove();document.removeEventListener('keydown',esc,true)};
+    var esc=function(e){if(e.key==='Escape')shut()};
+    o.querySelector('button').onclick=shut;document.addEventListener('keydown',esc,true);
+    document.body.appendChild(o);o.querySelector('button').focus();
+  };
+  window.__fillPlayerProfile=function(d,icon,title,box,fallbackName){
+    var g=(+d.av===1)?1:0,rk=(typeof d.rk==='number')?d.rk:-1,src='';
+    try{src=rk>=0?RK_AV[g][rk]:AVS[g]}catch(e){}
+    if(src){var im=document.createElement('img');im.alt='';im.draggable=false;im.src=src;icon.textContent='';icon.appendChild(im)}
+    title.textContent=d.name||fallbackName||'Oyuncu';
+    var pts=+d.pts||0,N=[2500,5000,10000,20000,30000,40000],ri=-1;
+    for(var i=0;i<N.length;i++)if(pts>=N[i])ri=i;
+    var rname='Acemi';try{if(ri>=0)rname=RANKS[ri]}catch(e){}
+    var seen=0;try{seen=typeof d.t.toMillis==='function'?d.t.toMillis():(typeof d.t==='number'?d.t:0)}catch(e){}
+    var online=!!seen&&(Date.now()-seen<65000);
+    var onp=+d.onp||0,onw=+d.onw||0,rate=onp?('%'+Math.round(onw/onp*100)):'—';
+    box.textContent='';
+    function row(l,v,cls){var r=document.createElement('div');r.className='pfp-row';var a=document.createElement('span');a.textContent=l;var b=document.createElement('b');if(cls){b.className=cls;var di=document.createElement('i');b.appendChild(di);b.appendChild(document.createTextNode(v))}else b.textContent=v;r.append(a,b);box.appendChild(r)}
+    var rk0=document.createElement('div');rk0.className='pfp-rank';rk0.textContent=rname;box.appendChild(rk0);
+    row('İlim Puanı','✨ '+pts);
+    row('Durum',online?'Online':'Offline','pfp-on'+(online?' on':''));
+    row('Online Mod Başarısı',rate+(onp?' ('+onw+'/'+onp+')':''));
+  };
 })();
 </script>

@@ -5577,7 +5577,7 @@ const oldAgain=$('bAgain');if(oldAgain)oldAgain.onclick=function(){open()};
 .fr b{display:block;font-size:15px}.fr small{font-size:11px;font-weight:800;color:#9fc3ff}
 .fr button{width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#ffb0c0;font-size:13px}
 </style>
-<div class="lbm" id="frm"><div class="frp" role="dialog" aria-label="Çevrim içi düello"><div class="frcrest" aria-hidden="true"><i><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="frSwG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#f2b53a"/><stop offset="1" stop-color="#b8780f"/></linearGradient><g id="frSw"><path d="M32 3l4 6v31h-8V9z"/><rect x="21" y="40" width="22" height="4.5" rx="2.2"/><rect x="29.5" y="44.5" width="5" height="11" rx="1.5"/><circle cx="32" cy="58.5" r="3.2"/></g></defs><g fill="url(#frSwG)" stroke="#7a4d0e" stroke-width="1"><use href="#frSw" transform="rotate(-42 32 32)"/><use href="#frSw" transform="rotate(42 32 32)"/></g></svg></i></div><button class="frx" id="frX" aria-label="Kapat">×</button><div class="frtitle"><span class="frtl"><b><span>ÇEVRİM İÇİ DÜELLO</span></b></span></div><div class="frsec">DİRHEM SEÇ</div><div class="frtg" id="frTg"></div><div class="frtabs"><button type="button" id="frRand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg><span>Rastgele Eşleş</span></button><button type="button" id="frFrTab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="9" r="2.6"/><path d="M17.4 14c2.8 0 4.6 1.9 4.6 4.8"/></svg><span>Arkadaşınla Oyna</span></button><button type="button" id="frFam"><span>👨‍👩‍👧 Ailenle Oyna</span></button></div><div class="frmsg" id="frMsg"></div><div class="frsec frsec2">ARKADAŞLAR</div><div class="frl" id="frL" style="display:none"></div><div class="famb" id="famBox" hidden><button type="button" class="fam-bk" id="famBk" aria-label="Geri">‹</button><div class="fam-pane" id="famMkP" hidden><div class="fam-stake" id="famStake"></div><div class="fam-codes one"><div><small>ODA ŞİFRESİ</small><b id="famPw">—</b></div></div><div class="fam-btns"><button type="button" id="famCp">Kopyala</button><button type="button" id="famCl">Odayı Kapat</button></div></div><div class="fam-join"><div class="fam-sub" id="famJSub">Size verilen oda şifresini giriniz</div><input id="famInP" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" aria-label="Oda şifresi"><button type="button" id="famGo">Gir</button><button type="button" id="famMk" class="fam-mk">Oda Kur</button></div></div></div></div><style id="duel-cleanup">
+<div class="lbm" id="frm"><div class="frp" role="dialog" aria-label="Çevrim içi düello"><div class="frcrest" aria-hidden="true"><i><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="frSwG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#f2b53a"/><stop offset="1" stop-color="#b8780f"/></linearGradient><g id="frSw"><path d="M32 3l4 6v31h-8V9z"/><rect x="21" y="40" width="22" height="4.5" rx="2.2"/><rect x="29.5" y="44.5" width="5" height="11" rx="1.5"/><circle cx="32" cy="58.5" r="3.2"/></g></defs><g fill="url(#frSwG)" stroke="#7a4d0e" stroke-width="1"><use href="#frSw" transform="rotate(-42 32 32)"/><use href="#frSw" transform="rotate(42 32 32)"/></g></svg></i></div><button class="frx" id="frX" aria-label="Kapat">×</button><button class="frdbk" id="frdBk" type="button" aria-label="Geri" hidden>‹</button><div class="frtitle"><span class="frtl"><b><span>ÇEVRİM İÇİ DÜELLO</span></b></span></div><div class="famtabs" id="famTabs"><button type="button" id="famTabMk">Oda Kur</button><button type="button" id="famTabJn">Şifre ile Odaya Gir</button></div><div class="frsec">DİRHEM SEÇ</div><div class="frtg" id="frTg"></div><div class="frtabs"><button type="button" id="frRand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg><span>Rastgele Eşleş</span></button><button type="button" id="frFrTab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="9" r="2.6"/><path d="M17.4 14c2.8 0 4.6 1.9 4.6 4.8"/></svg><span>Arkadaşınla Oyna</span></button><button type="button" id="frFam"><span>👨‍👩‍👧 Ailenle Oyna</span></button></div><div class="frmsg" id="frMsg"></div><div class="frsec frsec2">ARKADAŞLAR</div><div class="frl" id="frL" style="display:none"></div><div class="famb" id="famBox" hidden><button type="button" class="fam-bk" id="famBk" aria-label="Geri">‹</button><div class="fam-pane" id="famMkP" hidden><div class="fam-stake" id="famStake"></div><div class="fam-codes one"><div><small>ODA ŞİFRESİ</small><b id="famPw">—</b></div></div><div class="fam-btns"><button type="button" id="famCp">Kopyala</button><button type="button" id="famCl">Odayı Kapat</button></div></div><div class="fam-join"><div class="fam-sub" id="famJSub">Size verilen oda şifresini giriniz</div><input id="famInP" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" aria-label="Oda şifresi"><button type="button" id="famGo">Gir</button><button type="button" id="famMk" class="fam-mk">Oda Kur</button></div></div></div></div><style id="duel-cleanup">
 /* Online düello: ekrandaki dirhem (coin) rozeti, ilerleme çubuğu ve rakip adının altındaki 0/10 kaldırıldı */
 body:has(#duel.on) #homeWalletChip{display:none!important}
 </style>
@@ -5824,8 +5824,10 @@ async function list(){
   L.innerHTML=rows.map(r=>'<div class="fr '+(r.active?'fr-online':'fr-offline')+'"><i>'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</i><div class="fr-info"><b>'+esc(r.name||'Oyuncu')+'</b><small>ID '+esc(r.id)+' · ✨ '+(+r.pts||0)+' P</small><span class="fr-presence '+(r.active?'active':'inactive')+'"><em></em>'+(r.active?'Aktif':'Pasif')+'</span></div><div class="fb"><button class="fr-invite" data-c="'+esc(r.uid||'')+'" data-n="'+esc(r.name||'Oyuncu')+'" aria-label="Davet et">Davet Et</button><button class="fr-remove" data-d="'+esc(r.id)+'" aria-label="Arkadaşlıktan çıkar">×</button></div></div>').join('')
 }
 function fl(on){$('frFrTab').classList.toggle('on',on);$('frL').style.display=on?'grid':'none'}
-async function openFr(){tier=-1;{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}$('frm').classList.add('on');setId();msg('');paintT();fl(true);if(!$('frL').innerHTML.trim())$('frL').innerHTML='<div class="fe">Arkadaşlar yükleniyor…</div>';try{famPanel(false)}catch(e){}if(await boot()){try{await list()}catch(e){console.warn('list',e)}}}
-setInterval(()=>{const f=$('frm');if(f&&f.classList.contains('on')&&!f.classList.contains('fam')&&db&&!document.hidden)list().catch(()=>{})},20000);
+/* Arkadaşınla Oyna modu: dirhem seçimi + arkadaş listesi (Davet Et). Ana ekranda sadece 3 buton görünür. */
+function frdMode(on,r){const f=$('frm');f.classList.toggle('frd',!!on);f.classList.toggle('rnd',!!(on&&r));const sp=document.querySelector('#frm .frtitle b span');if(sp)sp.textContent=on?(r?'RASTGELE EŞLEŞ':'ARKADAŞINLA OYNA'):'ÇEVRİM İÇİ DÜELLO';const bk=$('frdBk');if(bk)bk.hidden=!on;tier=on?-1:0;{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}msg('');paintT();fl(!!on&&!r)}
+async function openFr(){$('frm').classList.add('on');frdMode(false);setId();try{famPanel(false)}catch(e){}await boot()}
+setInterval(()=>{const f=$('frm');if(f&&f.classList.contains('on')&&f.classList.contains('frd')&&!f.classList.contains('fam')&&db&&!document.hidden)list().catch(()=>{})},20000);
 /* Arkadaşlık isteği gönderildi: sayfanın ortasında, arka plan buğulu bilgi penceresi */
 function frSentPop(name){
   try{
@@ -6227,9 +6229,13 @@ function famSceneEnsure(){let s=$('famScene');if(s)return s;
  return s}
 function famSceneShow(){if(!famRoom)return;const s=famSceneEnsure();$('fsPw').textContent=famRoom.pw;$('fsStake').textContent=famRoom.stake?famRoom.stake+' dirhem bahis':'';try{$('fsMe').textContent=nm()||'Sen'}catch(e){}s.classList.add('on')}
 function famSceneHide(){const s=document.getElementById('famScene');if(s)s.classList.remove('on')}
-function famPanel(on){const b=$('famBox'),t=$('frFam');if(b)b.hidden=!on;if(t)t.classList.toggle('on',on);$('frm').classList.toggle('fam',!!on);if(on){try{fl(false)}catch(e){}$('famMkP').hidden=!famRoom;if(famRoom)famShow();setTimeout(()=>{try{$('famInP').focus()}catch(e){}},80)}else{try{$('famInP').value=''}catch(e){}}}
+function famView(){const f=$('frm');if(f)f.classList.toggle('famroom',!!famRoom)}
+function famTab(t){const f=$('frm');f.classList.toggle('famk',t==='mk');f.classList.toggle('famj',t==='jn');$('famTabMk').classList.toggle('on',t==='mk');$('famTabJn').classList.toggle('on',t==='jn');msg('');if(t==='mk'){if(!famRoom)tier=-1;paintT()}else{setTimeout(()=>{try{$('famInP').focus()}catch(e){}},80)}famView()}
+function famPanel(on,tab){const b=$('famBox'),t=$('frFam'),f=$('frm');if(b)b.hidden=!on;if(t)t.classList.toggle('on',on);f.classList.toggle('fam',!!on);
+  if(on){try{fl(false)}catch(e){}$('famMkP').hidden=!famRoom;if(famRoom)famShow();const sp=document.querySelector('#frm .frtitle b span');if(sp)sp.textContent='AİLENLE OYNA';const bk=$('frdBk');if(bk)bk.hidden=false;famTab(tab||(f.classList.contains('famj')&&!famRoom?'jn':'mk'))}
+  else{f.classList.remove('famk','famj','famroom');try{$('famInP').value=''}catch(e){}}}
 function famShow(){if(!famRoom)return;$('famMkP').hidden=false;$('famPw').textContent=famRoom.pw;$('famStake').textContent=famRoom.stake?'Bahis: '+famRoom.stake+' dirhem':'';famSceneShow()}
-function famClose(silent){clearTimeout(famTm);const had=famRoom;famRoom=null;famSceneHide();try{$('famMkP').hidden=true}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
+function famClose(silent){clearTimeout(famTm);const had=famRoom;famRoom=null;famSceneHide();try{$('famMkP').hidden=true}catch(e){}try{famView();if($('frm').classList.contains('fam')&&$('frm').classList.contains('famk')){tier=-1;paintT()}}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
 async function famMake(){
   const T0=TIERS[tier];
   if(gw()<T0.c){msg('Bu oda için '+T0.c+' dirhem gerekli (bakiyen '+gw()+').');return}
@@ -6266,7 +6272,7 @@ async function famJoin0(){
       dShow('s',waitHtml(fn));watch(m)}
     catch(e){console.warn(e);reset();$('duel').classList.remove('on');$('frm').classList.add('on');msg('Odaya katılınamadı. Kuralları kontrol et.')}
   }catch(e){console.warn('fam join',e);msg('Odaya katılınamadı. İnterneti kontrol et.')}}
-$('frFam').onclick=()=>{msg('');famPanel(true)};$('famMk').onclick=()=>famMake();$('famBk').onclick=()=>{msg('');famPanel(false)};
+$('frFam').onclick=()=>{msg('');famPanel(true)};$('famMk').onclick=()=>famMake();$('famTabMk').onclick=()=>famTab('mk');$('famTabJn').onclick=()=>famTab('jn');$('famBk').onclick=()=>{msg('');famPanel(false)};
 $('frFrTab').addEventListener('click',()=>famPanel(false));$('frRand').addEventListener('click',()=>famPanel(false));
 $('famGo').onclick=famJoin;$('famCl').onclick=()=>famClose();
 $('famCp').onclick=async()=>{if(!famRoom)return;const t='Aile odası şifresi: '+famRoom.pw;try{await navigator.clipboard.writeText(t);msg('Kopyalandı. Aile üyene gönder.')}catch(e){msg(t)}};
@@ -6292,8 +6298,9 @@ function listenFr(){if(frOn||!db)return;frOn=1;const C=F.collection(db,'friendRe
 $('frReqYes').onclick=async()=>{const r=frInb[0];if(!r||!db)return;$('frReq').classList.remove('on');frInb=frInb.filter(x=>x.id!==r.id);
   try{await F.setDoc(F.doc(db,'users',uid,'friends',r.fromPid),{uid:r.from,name:r.fromName||'Oyuncu',added:F.serverTimestamp()});await F.updateDoc(F.doc(db,'friendReqs',r.id),{st:'accepted'});if($('frL').style.display!=='none')list();if(document.getElementById('friendsManageModal')?.classList.contains('on')&&window.__refreshManagedFriends)await window.__refreshManagedFriends()}catch(e){console.warn(e);msg('İstek kabul edilemedi.')}};
 $('frReqNo').onclick=async()=>{const r=frInb[0];if(!r||!db)return;$('frReq').classList.remove('on');frInb=frInb.filter(x=>x.id!==r.id);try{await F.updateDoc(F.doc(db,'friendReqs',r.id),{st:'rejected'})}catch(e){console.warn(e)}};
-$('frFrTab').onclick=async()=>{if($('frFrTab').classList.contains('on')){fl(false);return}if(needTier())return;if(!await boot())return;fl(true);await list()};
-$('frRand').onclick=rand;$('frTg').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tier=+b.dataset.t;msg('');{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}paintT()};$('dX').onclick=()=>closeD(true);
+$('frFrTab').onclick=async()=>{frdMode(true);if(!$('frL').innerHTML.trim())$('frL').innerHTML='<div class="fe">Arkadaşlar yükleniyor…</div>';if(await boot()){try{await list()}catch(e){console.warn('list',e)}}};
+$('frdBk').onclick=()=>{if($('frm').classList.contains('fam'))famPanel(false);frdMode(false)};
+$('frRand').onclick=()=>frdMode(true,true);$('frTg').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tier=+b.dataset.t;msg('');{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}paintT();{const F=$('frm');if(F.classList.contains('rnd'))rand();else if(F.classList.contains('fam')&&F.classList.contains('famk')&&!famRoom)famMake()}};$('dX').onclick=()=>closeD(true);
 $('dO').onclick=e=>{const b=e.target.closest('[data-i]');if(b)pk(+b.dataset.i)};
 $('dSt').onclick=e=>{if(e.target.closest('#dClose,.ws-x'))closeD(false);else if(e.target.closest('#dAgain')){closeD(false).then(openFr)}};
 $('frL').addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)challenge(c.dataset.c,c.dataset.n)});
@@ -13358,7 +13365,7 @@ html body #hcHome #hqShareBtn:disabled{opacity:.7;cursor:progress}
 #frm .frp .frl{margin:10px 18px 8px!important}
 #frm .frp .frmsg{margin:10px 18px 4px!important;font-size:13px!important}
 /* Ailenle oyna: sayfa ortasında tek şifre kutusu */
-#frm.fam .frtitle,#frm.fam .frtabs,#frm.fam .frl{display:none!important}
+#frm.fam .frtabs,#frm.fam .frl{display:none!important}
 #frm.fam .frp{padding:56px 0 22px!important}
 #frm .famb{position:relative;margin:0 20px!important;padding:0!important;border:0!important;background:none!important}
 #frm .fam-join{display:flex;flex-direction:column;gap:12px;margin:0!important;padding:0!important;border:0!important}
@@ -13373,12 +13380,26 @@ html body #hcHome #hqShareBtn:disabled{opacity:.7;cursor:progress}
 .rq2-c.c1,.rq2-c:empty{display:none!important}
 </style>
 <style id="online-dirhem-friends">
-/* Online Oyna: sadece dirhem seçimi + altında arkadaş listesi (Davet Et) */
-#frm .frp .frtabs{display:none!important}
-html body #frm .frp .frtg{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px!important;margin:8px 14px 0!important}
-html body #frm .frp .frtg button{min-width:0}
+/* Online Oyna: ana ekranda 3 buton. "Arkadaşınla Oyna" -> dirhem seçimi + altında arkadaş listesi (Davet Et) */
+#frm .frsec,#frm .frsec2,#frm .frtg,#frm .frl{display:none!important}
 #frm .frsec{margin:16px 14px 0;text-align:center;font:900 12px/1.2 "Nunito",system-ui,sans-serif;letter-spacing:.18em;color:#9fc3ff}
 #frm .frsec2{margin-top:12px}
-html body #frm .frp .frl{margin:8px 14px 10px!important;max-height:min(280px,38dvh)!important;overflow-y:auto}
-#frm.fam .frtg,#frm.fam .frsec{display:none!important}
+#frm.frd .frsec,#frm.frd .frsec2{display:block!important}
+#frm.frd .frp .frtabs{display:none!important}
+html body #frm.frd .frp .frtg{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px!important;margin:8px 14px 0!important}
+html body #frm.frd .frp .frtg button{min-width:0}
+html body #frm.frd .frp .frl{display:grid!important;margin:8px 14px 10px!important;max-height:min(280px,38dvh)!important;overflow-y:auto}
+#frm .frp .frdbk{position:absolute;top:12px;left:12px;width:36px;height:36px;padding:0;display:grid;place-items:center;border-radius:50%;border:1px solid #ffd36a;font-size:24px;line-height:1;font-weight:900;color:#1a2340;background:linear-gradient(180deg,#ffe184,#e8aa29);cursor:pointer;z-index:3}
+#frm .frp .frdbk[hidden]{display:none!important}
+html body #frm.rnd .frp .frl,html body #frm.rnd .frsec2{display:none!important}
+#frm .famtabs{display:none;grid-template-columns:1fr 1fr;gap:8px;margin:12px 14px 0}
+#frm.fam .famtabs{display:grid}
+#frm .famtabs button{padding:12px 6px;border-radius:14px;border:2px solid #e9ad3d;background:#0b2272;color:#fff;font:900 14px/1.15 "Nunito",system-ui,sans-serif}
+#frm .famtabs button.on{background:linear-gradient(#ffd45a,#e39a1c);border-color:#ffe08a;color:#3a2300}
+#frm .famb .fam-bk,#frm .fam-join .fam-mk{display:none!important}
+#frm.fam:not(.famj) .fam-join{display:none!important}
+#frm.fam:not(.famk) #famMkP{display:none!important}
+html body #frm.fam.famk:not(.famroom) .frp .frsec{display:block!important}
+html body #frm.fam.famk:not(.famroom) .frp .frtg{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px!important;margin:8px 14px 0!important}
+html body #frm.fam.famk:not(.famroom) .frp .frtg button{min-width:0}
 </style>

@@ -5725,7 +5725,7 @@ async function list(){
   L.innerHTML=rows.map(r=>'<div class="fr '+(r.active?'fr-online':'fr-offline')+'"><i>'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</i><div class="fr-info"><b>'+esc(r.name||'Oyuncu')+'</b><small>ID '+esc(r.id)+' · ✨ '+(+r.pts||0)+' P</small><span class="fr-presence '+(r.active?'active':'inactive')+'"><em></em>'+(r.active?'Aktif':'Pasif')+'</span></div><div class="fb"><button class="fr-invite" data-c="'+esc(r.uid||'')+'" data-n="'+esc(r.name||'Oyuncu')+'" aria-label="Davet et">Davet Et</button><button class="fr-remove" data-d="'+esc(r.id)+'" aria-label="Arkadaşlıktan çıkar">×</button></div></div>').join('')
 }
 function fl(on){$('frFrTab').classList.toggle('on',on);$('frL').style.display=on?'grid':'none'}
-async function openFr(){tier=-1;{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}$('frm').classList.add('on');setId();msg('');paintT();fl(false);try{famPanel(false)}catch(e){}await boot()}
+async function openFr(){window.__famDuelOn=false;tier=-1;{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}$('frm').classList.add('on');setId();msg('');paintT();fl(false);try{famPanel(false)}catch(e){}await boot()}
 /* Arkadaşlık isteği gönderildi: sayfanın ortasında, arka plan buğulu bilgi penceresi */
 function frSentPop(name){
   try{
@@ -5968,8 +5968,8 @@ async function rand(){
   catch(e){console.warn(e);reset();$('duel').classList.remove('on');$('frm').classList.add('on');msg('Davet gönderilemedi. Kuralları kontrol et.')}}
 /* Rakip avatarı + derece: herkes kendi profil avatarını/derecesini maça yazar, karşı taraf okuyup üst barda gösterir */
 function myRk(){let r=-1,g=0;try{if(typeof rkGet==='function')r=rkGet();if(r<0&&typeof rankIdx==='function')r=rankIdx();if(typeof avGet==='function')g=avGet()===1?1:0}catch(e){}return{r:r,g:g}}
-function meAv(){const w=$('dMav'),im=$('dMavI');if(!w||!im)return;try{const q=myRk();let src='';try{src=q.r>=0?RK_AV[q.g][q.r]:AVS[q.g]}catch(e){}if(!src){const h=$('hAv');src=h&&h.src||''}if(!src)return;const key=q.r+'|'+q.g+'|'+src;if(im.dataset.k!==key){im.src=src;im.dataset.k=key}w.classList.toggle('rk',q.r>=0)}catch(e){}}
-function oppAv(rk,av){const w=$('dOav'),im=$('dOavI');if(!w||!im)return;
+function meAv(){const w=$('dMav'),im=$('dMavI');if(!w||!im)return;try{const q0=myRk();if(window.__famDuelPaint&&window.__famDuelPaint(w,q0.g,Math.max(0,Math.min(6,q0.r+1))))return}catch(e){}try{const q=myRk();let src='';try{src=q.r>=0?RK_AV[q.g][q.r]:AVS[q.g]}catch(e){}if(!src){const h=$('hAv');src=h&&h.src||''}if(!src)return;const key=q.r+'|'+q.g+'|'+src;if(im.dataset.k!==key){im.src=src;im.dataset.k=key}w.classList.toggle('rk',q.r>=0)}catch(e){}}
+function oppAv(rk,av){const w=$('dOav'),im=$('dOavI');if(!w||!im)return;try{if(window.__famDuelPaint&&window.__famDuelPaint(w,av===1?1:0,typeof rk==='number'?Math.max(0,Math.min(6,rk+1)):0)){if(typeof rk==='number'&&rk>=0&&typeof RANKS!=='undefined'&&RANKS[rk]&&!$('dOn').querySelector('.dork')){const sp=document.createElement('span');sp.className='dork';sp.textContent=String(RANKS[rk]).toLocaleUpperCase('tr');$('dOn').appendChild(sp)}return}}catch(e){}
   if(typeof rk!=='number'||typeof RK_AV==='undefined'){try{const f=AVS[0];if(f&&im.dataset.k!=='def'){im.src=f;im.dataset.k='def'}}catch(e){}w.classList.remove('rk');w.hidden=false;return}
   const g=av===1?1:0;let src='';try{src=rk>=0?RK_AV[g][rk]:AVS[g]}catch(e){}
   if(!src){w.classList.remove('rk');w.hidden=false;return}
@@ -6148,7 +6148,7 @@ function famStu(o){const i=o.id,t=Math.max(0,Math.min(6,o.t|0)),f=o.g===1,c=FS_P
  +'<path d="M67 183h27M67 189h27M67 195h27M67 201h19" stroke="#2f7a55" stroke-width="2.1" stroke-linecap="round" opacity=".85"/><path d="M106 183h27M106 189h27M106 195h27M106 201h19" stroke="#2f7a55" stroke-width="2.1" stroke-linecap="round" opacity=".85"/>'
  +'<circle cx="49" cy="205" r="8.5" fill="'+skin+'"/><circle cx="151" cy="205" r="8.5" fill="'+skin+'"/>'
  +'</svg>'}
-function famMyLook(){let g=0,t=0;try{g=ibMyG()===1?1:0}catch(e){}try{if(typeof rkGet==='function')t=rkGet()+1}catch(e){}return{g:g,t:Math.max(0,Math.min(6,t))}}
+window.__famStu=famStu;function famMyLook(){let g=0,t=0;try{g=ibMyG()===1?1:0}catch(e){}try{if(typeof rkGet==='function')t=rkGet()+1}catch(e){}return{g:g,t:Math.max(0,Math.min(6,t))}}
 function famSceneEnsure(){let s=$('famScene');if(s)return s;
  s=document.createElement('div');s.id='famScene';s.setAttribute('role','dialog');s.setAttribute('aria-label','Aile odası');
  s.innerHTML='<div class="fs-top"><div class="fs-pw"><small>ODA ŞİFRESİ</small><b id="fsPw">----</b></div><div id="fsStake"></div></div><button type="button" class="fs-x" id="fsCl" aria-label="Odayı kapat">×</button><div class="fs-stage" id="fsStage"></div>';
@@ -6225,7 +6225,7 @@ async function famJoin(rr){if(rr&&!(rr.uid&&rr.stake))rr=null;
     if((+r.cap||2)>2){await famJoinMulti(r);return}
     const hu=r.uid,lv=TIERS.findIndex(t=>t.c===+r.stake),T1=TIERS[lv];if(!T1){msg('Oda bilgisi geçersiz.');return}
     if(gw()<T1.c){msg('Bu oda için '+T1.c+' dirhem gerekli (bakiyen '+gw()+').');return}
-    const fn=r.name||'Aile üyesi';$('frm').classList.remove('on');reset();const m=uid+'_'+Date.now();
+    const fn=r.name||'Aile üyesi';$('frm').classList.remove('on');reset();window.__famDuelOn=true;const m=uid+'_'+Date.now();
     try{
       await F.setDoc(F.doc(db,'matches',m),{p:[uid,hu],names:{[uid]:nm(),[hu]:fn},st:'wait',q:pick(lv),stake:T1.c,lv,tq:T1.tq,ts:Date.now(),s:{},n:{},d:{},x:{},paid:false});
       await F.setDoc(F.doc(db,'invites',hu),{from:uid,name:nm(),mid:m,stake:T1.c,lv,ts:Date.now(),fam:1,famh:'p'+p});
@@ -6369,7 +6369,7 @@ $('invYes').onclick=async()=>{const d=invData;$('invBn').classList.remove('on');
   try{const r=F.doc(db,'matches',d.mid),sn=await F.getDoc(r);F.deleteDoc(F.doc(db,'invites',uid)).catch(()=>{});
     if(!sn.exists()||sn.data().st!=='wait'){alert('Davet artık geçerli değil.');return}
     const stk=+sn.data().stake||0;if(gw()<stk){alert('Bu yarışma için '+stk+' dirhem gerekli. Bakiyen: '+gw());try{await F.updateDoc(r,{st:'no'})}catch(e){}return}
-    reset();$('frm').classList.remove('on');dShow('s','<b>Başlıyor…</b>');await F.updateDoc(r,{st:'play'});watch(d.mid)}catch(e){console.warn(e)}};
+    reset();window.__famDuelOn=!!(d&&d.fam);$('frm').classList.remove('on');dShow('s','<b>Başlıyor…</b>');await F.updateDoc(r,{st:'play'});watch(d.mid)}catch(e){console.warn(e)}};
 $('invNo').onclick=async()=>{const d=invData;$('invBn').classList.remove('on');if(!d)return;try{await F.updateDoc(F.doc(db,'matches',d.mid),{st:'no'})}catch(e){}F.deleteDoc(F.doc(db,'invites',uid)).catch(()=>{})};
 /* ===== ARKADAŞLIK İSTEĞİ: profilden gönder → karşıda ortada Kabul/Reddet → kabul edilince iki taraf kendi listesine ekler ===== */
 let frOn=0,frInb=[];
@@ -13651,3 +13651,21 @@ html body #frm .frp .famcap{margin-top:18px}
 html body #frm .frp .famcap small{font-size:21px!important;font-weight:900!important;letter-spacing:.01em!important;color:#ffe9a8!important;text-shadow:0 0 8px rgba(255,200,80,.5)!important}
 #frm .famcap.shake{animation:frShake .45s ease}
 </style>
+<style id="fam-duel-svg">
+#duel .dopav.fdsvg>img{display:none!important}
+#duel .dopav.fdsvg{background:none!important;border:0!important;box-shadow:none!important;overflow:visible!important;border-radius:0!important;width:auto!important;flex:none!important}
+#duel .dopav .fd-svg{display:block;height:100%}
+#duel .dopav .fd-svg svg{display:block;height:100%;width:auto;overflow:visible;filter:drop-shadow(0 8px 10px rgba(0,0,0,.35))}
+#duel .dopav .fs-sway{transform-origin:100px 238px;animation:fsSway 3.4s ease-in-out infinite}
+#duel .dopav .fs-glow{animation:fsGl 2.8s ease-in-out infinite}
+</style>
+<script>
+/* Ailenle Oyna (2 kişi): düelloda da rahle + talebe SVG olarak görünür kalır */
+window.__famDuelPaint=function(w,g,t){
+  var h=w.querySelector('.fd-svg');
+  if(!window.__famDuelOn||typeof window.__famStu!=='function'){if(h)h.remove();w.classList.remove('fdsvg');return false}
+  var key=g+'|'+t;
+  if(!h){h=document.createElement('span');h.className='fd-svg';w.appendChild(h)}
+  if(h.dataset.k!==key){h.dataset.k=key;h.innerHTML=window.__famStu({id:'fd'+(w.id||'x'),g:g,t:t})}
+  w.classList.add('fdsvg');w.hidden=false;return true};
+</script>

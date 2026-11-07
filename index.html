@@ -2741,6 +2741,7 @@ const ON_KEY='islamibilgi_online_stats';function onBase(){let o=null;try{o=JSON.
 window.__pOnStat=function(k){const o=onBase();o.p++;if(k==='w')o.w++;else if(k==='t')o.d++;else o.l++;try{localStorage.setItem(ON_KEY,JSON.stringify(o))}catch(e){}};
 window.__onBase=function(){return onBase()};
 window.__pStat=function(k){const o=stBase();o.p++;if(k==='w')o.w++;else if(k==='t')o.d++;else o.l++;try{localStorage.setItem(ST_KEY,JSON.stringify(o))}catch(e){}};
+window.__playerLook=function(pts,av){pts=Number(pts)||0;const g=(+av===1)?1:0;let k=-1;for(let i=0;i<RK_NEED.length;i++)if(pts>=RK_NEED[i])k=i;return{src:k>=0?RK_AV[g][k]:AVS[g],rank:k>=0?RANKS[k]:'Rütbesiz',ranked:k>=0}};
 function pfFill(mine){
   const st=stBase(),pts=ptsGet();let idx=-1;for(let k=0;k<RK_NEED.length;k++)if(pts>=RK_NEED[k])idx=k;
   $('pfRankN').textContent=idx>=0?RANKS[idx]:'Acemi';document.querySelector('#profm .pm-yl').textContent=idx>=0?RANKS[idx]:'Rütbesiz';$('pfRankN').classList.toggle('pm-lg',$('pfRankN').textContent.length>8);$('pfPts').textContent=fmt(pts);
@@ -5756,7 +5757,7 @@ async function add(){
   if(!await boot())return;
   try{const i=await F.getDoc(F.doc(db,'ids',c));if(!i.exists()){msg('Bu ID ile oyuncu bulunamadı.');return}
     const fu=i.data().uid;
-    {const gs=await F.getDoc(F.doc(db,'users',fu));if(gs.exists()&&!ibGenderOK(gs.data())){msg(GENDER_MSG);return}}
+    {const gs=await F.getDoc(F.doc(db,'users',fu));if(gs.exists()&&!ibGenderOK(gs.data())){msg('');window.__showGenderBlock();return}}
     if((await F.getDoc(F.doc(db,'users',uid,'friends',c))).exists()){msg('Zaten arkadaşsınız.');return}
     const blockedByMe=await F.getDoc(F.doc(db,'users',uid,'blocked',c));const blockedMe=await F.getDoc(F.doc(db,'users',fu,'blocked',pid));if(blockedByMe.exists()||blockedMe.exists()){msg('Bu oyuncuya arkadaşlık isteği gönderilemiyor.');return}
     const u=await F.getDoc(F.doc(db,'users',fu)),fn=(u.exists()&&u.data().name)||'Oyuncu';
@@ -6082,6 +6083,16 @@ const GENDER_MSG='Erkekler yalnızca erkeklere, hanımlar yalnızca hanımlara a
 function ibMyG(){return(typeof avGet==='function'&&avGet()===1)?1:0}
 function ibGenderOK(d){return((+(d&&d.av)===1)?1:0)===ibMyG()}
 window.__ibGender=ibGenderOK;window.__ibGenderMsg=GENDER_MSG;
+/* Namahremlik uyarısı: ekran komple kararır, başlık + kural + açıklama + SVG ikon */
+window.__showGenderBlock=function(){
+  const old=document.getElementById('genderBlockOv');if(old)old.remove();
+  const ov=document.createElement('div');ov.id='genderBlockOv';ov.className='gender-block-ov';ov.setAttribute('role','alertdialog');ov.setAttribute('aria-modal','true');ov.setAttribute('aria-labelledby','gbT');ov.setAttribute('aria-describedby','gbP');
+  ov.innerHTML='<div class="gb-icon"><svg viewBox="0 0 120 120" width="120" height="120" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="60" cy="60" r="55" stroke="#e0b245" stroke-width="3"/><circle cx="41" cy="45" r="8" stroke="#ffe08a" stroke-width="3.5"/><path d="M27 83c0-9 6-16 14-16s14 7 14 16" stroke="#ffe08a" stroke-width="3.5"/><circle cx="79" cy="45" r="8" stroke="#ffe08a" stroke-width="3.5"/><path d="M65 83c0-9 6-16 14-16s14 7 14 16" stroke="#ffe08a" stroke-width="3.5"/><path d="M22 98 98 22" stroke="#ff4d5a" stroke-width="6.5"/></svg></div><h2 id="gbT">Namahremlik Kuralı</h2><div class="gb-rule">Erkekler yalnızca erkeklerle, hanımlar yalnızca hanımlarla arkadaş olabilir.</div><p id="gbP">Dinî hassasiyetlerimiz ve uygulamamızın namahremiyet ilkeleri gereği farklı cinsiyetteki oyunculara arkadaşlık isteği gönderilemez. Aile üyenle oynamak istersen “Ailenle Oyna” bölümünü kullanabilirsin.</p><button type="button" class="gb-ok">Anladım</button>';
+  const shut=()=>{document.removeEventListener('keydown',key,true);ov.classList.add('out');setTimeout(()=>ov.remove(),220)};
+  const key=e=>{if(e.key==='Escape'){e.preventDefault();shut()}};
+  const ok=ov.querySelector('.gb-ok');ok.onclick=shut;document.addEventListener('keydown',key,true);
+  document.body.appendChild(ov);try{navigator.vibrate&&navigator.vibrate([40,60,40])}catch(e){}ok.focus({preventScroll:true});
+};
 let famRoom=null,famTm=null,famFs=0,famFm='',famBusy=false,famPend='';const FAM_MS=15*60000,famT=pw=>10000+(+pw);
 const FS_RANKS=['Acemi','Talebe','Yolcu','Çırak','Mütefekkir','Muallim','Üstad'];
 const FS_PAL=[['#ddd8c6','#aaa38a'],['#2fae7a','#177150'],['#3b9fd8','#1f6aa0'],['#e0a13a','#a3691a'],['#8a5fd0','#563496'],['#c4455a','#8a2236'],['#2f4396','#141f4d']];
@@ -6241,12 +6252,12 @@ $('frRand').onclick=()=>famGo('rand');$('frTg').onclick=e=>{const b=e.target.clo
 $('dO').onclick=e=>{const b=e.target.closest('[data-i]');if(b)pk(+b.dataset.i)};
 $('dSt').onclick=e=>{if(e.target.closest('#dClose,.ws-x'))closeD(false);else if(e.target.closest('#dAgain')){closeD(false).then(openFr)}};
 $('frL').addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)challenge(c.dataset.c,c.dataset.n)});
-const pdoc=()=>{try{const q=window.periodPts(),ob=window.__onBase?window.__onBase():{p:0,w:0};return{dk:q.dk,dpts:q.d,wk:q.wk,wpts:q.w,onp:ob.p,onw:ob.w}}catch(e){return{}}};
+const pdoc=()=>{try{const q=window.periodPts(),ob=window.__onBase?window.__onBase():{p:0,w:0};return{dk:q.dk,dpts:q.d,wk:q.wk,wpts:q.w,onp:ob.p,onw:ob.w,av:+(window.avGet?window.avGet():0)||0}}catch(e){return{}}};
 let lastLb=0;
 async function syncPts(){if(!db||!uid)return;try{await F.setDoc(F.doc(db,'users',uid),{name:nm(),pts:+(window.homePts?window.homePts():0)||0,...pdoc(),t:F.serverTimestamp()},{merge:true})}catch(e){}}
 setInterval(()=>{if(db)syncPts()},20000);
 window.lbFetch=async()=>{try{if(Date.now()-lastLb<8000)return;lastLb=Date.now();if(!await boot())return;await syncPts();const pp=window.periodPts(),U=F.collection(db,'users');
-  const map=(sn,f)=>sn.docs.map(d=>{const x=d.data();return{id:d.id,pid:String(x.pid||''),n:String(x.name||'Oyuncu').slice(0,14),c:+x[f]||0,p:+x.pts||0,op:+x.onp||0,ow:+x.onw||0,me:d.id===uid}}).filter(r=>r.c>0).sort((x,y)=>y.c-x.c).slice(0,10);
+  const map=(sn,f)=>sn.docs.map(d=>{const x=d.data();return{id:d.id,pid:String(x.pid||''),n:String(x.name||'Oyuncu').slice(0,14),c:+x[f]||0,p:+x.pts||0,op:+x.onp||0,ow:+x.onw||0,av:+x.av||0,me:d.id===uid}}).filter(r=>r.c>0).sort((x,y)=>y.c-x.c).slice(0,10);
   const R=await Promise.allSettled([F.getDocs(F.query(U,F.orderBy('pts','desc'),F.limit(10))),F.getDocs(F.query(U,F.where('dk','==',pp.dk),F.limit(200))),F.getDocs(F.query(U,F.where('wk','==',pp.wk),F.limit(200)))]);
   if(R[0].status==='fulfilled')window.__lbRemote=map(R[0].value,'pts');if(R[1].status==='fulfilled')window.__lbRemoteD=map(R[1].value,'dpts');if(R[2].status==='fulfilled')window.__lbRemoteW=map(R[2].value,'wpts');
   R.forEach(r=>{if(r.status==='rejected')console.warn('lb',r.reason)});
@@ -6274,7 +6285,7 @@ async function refreshManagedFriends(){
       const rows=await Promise.all(snap.docs.map(async d=>{let u=d.data();try{const x=await F.getDoc(F.doc(db,'users',u.uid));if(x.exists())u={...u,...x.data()}}catch(e){}let seen=0;try{seen=typeof u.t?.toMillis==='function'?u.t.toMillis():(typeof u.t==='number'?u.t:0)}catch(e){}return {id:d.id,uid:u.uid||'',name:u.name||'Oyuncu',pts:+u.pts||0,seen}}));
       const fmAgo=t=>{if(!t)return 'Son aktiflik bilinmiyor';const d=Date.now()-t;if(d<65000)return '🟢 Şu an aktif';const m=Math.floor(d/60000);if(m<60)return m+' dk önce aktifti';const h=Math.floor(m/60);if(h<24)return h+' sa önce aktifti';const g=Math.floor(h/24);return g+' gün önce aktifti'};
       rows.sort((a,b)=>b.pts-a.pts||b.seen-a.seen);
-      fmList.innerHTML=rows.map((r,i)=>'<div class="fm-row"><span class="fm-rank r'+(i<3?i+1:0)+'">'+(i+1)+'</span><div class="fm-avatar">'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</div><div class="fm-details"><b>'+esc(r.name)+'</b><small>'+r.pts+' puan · '+fmAgo(r.seen)+'</small></div><div class="fm-actions"><button type="button" data-fm-remove="'+esc(r.id)+'" data-fm-name="'+esc(r.name)+'">Çıkar</button><button type="button" data-fm-block="'+esc(r.id)+'" data-fm-uid="'+esc(r.uid)+'" data-fm-name="'+esc(r.name)+'">Engelle</button></div></div>').join('')}
+      fmList.innerHTML=rows.map((r,i)=>'<div class="fm-row" data-pf-uid="'+esc(r.uid||'')+'" data-pf-name="'+esc(r.name||'Oyuncu')+'"><span class="fm-rank r'+(i<3?i+1:0)+'">'+(i+1)+'</span><div class="fm-avatar">'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</div><div class="fm-details"><b>'+esc(r.name)+'</b><small>'+r.pts+' puan · '+fmAgo(r.seen)+'</small></div><div class="fm-actions"><button type="button" data-fm-remove="'+esc(r.id)+'" data-fm-name="'+esc(r.name)+'">Çıkar</button><button type="button" data-fm-block="'+esc(r.id)+'" data-fm-uid="'+esc(r.uid)+'" data-fm-name="'+esc(r.name)+'">Engelle</button></div></div>').join('')}
   }catch(e){console.warn('friends list',e);fmList.innerHTML='<div class="fm-empty">Arkadaşlar yüklenemedi.</div>'}
   try{
     const bs=await F.getDocs(F.collection(db,'users',uid,'blocked')),n=document.getElementById('fmBlkN');
@@ -6295,10 +6306,10 @@ async function refreshPendingRequests(){
   box.innerHTML=rows.map(r=>'<div class="fm-row"><div class="fm-avatar">'+esc((r.fromName||'?').charAt(0).toLocaleUpperCase('tr'))+'</div><div class="fm-details"><b>'+esc(r.fromName||'Oyuncu')+'</b><small>ID '+esc(r.fromPid||'')+' · Arkadaşlık isteği</small></div><div class="fm-actions"><button type="button" data-fm-accept="'+esc(r.id)+'" data-fm-name="'+esc(r.fromName||'Oyuncu')+'">Kabul</button><button type="button" data-fm-reject="'+esc(r.id)+'" data-fm-name="'+esc(r.fromName||'Oyuncu')+'">Reddet</button></div></div>').join('');
  }catch(e){console.warn('pending friends',e);box.innerHTML='<div class="fm-empty">İstekler yüklenemedi.</div>'}
 }
-async function resolvePendingFriend(btn,accept){if(!await boot())return;const id=btn.dataset.fmAccept||btn.dataset.fmReject,ref=F.doc(db,'friendReqs',id);try{const sn=await F.getDoc(ref);if(!sn.exists()||sn.data().to!==uid||sn.data().st!=='pending'){fmNote('Bu istek artık beklemiyor.');await refreshPendingRequests();return}const r=sn.data();if(accept){{const gs=await F.getDoc(F.doc(db,'users',r.from));if(gs.exists()&&!ibGenderOK(gs.data())){await F.updateDoc(ref,{st:'rejected'});fmNote(GENDER_MSG);await refreshPendingRequests();return}}await F.setDoc(F.doc(db,'users',uid,'friends',r.fromPid),{uid:r.from,name:r.fromName||'Oyuncu',added:F.serverTimestamp()});await F.updateDoc(ref,{st:'accepted'});fmNote((r.fromName||'Oyuncu')+' artık arkadaşın.')}else{await F.updateDoc(ref,{st:'rejected'});fmNote('Arkadaşlık isteği reddedildi.')}await refreshPendingRequests();await refreshManagedFriends()}catch(e){console.warn('resolve friend request',e);fmNote('İstek işlenemedi. Tekrar deneyebilirsin.')}}
+async function resolvePendingFriend(btn,accept){if(!await boot())return;const id=btn.dataset.fmAccept||btn.dataset.fmReject,ref=F.doc(db,'friendReqs',id);try{const sn=await F.getDoc(ref);if(!sn.exists()||sn.data().to!==uid||sn.data().st!=='pending'){fmNote('Bu istek artık beklemiyor.');await refreshPendingRequests();return}const r=sn.data();if(accept){{const gs=await F.getDoc(F.doc(db,'users',r.from));if(gs.exists()&&!ibGenderOK(gs.data())){await F.updateDoc(ref,{st:'rejected'});window.__showGenderBlock();await refreshPendingRequests();return}}await F.setDoc(F.doc(db,'users',uid,'friends',r.fromPid),{uid:r.from,name:r.fromName||'Oyuncu',added:F.serverTimestamp()});await F.updateDoc(ref,{st:'accepted'});fmNote((r.fromName||'Oyuncu')+' artık arkadaşın.')}else{await F.updateDoc(ref,{st:'rejected'});fmNote('Arkadaşlık isteği reddedildi.')}await refreshPendingRequests();await refreshManagedFriends()}catch(e){console.warn('resolve friend request',e);fmNote('İstek işlenemedi. Tekrar deneyebilirsin.')}}
 window.__sendFriendRequestToUid=async function(targetUid){
  if(!targetUid)return{ok:false,message:'Oyuncu bulunamadı.'};if(!await boot())return{ok:false,message:'Bağlantı kurulamadı.'};if(targetUid===uid)return{ok:false,message:'Kendine arkadaşlık isteği gönderemezsin.'};
- try{const userSnap=await F.getDoc(F.doc(db,'users',targetUid));if(!userSnap.exists())return{ok:false,message:'Oyuncu profili bulunamadı.'};const target=userSnap.data(),targetPid=String(target.pid||'');if(!targetPid)return{ok:false,message:'Oyuncu ID bilgisi bulunamadı.'};if(!ibGenderOK(target))return{ok:false,message:GENDER_MSG};
+ try{const userSnap=await F.getDoc(F.doc(db,'users',targetUid));if(!userSnap.exists())return{ok:false,message:'Oyuncu profili bulunamadı.'};const target=userSnap.data(),targetPid=String(target.pid||'');if(!targetPid)return{ok:false,message:'Oyuncu ID bilgisi bulunamadı.'};if(!ibGenderOK(target))return{ok:false,gender:true,message:GENDER_MSG};
   if((await F.getDoc(F.doc(db,'users',uid,'friends',targetPid))).exists())return{ok:false,message:'Zaten arkadaşsınız.'};
   const reqRef=F.doc(db,'friendReqs',uid+'_'+targetUid),old=await F.getDoc(reqRef);if(old.exists()&&old.data().st==='pending')return{ok:false,message:'Arkadaşlık isteği zaten gönderilmiş.'};
   const reverse=await F.getDoc(F.doc(db,'friendReqs',targetUid+'_'+uid));if(reverse.exists()&&reverse.data().st==='pending')return{ok:false,message:'Bu oyuncunun bekleyen isteğini arkadaşlar sekmesinden kabul edebilirsin.'};
@@ -6307,17 +6318,39 @@ window.__sendFriendRequestToUid=async function(targetUid){
  }catch(e){console.warn('friend request by profile',e);return{ok:false,message:'İstek gönderilemedi. İnternet bağlantını kontrol et.'}}
 };
 window.__openPlayerFriendModal=function(targetUid,targetName){
- const old=document.getElementById('playerFriendModal');if(old)old.remove();const ov=document.createElement('div');ov.id='playerFriendModal';ov.className='player-friend-ov';ov.setAttribute('role','presentation');
- const card=document.createElement('section');card.className='player-friend-card';card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-labelledby','playerFriendTitle');
- const close=document.createElement('button');close.type='button';close.className='player-friend-close';close.setAttribute('aria-label','Kapat');close.textContent='×';
- const icon=document.createElement('div');icon.className='player-friend-icon';icon.textContent='+';
- const title=document.createElement('h2');title.id='playerFriendTitle';title.textContent=targetName||'Oyuncu';
- const copy=document.createElement('p');copy.textContent='Bu oyuncuyu arkadaş olarak eklemek ister misin?';
- const add=document.createElement('button');add.type='button';add.className='player-friend-add';add.textContent='Arkadaş olarak ekle';
- const status=document.createElement('div');status.className='player-friend-status';status.setAttribute('role','status');
- const shut=()=>ov.remove();close.onclick=shut;ov.addEventListener('click',e=>{if(e.target===ov)shut()});add.onclick=async()=>{if(add.disabled)return;add.disabled=true;add.textContent='İstek gönderiliyor…';const r=await window.__sendFriendRequestToUid(targetUid);status.textContent=r.message;add.textContent=r.ok?'İstek gönderildi':(r.message==='Zaten arkadaşsınız.'?'Zaten arkadaşsınız':'Arkadaş olarak ekle');add.disabled=!!r.ok};card.append(close,icon,title,copy,add,status);ov.appendChild(card);document.body.appendChild(ov);close.focus();
+ const old=document.getElementById('playerFriendModal');if(old)old.remove();
+ const mk=(t,c,x)=>{const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e};
+ const ini=n=>((String(n||'?').trim().charAt(0))||'?').toLocaleUpperCase('tr');
+ const ago=ms=>{const m=Math.floor((Date.now()-ms)/60000);if(m<1)return 'az önce';if(m<60)return m+' dk önce';const h=Math.floor(m/60);if(h<24)return h+' sa önce';return Math.floor(h/24)+' gün önce'};
+ const ov=mk('div','player-friend-ov');ov.id='playerFriendModal';ov.setAttribute('role','presentation');
+ const card=mk('section','player-friend-card pfc2');card.setAttribute('role','dialog');card.setAttribute('aria-modal','true');card.setAttribute('aria-labelledby','playerFriendTitle');
+ const close=mk('button','player-friend-close','×');close.type='button';close.setAttribute('aria-label','Kapat');
+ const avBox=mk('div','pfc-av');avBox.appendChild(mk('b','',ini(targetName)));
+ const title=mk('h2','',targetName||'Oyuncu');title.id='playerFriendTitle';
+ const rank=mk('span','pfc-rank','');
+ const stWrap=mk('div'),state=mk('div','pfc-state'),stTx=mk('span','','Yükleniyor…');state.append(document.createElement('em'),stTx);stWrap.appendChild(state);
+ const stats=mk('div','pfc-stats');const cell=l=>{const c=mk('div','pfc-stat'),v=mk('b','','—');c.append(v,mk('small','',l));stats.appendChild(c);return v};
+ const vPts=cell('İlim Puanı'),vMatch=cell('Online Maç'),vRate=cell('Online Başarı');
+ const add=mk('button','player-friend-add','Arkadaş olarak ekle');add.type='button';
+ const status=mk('div','player-friend-status');status.setAttribute('role','status');
+ const shut=()=>ov.remove();close.onclick=shut;ov.addEventListener('click',e=>{if(e.target===ov)shut()});
+ add.onclick=async()=>{if(add.disabled)return;add.disabled=true;add.textContent='İstek gönderiliyor…';const r=await window.__sendFriendRequestToUid(targetUid);
+  if(r.gender){add.textContent='Arkadaş olarak ekle';add.disabled=false;status.textContent='';window.__showGenderBlock();return}
+  status.textContent=r.message;add.textContent=r.ok?'İstek gönderildi':(r.message==='Zaten arkadaşsınız.'?'Zaten arkadaşsınız':'Arkadaş olarak ekle');add.disabled=!!r.ok};
+ card.append(close,avBox,title,rank,stWrap,stats,add,status);ov.appendChild(card);document.body.appendChild(ov);close.focus();
+ (async()=>{try{
+  if(!await boot())throw new Error('boot');
+  const s=await F.getDoc(F.doc(db,'users',targetUid));if(!s.exists())throw new Error('yok');if(!ov.isConnected)return;
+  const d=s.data(),look=window.__playerLook?window.__playerLook(d.pts,d.av):null;
+  if(d.name)title.textContent=String(d.name).slice(0,14);
+  if(look){const im=document.createElement('img');im.alt='';im.src=look.src;avBox.textContent='';avBox.appendChild(im);rank.textContent=look.rank}
+  const ms=typeof d.t?.toMillis==='function'?d.t.toMillis():(+d.t||0),act=!!ms&&Date.now()-ms<65000;
+  state.classList.toggle('on',act);stTx.textContent=act?'Aktif':('Pasif'+(ms?' · '+ago(ms):''));
+  const p=+d.onp||0,w=+d.onw||0;vPts.textContent=(+d.pts||0).toLocaleString('tr-TR');vMatch.textContent=String(p);vRate.textContent=p?'%'+Math.round(w/p*100):'—';
+ }catch(e){console.warn('player profile',e);stTx.textContent='Bilgiler alınamadı'}})();
 };
 window.__refreshManagedFriends=refreshManagedFriends;
+if(fmList)fmList.addEventListener('click',e=>{if(e.target.closest('button'))return;const r=e.target.closest('[data-pf-uid]');if(r&&r.dataset.pfUid&&window.__openPlayerFriendModal)window.__openPlayerFriendModal(r.dataset.pfUid,r.dataset.pfName)});
 const fmOpen=document.getElementById('openFriendsManage'),fmClose=document.getElementById('friendsManageClose');
 if(fmOpen)fmOpen.addEventListener('click',async e=>{e.preventDefault();e.stopPropagation();if(fmModal){document.body.appendChild(fmModal);fmModal.classList.add('on');fmModal.style.setProperty('display','flex','important');fmModal.style.setProperty('z-index','2147483647','important');fmModal.style.setProperty('position','fixed','important');fmModal.style.setProperty('inset','0','important');fmSetTab('f');fmNote('');await refreshManagedFriends();await refreshPendingRequests()}});
 if(fmClose)fmClose.onclick=()=>fmModal.classList.remove('on');
@@ -8247,7 +8280,7 @@ if(fmModal)fmModal.addEventListener('click',async function(e){
   const target=fbMatches.find(x=>x.uid===add.dataset.fbAdd);if(!target||!await boot())return;
   add.disabled=true;
   try{
-    {const gs=await F.getDoc(F.doc(db,'users',target.uid));if(gs.exists()&&window.__ibGender&&!window.__ibGender(gs.data())){add.disabled=false;alert(window.__ibGenderMsg||'Aynı cinsiyet gerekli.');return}}
+    {const gs=await F.getDoc(F.doc(db,'users',target.uid));if(gs.exists()&&window.__ibGender&&!window.__ibGender(gs.data())){add.disabled=false;(window.__showGenderBlock?window.__showGenderBlock():alert(window.__ibGenderMsg||'Aynı cinsiyet gerekli.'));return}}
     if((await F.getDoc(F.doc(db,'users',uid,'friends',target.pid))).exists()){add.textContent='Zaten arkadaşsınız';return}
     const reqRef=F.doc(db,'friendReqs',uid+'_'+target.uid),old=await F.getDoc(reqRef);
     if(old.exists()&&old.data().st==='pending'){add.textContent='İstek gönderildi';return}
@@ -12405,6 +12438,34 @@ if(!addBtn()){var n=0,t=setInterval(function(){if(addBtn()||++n>80)clearInterval
 #lb .lbpc[data-friend-uid],#lb .lbr[data-friend-uid],#dOn[role="button"]{cursor:pointer}
 @keyframes playerFriendFade{from{opacity:0}to{opacity:1}}@keyframes playerFriendPop{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){.player-friend-ov,.player-friend-card{animation:none!important}}
+
+.pfc2{padding-top:22px}
+.pfc-av{width:104px;height:104px;margin:2px auto 10px;border-radius:50%;border:3px solid #f0c24a;box-shadow:0 0 0 4px #6b4b13,0 8px 22px #0009;overflow:hidden;background:#0d1b4a;display:grid;place-items:center}
+.pfc-av img{width:100%;height:100%;object-fit:cover}
+.pfc-av b{font:900 40px "Nunito",system-ui,sans-serif;color:#ffe08a}
+.pfc2 h2{margin:0 0 6px}
+.pfc-rank{display:inline-block;margin-bottom:10px;padding:3px 12px;border:1px solid rgba(240,194,74,.5);border-radius:999px;background:rgba(240,194,74,.16);color:#ffe08a;font:900 12px "Nunito",system-ui,sans-serif}
+.pfc-rank:empty{display:none}
+.pfc-state{display:inline-flex;align-items:center;gap:7px;margin:0 0 14px;padding:5px 13px;border-radius:999px;background:rgba(255,255,255,.07);color:#c9d9ff;font:800 12px "Nunito",system-ui,sans-serif}
+.pfc-state em{width:9px;height:9px;border-radius:50%;background:#8791ad}
+.pfc-state.on{background:rgba(34,181,102,.16);color:#b9ffd8}
+.pfc-state.on em{background:#3ee08a;animation:pfcPulse 1.6s infinite}
+.pfc-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 16px}
+.pfc-stat{padding:10px 4px 9px;border:1px solid rgba(255,240,184,.25);border-radius:14px;background:rgba(255,255,255,.06)}
+.pfc-stat b{display:block;color:#fff0b8;font:900 19px/1.1 "Nunito",system-ui,sans-serif}
+.pfc-stat small{display:block;margin-top:5px;color:#9fb6f0;font:800 10px/1.2 "Nunito",system-ui,sans-serif}
+#friendsManageModal .fm-row[data-pf-uid]{cursor:pointer}
+@keyframes pfcPulse{0%{box-shadow:0 0 0 0 rgba(62,224,138,.7)}70%{box-shadow:0 0 0 8px rgba(62,224,138,0)}100%{box-shadow:0 0 0 0 rgba(62,224,138,0)}}
+.gender-block-ov{position:fixed;inset:0;z-index:2147483647;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 26px;background:rgba(0,0,0,.97);color:#fff;text-align:center;animation:gbFade .4s ease-out;transition:opacity .22s}
+.gender-block-ov.out{opacity:0}
+.gb-icon{margin-bottom:18px;filter:drop-shadow(0 0 18px rgba(255,77,90,.35));animation:gbPop .5s cubic-bezier(.18,1.25,.35,1)}
+.gender-block-ov h2{margin:0 0 12px;color:#ffe08a;font:900 27px/1.15 "Nunito",system-ui,sans-serif}
+.gb-rule{max-width:340px;margin:0 0 14px;color:#fff;font:900 16px/1.4 "Nunito",system-ui,sans-serif}
+.gender-block-ov p{max-width:340px;margin:0 0 26px;color:#aeb8d6;font:700 14px/1.55 "Nunito",system-ui,sans-serif}
+.gb-ok{min-width:170px;min-height:48px;padding:11px 26px;border:2px solid #ffe08a;border-radius:14px;background:linear-gradient(180deg,#ffe48a,#d99419);color:#382100;font:900 16px "Nunito",system-ui,sans-serif;box-shadow:0 4px 0 #80500a;cursor:pointer}
+.gb-ok:active{transform:translateY(3px);box-shadow:0 1px 0 #80500a}
+@keyframes gbFade{from{opacity:0}to{opacity:1}}@keyframes gbPop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){.gender-block-ov,.gb-icon,.pfc-state.on em{animation:none!important}}
 </style>
 <script id="player-friend-profile-events">(function(){document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('#dOn[data-friend-uid]');if(b&&window.__openPlayerFriendModal)window.__openPlayerFriendModal(b.dataset.friendUid,b.dataset.friendName)});document.addEventListener('keydown',function(e){if(e.key!=='Enter'&&e.key!==' ')return;var b=e.target.closest&&e.target.closest('#dOn[data-friend-uid]');if(!b)return;e.preventDefault();if(window.__openPlayerFriendModal)window.__openPlayerFriendModal(b.dataset.friendUid,b.dataset.friendName)})})();</script><style id="random-match-background-refresh">
 #frm.lbm{background:radial-gradient(ellipse at 50% 22%,rgba(65,133,223,.28),transparent 58%),linear-gradient(145deg,rgba(10,34,82,.76),rgba(12,15,54,.82));-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}

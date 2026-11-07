@@ -6449,8 +6449,8 @@ window.__sendFriendRequestToUid=async function(targetUid){
  if(!targetUid)return{ok:false,message:'Oyuncu bulunamadı.'};if(!await boot())return{ok:false,message:'Bağlantı kurulamadı.'};if(targetUid===uid)return{ok:false,message:'Kendine arkadaşlık isteği gönderemezsin.'};
  try{const S=(n,p)=>p.catch(e=>{try{e.fstep=n}catch(x){}throw e});const userSnap=await S('hedef profil',F.getDoc(F.doc(db,'users',targetUid)));if(!userSnap.exists())return{ok:false,message:'Oyuncu profili bulunamadı.'};const target=userSnap.data(),targetPid=String(target.pid||'');if(!targetPid)return{ok:false,message:'Oyuncu ID bilgisi bulunamadı.'};if(!ibGenderOK(target))return{ok:false,gender:true,message:GENDER_MSG};
   if((await S('arkadaş listesi',F.getDoc(F.doc(db,'users',uid,'friends',targetPid)))).exists())return{ok:false,message:'Zaten arkadaşsınız.'};
-  const reqRef=F.doc(db,'friendReqs',uid+'_'+targetUid),old=await S('istek kaydı',F.getDoc(reqRef));if(old.exists()&&old.data().st==='pending')return{ok:false,message:'Arkadaşlık isteği zaten gönderilmiş.'};
-  const reverse=await S('karşı istek',F.getDoc(F.doc(db,'friendReqs',targetUid+'_'+uid)));if(reverse.exists()&&reverse.data().st==='pending')return{ok:false,message:'Bu oyuncunun bekleyen isteğini arkadaşlar sekmesinden kabul edebilirsin.'};
+  const reqRef=F.doc(db,'friendReqs',uid+'_'+targetUid),old=await S('istek kaydı',F.getDoc(reqRef).catch(e=>{if(e&&e.code==='permission-denied')return {exists:()=>false,data:()=>({})};throw e}));if(old.exists()&&old.data().st==='pending')return{ok:false,message:'Arkadaşlık isteği zaten gönderilmiş.'};
+  const reverse=await S('karşı istek',F.getDoc(F.doc(db,'friendReqs',targetUid+'_'+uid)).catch(e=>{if(e&&e.code==='permission-denied')return {exists:()=>false,data:()=>({})};throw e}));if(reverse.exists()&&reverse.data().st==='pending')return{ok:false,message:'Bu oyuncunun bekleyen isteğini arkadaşlar sekmesinden kabul edebilirsin.'};
   const blockedByMe=await S('engel listem',F.getDoc(F.doc(db,'users',uid,'blocked',targetPid))),blockedMe=await S('karşının engel listesi',F.getDoc(F.doc(db,'users',targetUid,'blocked',pid)));if(blockedByMe.exists()||blockedMe.exists())return{ok:false,message:'Bu oyuncuya istek gönderilemiyor.'};
   const myAvatar=(typeof avGet==='function'&&typeof AVS!=='undefined')?AVS[avGet()]||'':'';await S('istek yazma',F.setDoc(reqRef,{from:uid,to:targetUid,fromName:nm(),fromPid:pid,fromAvatar:myAvatar,toName:target.name||'Oyuncu',toPid:targetPid,st:'pending',ts:Date.now()}));return{ok:true,message:'Arkadaşlık isteği gönderildi.'};
  }catch(e){console.warn('friend request by profile',e);const c=String(e&&e.code||''),net=!navigator.onLine||/unavailable|network|deadline|offline/i.test(c+' '+(e&&e.message||'')),st=e&&e.fstep?' ['+e.fstep+']':'';return{ok:false,message:net?'İstek gönderilemedi. İnternet bağlantını kontrol et.':'İstek gönderilemedi'+st+': '+(c||(e&&e.message)||'bilinmeyen hata')}}
@@ -8420,7 +8420,7 @@ if(fmModal)fmModal.addEventListener('click',async function(e){
   try{
     {const gs=await F.getDoc(F.doc(db,'users',target.uid));if(gs.exists()&&window.__ibGender&&!window.__ibGender(gs.data())){add.disabled=false;(window.__showGenderBlock?window.__showGenderBlock():alert(window.__ibGenderMsg||'Aynı cinsiyet gerekli.'));return}}
     if((await F.getDoc(F.doc(db,'users',uid,'friends',target.pid))).exists()){add.textContent='Zaten arkadaşsınız';return}
-    const reqRef=F.doc(db,'friendReqs',uid+'_'+target.uid),old=await F.getDoc(reqRef);
+    const reqRef=F.doc(db,'friendReqs',uid+'_'+target.uid),old=await F.getDoc(reqRef).catch(e=>{if(e&&e.code==='permission-denied')return {exists:()=>false,data:()=>({})};throw e});
     if(old.exists()&&old.data().st==='pending'){add.textContent='İstek gönderildi';return}
     const blockedByMe=await F.getDoc(F.doc(db,'users',uid,'blocked',target.pid));
     const blockedMe=await F.getDoc(F.doc(db,'users',target.uid,'blocked',pid));

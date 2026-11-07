@@ -5688,13 +5688,13 @@ const nm=()=>(localStorage.getItem('islamibilgi_name')||'Misafir').trim().slice(
 const prof=()=>({name:nm(),pts:+(window.homePts?window.homePts():0)||0,av:+(window.avGet?window.avGet():0)||0,facebookUid:(localStorage.getItem('islamibilgi_fb_graph_uid')||'')||null});
 let bootP=null,mking=false;
 function setId(){$('pfId').textContent=pid||(mking?'…':'—')}
-function boot(){if(db)return Promise.resolve(true);if(!bootP){mking=!pid;setId();bootP=boot0().finally(()=>{bootP=null;mking=false;setId()})}return bootP}
+let AUTHREF=null;function boot(){try{if(db&&AUTHREF){const cu=AUTHREF.currentUser;if(!cu||cu.uid!==uid){db=null;pid='';invOn=0;frOn=0;wReady=false}}}catch(e){}if(db)return Promise.resolve(true);if(!bootP){mking=!pid;setId();bootP=boot0().finally(()=>{bootP=null;mking=false;setId()})}return bootP}
 async function boot0(){
   if(db)return true;
   if(!ok){msg('Online mod için Firebase ayarı henüz eklenmedi.');return false}
   try{msg('BAĞLAnıyor…');
     const[A,U,S]=await Promise.all([import(G+'firebase-app.js'),import(G+'firebase-auth.js'),import(G+'firebase-firestore.js')]);
-    const app=A.getApps().length?A.getApp():A.initializeApp(FB),au=U.getAuth(app);F=S;db=S.getFirestore(app);
+    const app=A.getApps().length?A.getApp():A.initializeApp(FB),au=U.getAuth(app);AUTHREF=au;F=S;db=S.getFirestore(app);
     await au.authStateReady();if(!au.currentUser)await U.signInAnonymously(au);uid=au.currentUser.uid;
     const ur=F.doc(db,'users',uid),sn=await F.getDoc(ur);pid=sn.exists()&&sn.data().pid||'';
     for(let t=0;!pid&&t<10;t++){const c=String(1000000+Math.floor(Math.random()*9000000));

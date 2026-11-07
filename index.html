@@ -1196,7 +1196,7 @@ transition:opacity 2.6s ease-in-out,transform 2.6s ease-in-out,visibility 0s lin
   <div class="pm-head">
     <div class="pm-av" id="pmAv"><img id="profImg" alt=""></div>
     <input class="pm-nm" id="profNm" maxlength="14" placeholder="Kullanıcı adı" autocomplete="off" aria-label="Kullanıcı adı" readonly aria-readonly="true" tabindex="-1">
-    <span class="pm-rk" id="pfRankN">Rütbesiz</span>
+    <span class="pm-rk" id="pfRankN">Acemi</span>
     <button type="button" class="pm-id" id="pfIdBtn" aria-label="ID numaram"><small>ID</small><b id="pfId">—</b></button>
     <button type="button" class="pm-addf" id="pfAddFriendBtn" aria-label="Arkadaş ekle">+ Arkadaş Ekle</button>
   </div>
@@ -2741,10 +2741,10 @@ const ON_KEY='islamibilgi_online_stats';function onBase(){let o=null;try{o=JSON.
 window.__pOnStat=function(k){const o=onBase();o.p++;if(k==='w')o.w++;else if(k==='t')o.d++;else o.l++;try{localStorage.setItem(ON_KEY,JSON.stringify(o))}catch(e){}};
 window.__onBase=function(){return onBase()};
 window.__pStat=function(k){const o=stBase();o.p++;if(k==='w')o.w++;else if(k==='t')o.d++;else o.l++;try{localStorage.setItem(ST_KEY,JSON.stringify(o))}catch(e){}};
-window.__playerLook=function(pts,av){pts=Number(pts)||0;const g=(+av===1)?1:0;let k=-1;for(let i=0;i<RK_NEED.length;i++)if(pts>=RK_NEED[i])k=i;return{src:k>=0?RK_AV[g][k]:AVS[g],rank:k>=0?RANKS[k]:'Rütbesiz',ranked:k>=0}};
+window.__playerLook=function(pts,av){pts=Number(pts)||0;const g=(+av===1)?1:0;let k=-1;for(let i=0;i<RK_NEED.length;i++)if(pts>=RK_NEED[i])k=i;return{src:k>=0?RK_AV[g][k]:AVS[g],rank:k>=0?RANKS[k]:'Acemi',ranked:k>=0}};
 function pfFill(mine){
   const st=stBase(),pts=ptsGet();let idx=-1;for(let k=0;k<RK_NEED.length;k++)if(pts>=RK_NEED[k])idx=k;
-  $('pfRankN').textContent=idx>=0?RANKS[idx]:'Acemi';document.querySelector('#profm .pm-yl').textContent=idx>=0?RANKS[idx]:'Rütbesiz';$('pfRankN').classList.toggle('pm-lg',$('pfRankN').textContent.length>8);$('pfPts').textContent=fmt(pts);
+  $('pfRankN').textContent=idx>=0?RANKS[idx]:'Acemi';document.querySelector('#profm .pm-yl').textContent=idx>=0?RANKS[idx]:'Acemi';$('pfRankN').classList.toggle('pm-lg',$('pfRankN').textContent.length>8);$('pfPts').textContent=fmt(pts);
   const low=idx>=0?RK_NEED[idx]:0,nxt=idx+1<RK_NEED.length?RK_NEED[idx+1]:0,pct=nxt?Math.max(0,Math.min(100,(pts-low)/(nxt-low)*100)):100;
   $('pfCurN').textContent=idx>=0?RANKS[idx]:'Acemi';{const im=$('pfNextImg'),g=avGet()===1?1:0;$('pfCurImg').src=idx>=0?RK_AV[g][idx]:$('profImg').src;if(nxt){im.src=RK_AV[g][idx+1];im.hidden=false;$('pfNextN').textContent=RANKS[idx+1];$('pfNext').textContent=fmt(nxt-pts)+' P kaldı'}else{im.hidden=true;$('pfNextN').textContent='🏆 En üst';$('pfNext').textContent='Tüm dereceler açık'}}
   {const on=onBase();$('profCnt').textContent=on.p;$('pfW').textContent=on.w;$('pfL').textContent=on.l;$('pfD').textContent=on.d;$('pfRate').textContent=on.p?'%'+Math.round(on.w/on.p*100):'—'}
@@ -5478,7 +5478,7 @@ const oldAgain=$('bAgain');if(oldAgain)oldAgain.onclick=function(){open()};
 .fr b{display:block;font-size:15px}.fr small{font-size:11px;font-weight:800;color:#9fc3ff}
 .fr button{width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#ffb0c0;font-size:13px}
 </style>
-<div class="lbm" id="frm"><div class="frp" role="dialog" aria-label="Çevrim içi düello"><div class="frcrest" aria-hidden="true"><i><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="frSwG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#f2b53a"/><stop offset="1" stop-color="#b8780f"/></linearGradient><g id="frSw"><path d="M32 3l4 6v31h-8V9z"/><rect x="21" y="40" width="22" height="4.5" rx="2.2"/><rect x="29.5" y="44.5" width="5" height="11" rx="1.5"/><circle cx="32" cy="58.5" r="3.2"/></g></defs><g fill="url(#frSwG)" stroke="#7a4d0e" stroke-width="1"><use href="#frSw" transform="rotate(-42 32 32)"/><use href="#frSw" transform="rotate(42 32 32)"/></g></svg></i></div><button class="frx" id="frX" aria-label="Kapat">×</button><div class="frtitle"><span class="frtl"><b><span>ÇEVRİM İÇİ DÜELLO</span></b></span></div><div class="famb" id="famTop"><div class="fam-pane" id="famMkP" hidden><div class="fam-sub">Oda kuruldu! Bu şifreyi aile üyene ver. O da "Odaya Gir" sekmesinde şifreyi girince oyun başlar.</div><div class="fam-stake" id="famStake"></div><div class="fam-codes one"><div><small>ODA ŞİFRESİ</small><b id="famPw">—</b></div></div><div class="fam-st">Oda açık</div><div class="fam-btns"><button type="button" id="famCp">Kopyala</button><button type="button" id="famCl">Odayı Kapat</button></div></div></div><div class="frsub"><i></i><span id="frSubT">Dirhem miktarını seç</span><i></i></div><div class="frtg" id="frTg"></div><div class="frtabs"><button type="button" id="frRand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg><span>Rastgele Eşleş</span></button><button type="button" id="frFrTab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="9" r="2.6"/><path d="M17.4 14c2.8 0 4.6 1.9 4.6 4.8"/></svg><span>Arkadaşınla Oyna</span></button><button type="button" id="frFam"><span>👨‍👩‍👧 Ailenle Oyna</span></button></div><div class="frtabs" id="famTabs"><button type="button" id="famTabMk"><span>🏠 Oda Kur</span></button><button type="button" id="famTabJn"><span>🔑 Odaya Gir</span></button></div><div class="frmsg" id="frMsg"></div><div class="frl" id="frL" style="display:none"></div><div class="famb" id="famBox" hidden><div class="fam-join"><div class="fam-sub" id="famJSub">Oda şifresini gir ve odaya katıl.</div><input id="famInP" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" autocomplete="off"><button type="button" id="famGo">Odaya Gir</button><button type="button" id="famBack" style="display:block;width:100%;margin-top:8px">Geri</button></div></div><div class="frfoot" aria-hidden="true"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5z"/><path d="M12 6l4.2 1.6v3.6c0 2.7-1.7 4.8-4.2 5.9-2.5-1.1-4.2-3.2-4.2-5.9V7.6z" stroke-width="1.2"/></svg><span>Doğru cevaplarla rakibinden önce puan topla!</span><i></i></div></div></div><style id="duel-cleanup">
+<div class="lbm" id="frm"><div class="frp" role="dialog" aria-label="Çevrim içi düello"><div class="frcrest" aria-hidden="true"><i><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="frSwG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#f2b53a"/><stop offset="1" stop-color="#b8780f"/></linearGradient><g id="frSw"><path d="M32 3l4 6v31h-8V9z"/><rect x="21" y="40" width="22" height="4.5" rx="2.2"/><rect x="29.5" y="44.5" width="5" height="11" rx="1.5"/><circle cx="32" cy="58.5" r="3.2"/></g></defs><g fill="url(#frSwG)" stroke="#7a4d0e" stroke-width="1"><use href="#frSw" transform="rotate(-42 32 32)"/><use href="#frSw" transform="rotate(42 32 32)"/></g></svg></i></div><button class="frx" id="frX" aria-label="Kapat">×</button><div class="frtitle"><span class="frtl"><b><span>ÇEVRİM İÇİ DÜELLO</span></b></span></div><div class="famb" id="famTop"><div class="fam-pane" id="famMkP" hidden><div class="fam-sub">Oda kuruldu! Bu şifreyi aile üyene ver. O da "Odaya Gir" sekmesinde şifreyi girince oyun başlar.</div><div class="fam-stake" id="famStake"></div><div class="fam-codes one"><div><small>ODA ŞİFRESİ</small><b id="famPw">—</b></div></div><div class="fam-st">Oda açık</div><div class="fam-btns"><button type="button" id="famCp">Kopyala</button><button type="button" id="famCl">Odayı Kapat</button></div></div></div><div class="frsub"><i></i><span id="frSubT">Dirhem miktarını seç</span><i></i></div><div class="frtg" id="frTg"></div><div class="frtabs"><button type="button" id="frRand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg><span>Rastgele Eşleş</span></button><button type="button" id="frFrTab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="9" r="2.6"/><path d="M17.4 14c2.8 0 4.6 1.9 4.6 4.8"/></svg><span>Arkadaşınla Oyna</span></button><button type="button" id="frFam"><span>👨‍👩‍👧 Ailenle Oyna</span></button></div><div class="famcap" id="famCap" hidden><small>Kaç kişilik oda?</small><div><button type="button" data-n="2" class="on">2 kişi</button><button type="button" data-n="3">3 kişi</button><button type="button" data-n="4">4 kişi</button></div></div><div class="frtabs" id="famTabs"><button type="button" id="famTabMk"><span>🏠 Oda Kur</span></button><button type="button" id="famTabJn"><span>🔑 Odaya Gir</span></button></div><div class="frmsg" id="frMsg"></div><div class="frl" id="frL" style="display:none"></div><div class="famb" id="famBox" hidden><div class="fam-join"><div class="fam-sub" id="famJSub">Oda şifresini gir ve odaya katıl.</div><input id="famInP" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" autocomplete="off"><button type="button" id="famGo">Odaya Gir</button><button type="button" id="famBack" style="display:block;width:100%;margin-top:8px">Geri</button></div></div><div class="frfoot" aria-hidden="true"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5z"/><path d="M12 6l4.2 1.6v3.6c0 2.7-1.7 4.8-4.2 5.9-2.5-1.1-4.2-3.2-4.2-5.9V7.6z" stroke-width="1.2"/></svg><span>Doğru cevaplarla rakibinden önce puan topla!</span><i></i></div></div></div><style id="duel-cleanup">
 /* Online düello: ekrandaki dirhem (coin) rozeti, ilerleme çubuğu ve rakip adının altındaki 0/10 kaldırıldı */
 body:has(#duel.on) #homeWalletChip{display:none!important}
 </style>
@@ -6093,7 +6093,7 @@ window.__showGenderBlock=function(){
   const ok=ov.querySelector('.gb-ok');ok.onclick=shut;document.addEventListener('keydown',key,true);
   document.body.appendChild(ov);try{navigator.vibrate&&navigator.vibrate([40,60,40])}catch(e){}ok.focus({preventScroll:true});
 };
-let famRoom=null,famTm=null,famFs=0,famFm='',famBusy=false,famPend='';const FAM_MS=15*60000,famT=pw=>10000+(+pw);
+let famRoom=null,famTm=null,famFs=0,famFm='',famBusy=false,famPend='',famCap=2,famG=null;const FAM_MS=15*60000,famT=pw=>10000+(+pw);
 const FS_RANKS=['Acemi','Talebe','Yolcu','Çırak','Mütefekkir','Muallim','Üstad'];
 const FS_PAL=[['#ddd8c6','#aaa38a'],['#2fae7a','#177150'],['#3b9fd8','#1f6aa0'],['#e0a13a','#a3691a'],['#8a5fd0','#563496'],['#c4455a','#8a2236'],['#2f4396','#141f4d']];
 function famStu(o){const i=o.id,t=Math.max(0,Math.min(6,o.t|0)),f=o.g===1,c=FS_PAL[t],gold='#e8c66c',skin='#f3cfa6',dk='#e6b184';
@@ -6149,20 +6149,27 @@ function famStu(o){const i=o.id,t=Math.max(0,Math.min(6,o.t|0)),f=o.g===1,c=FS_P
 function famMyLook(){let g=0,t=0;try{g=ibMyG()===1?1:0}catch(e){}try{if(typeof rkGet==='function')t=rkGet()+1}catch(e){}return{g:g,t:Math.max(0,Math.min(6,t))}}
 function famSceneEnsure(){let s=$('famScene');if(s)return s;
  s=document.createElement('div');s.id='famScene';s.setAttribute('role','dialog');s.setAttribute('aria-label','Aile odası');
- s.innerHTML='<div class="fs-top"><div class="fs-pw"><small>ODA ŞİFRESİ</small><b id="fsPw">----</b></div><div id="fsStake"></div></div>'
-  +'<button type="button" class="fs-x" id="fsCl" aria-label="Odayı kapat">×</button>'
-  +'<div class="fs-stage"><div class="fs-half l"><div id="fsLeft" style="width:100%"></div><div class="fs-nm"><span id="fsMe">Sen</span><small id="fsMeRk"></small></div></div>'
-  +'<div class="fs-half r dim"><div id="fsRight" style="width:100%"></div><div class="fs-nm fs-wait"><span>Rakip bekleniyor</span></div></div><i class="fs-div"></i></div>';
- document.body.appendChild(s);
- $('fsCl').onclick=()=>famClose();
- return s}
-function famSceneShow(){if(!famRoom)return;const s=famSceneEnsure(),L=famMyLook();$('fsPw').textContent=famRoom.pw;$('fsStake').textContent=famRoom.stake+' dirhemlik yarışma';
- {const k=L.g+'|'+L.t,lf=$('fsLeft');if(lf.dataset.k!==k){lf.dataset.k=k;lf.innerHTML=famStu({id:'fsa',g:L.g,t:L.t});$('fsRight').innerHTML=famStu({id:'fsb',g:0,t:0})}}$('fsMeRk').textContent=FS_RANKS[L.t];
- try{$('fsMe').textContent=nm()||'Sen'}catch(e){}s.classList.add('on')}
-function famSceneHide(){const s=document.getElementById('famScene');if(s)s.classList.remove('on')}
+ s.innerHTML='<div class="fs-top"><div class="fs-pw"><small>ODA ŞİFRESİ</small><b id="fsPw">----</b></div><div id="fsStake"></div></div><button type="button" class="fs-x" id="fsCl" aria-label="Odayı kapat">×</button><div class="fs-stage" id="fsStage"></div>';
+ document.body.appendChild(s);$('fsCl').onclick=()=>{if(famG)famLeave();else famClose()};return s}
+function famSceneShow(){if(famG&&famG.doc){famGStep();return}if(!famRoom)return;const s=famSceneEnsure(),L=famMyLook(),cap=Math.max(2,Math.min(4,+famRoom.cap||2));
+ $('fsPw').textContent=famRoom.pw;$('fsStake').textContent=famRoom.stake+' dirhemlik yarışma · '+cap+' kişilik';
+ let me0='Sen';try{me0=nm()||'Sen'}catch(e){}
+ const st=$('fsStage'),key=cap+'|'+L.g+'|'+L.t;
+ if(st.dataset.k!==key){st.dataset.k=key;st.className='fs-stage c'+cap;
+  /* sıra: 0 = ben (her zaman altta), diğerleri köşelere dağılır */
+  const pos=cap===2?['l','r']:cap===3?['bc','tl','tr']:['bl','tl','tr','br'];
+  let h='';
+  for(let i=0;i<cap;i++){const me=i===0,svg=famStu(me?{id:'fsa',g:L.g,t:L.t}:{id:'fsb'+i,g:0,t:0});
+   h+='<div class="fs-seat fs-half '+pos[i]+(me?' me':' dim')+'">'+(me?'<div class="fs-sen">SEN</div>':'')+'<div class="fs-svg">'+svg+'</div><div class="fs-nm'+(me?'':' fs-wait')+'"><span'+(me?' id="fsMe"':'')+'>'+(me?'Sen':(cap===2?'Rakip bekleniyor':(i+1)+'. oyuncu bekleniyor'))+'</span>'+(me?'<small id="fsMeRk"></small>':'')+'</div></div>'}
+  h+=cap===2?'<i class="fs-div"></i>':'<div class="fs-center"><b id="fsCnt">1 / '+cap+'</b><span>kişi hazır</span><small>'+cap+' kişi tamamlanınca sorular burada açılır</small></div>';
+  st.innerHTML=h}
+ const m=$('fsMe');if(m)m.textContent=me0;const rk=$('fsMeRk');if(rk)rk.textContent=FS_RANKS[L.t];
+ s.classList.add('on')}
+function famSceneHide(){const s=document.getElementById('famScene');if(s){s.classList.remove('on');s.classList.remove('playing')}}
 /* Online ekranı adımları: 0 = sadece "Ailenle Oyna" · 1 = dirhem seç · 2 = "Oda Kur" / "Odaya Gir" sekmeleri */
 function famUi(){const f=$('frm');if(!f)return;f.classList.remove('f0','f1','f2');f.classList.add('f'+famFs);f.classList.toggle('ffam',famPend==='fam');f.classList.toggle('frand',famPend==='rand');f.classList.toggle('ffr',famPend==='fr');f.classList.toggle('ffrl',famPend==='fr'&&famFm==='fl');f.classList.toggle('fjn',famFs===2&&famFm==='jn');f.classList.toggle('froom',famFs===2&&famFm==='mk'&&!!famRoom);
   $('frFam').classList.toggle('on',famPend==='fam');$('famTabMk').classList.toggle('on',famFs===2&&famFm==='mk');$('famTabJn').classList.toggle('on',famFs===2&&famFm==='jn');
+  {const cp=$('famCap');if(cp)cp.hidden=!(famFs===2&&!famRoom&&famFm!=='jn')}
   if(famRoom)famShow();else $('famMkP').hidden=true}
 function famPanel(on){if(!on){famFs=famRoom?2:0;famFm=famRoom?'mk':'';famPend=famRoom?'fam':''}famUi()}
 function famGo(k){/* k: 'rand' | 'fr' | 'fam' — dirhem seçiliyse çalıştır, seçili değilse önce dirhem seçtir */
@@ -6175,15 +6182,15 @@ async function famRun(k){
   if(k==='fr'){famFs=1;famFm='';famUi();if(!await boot())return;if(famPend!=='fr')return;fl(true);famFm='fl';famUi();await list();return}
   if(k==='fam'){famFs=2;famFm='';famUi()}}
 function famAfterTier(){if(famPend&&famFs>=1)famRun(famPend)}
-function famShow(){if(!famRoom)return;$('famMkP').hidden=false;$('famPw').textContent=famRoom.pw;$('famStake').textContent='Bahis: '+famRoom.stake+' dirhem';try{famSceneShow()}catch(e){console.warn('famScene',e)}}
-function famClose(silent){clearTimeout(famTm);const had=famRoom;famRoom=null;famFm='';try{famSceneHide()}catch(e){}try{$('famMkP').hidden=true;famUi()}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
-async function qPut(pw,T0){const put=()=>F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c});try{await put()}catch(e){if(!e||e.code!=='permission-denied')throw e;console.warn('queue yazma reddedildi, Firebase yeniden kuruluyor',e);const od=db;db=null;pid='';invOn=0;frOn=0;wReady=false;try{await F.terminate(od)}catch(x){}try{const A=await import(G+'firebase-app.js');await A.deleteApp(A.getApp())}catch(x){console.warn('deleteApp',x)}if(!await boot()||!pid)throw e;await put()}}
+function famShow(){if(!famRoom)return;$('famMkP').hidden=false;$('famPw').textContent=famRoom.pw;$('famStake').textContent='Bahis: '+famRoom.stake+' dirhem';{const st=document.querySelector('#famMkP .fam-st');if(st)st.textContent='Oda açık · 1/'+(famRoom.cap||2)+' kişi'}try{famSceneShow()}catch(e){console.warn('famScene',e)}}
+function famClose(silent){try{if(famG){if(famG.hid===uid&&famG.doc&&famG.doc.st==='lobby'&&db)F.deleteDoc(F.doc(db,'famRooms',uid)).catch(()=>{});famGStop()}}catch(e){}clearTimeout(famTm);const had=famRoom;famRoom=null;famFm='';try{famSceneHide()}catch(e){}try{$('famMkP').hidden=true;famUi()}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
+async function qPut(pw,T0){const put=()=>F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c,...(famRoom&&famRoom.cap>2?{cap:famRoom.cap}:{})});try{await put()}catch(e){if(!e||e.code!=='permission-denied')throw e;console.warn('queue yazma reddedildi, Firebase yeniden kuruluyor',e);const od=db;db=null;pid='';invOn=0;frOn=0;wReady=false;try{await F.terminate(od)}catch(x){}try{const A=await import(G+'firebase-app.js');await A.deleteApp(A.getApp())}catch(x){console.warn('deleteApp',x)}if(!await boot()||!pid)throw e;await put()}}
 async function famMake(){
   const T0=TIERS[tier];
   if(gw()<T0.c){msg('Bu oda için '+T0.c+' dirhem gerekli (bakiyen '+gw()+').');return}
   /* Oda anında açılır (rakip beklenmez); Firestore kaydı arka planda yapılır */
   let pw=String(1000+Math.floor(Math.random()*9000));
-  clearTimeout(famTm);const room={h:'p'+pw,pw,lv:tier,stake:T0.c,ts:Date.now()};famRoom=room;famTm=setTimeout(()=>famClose(true),FAM_MS);
+  clearTimeout(famTm);const room={h:'p'+pw,pw,lv:tier,stake:T0.c,ts:Date.now(),cap:famCap};famRoom=room;famTm=setTimeout(()=>famClose(true),FAM_MS);
   famFs=2;famFm='mk';msg('');famUi();
   try{
     try{const cu=db&&(await import(G+'firebase-auth.js')).getAuth().currentUser;if(cu&&cu.uid!==uid){db=null;pid='';invOn=0;frOn=0}}catch(x){console.warn('uid sync',x)}
@@ -6194,6 +6201,7 @@ async function famMake(){
     if(famRoom!==room)return;
     room.pw=pw;room.h='p'+pw;famShow();
     await qPut(pw,T0);
+    if(famRoom===room&&room.cap>2){await F.setDoc(F.doc(db,'famRooms',uid),{host:uid,pw:room.pw,cap:room.cap,stake:T0.c,lv:room.lv,tq:T0.tq,st:'lobby',q:pick(room.lv),ts:Date.now(),order:[uid],pl:{[uid]:famPl()},a:{},x:{}});if(famRoom===room)famWatch(uid)}
     if(famRoom===room)room.ts=Date.now()
   }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);let au='yok';try{au=AUTHREF.currentUser.uid}catch(x){}msg('Oda kurulamadı ('+String((e&&(e.code||e.message))||e).slice(0,40)+') uid:'+String(uid).slice(0,5)+' auth:'+String(au).slice(0,5))}}}
 function famAuto(d){
@@ -6209,6 +6217,7 @@ async function famJoin(){
     const sn=await F.getDocs(F.query(F.collection(db,'queue'),F.where('tier','==',famT(p)),F.limit(10)));
     let r=null;sn.forEach(d=>{const x=d.data();if(!r&&x&&x.uid&&x.uid!==uid&&Date.now()-(+x.ts||0)<FAM_MS+30000)r=x});
     if(!r){msg('Bu şifreyle açık oda yok ya da süresi dolmuş.');return}
+    if((+r.cap||2)>2){await famJoinMulti(r);return}
     const hu=r.uid,lv=TIERS.findIndex(t=>t.c===+r.stake),T1=TIERS[lv];if(!T1){msg('Oda bilgisi geçersiz.');return}
     if(gw()<T1.c){msg('Bu oda için '+T1.c+' dirhem gerekli (bakiyen '+gw()+').');return}
     const fn=r.name||'Aile üyesi';$('frm').classList.remove('on');reset();const m=uid+'_'+Date.now();
@@ -6218,7 +6227,102 @@ async function famJoin(){
       dShow('s',waitHtml(fn));watch(m)}
     catch(e){console.warn(e);reset();$('duel').classList.remove('on');$('frm').classList.add('on');msg('Odaya katılınamadı. Kuralları kontrol et.')}
   }catch(e){console.warn('fam join',e);msg('Odaya katılınamadı. İnterneti kontrol et.')}}
+/* ===== ÇOK OYUNCULU AİLE YARIŞMASI (3-4 kişi) =====
+   Oda belgesi: famRooms/{kurucuUid}. Oda dolunca herkes aynı 10 soruyu çözer.
+   Puan: doğru = 100 + hız bonusu (en fazla 50). En çok puan alan(lar) bahsin tamamını alır. */
+const famNQ=d=>Math.min(10,((d&&d.q)||[]).length);
+function famPl(){let r=-1,g=0;try{const q=myRk();r=q.r;g=q.g}catch(e){}return{n:nm(),rk:r,g:g}}
+function famGRef(){return F.doc(db,'famRooms',famG.hid)}
+function famGAnsd(d,q,u){return !!((d.a&&d.a[q+'_'+u])||(famG&&u===uid&&famG.loc[q])||(d.x&&d.x[u]))}
+function famGSc(d,u){let s=0;const T=(+d.tq||10)*1000;for(let q=0;q<famNQ(d);q++){const r=(d.a&&d.a[q+'_'+u])||(famG&&u===uid&&famG.loc[q]);if(r&&r.ok)s+=100+Math.round(50*Math.max(0,1-(+r.ms||0)/T))}return s}
+function famWatch(hid){famGStop();famG={hid,doc:null,u:null,on:false,qi:-1,loc:{},adv:false,ans:null,tm:null,t1:null,t2:null,qT0:0,fin:false};
+  famG.u=F.onSnapshot(F.doc(db,'famRooms',hid),sn=>{if(!famG||famG.hid!==hid)return;if(!sn.exists()){famGGone();return}famG.doc=sn.data();try{famGStep()}catch(e){console.warn('famGStep',e)}},e=>console.warn('famRoom dinleme',e))}
+function famGStop(){if(!famG)return;try{famG.u&&famG.u()}catch(e){}clearInterval(famG.tm);clearTimeout(famG.t1);clearTimeout(famG.t2);famG=null}
+function famGGone(){const had=famG;famGStop();try{famSceneHide()}catch(e){}if(had&&!had.fin)alert('Oda kapatıldı.')}
+function famGSeats(d){
+  const cap=Math.max(3,Math.min(4,+d.cap||3)),seq=[uid].concat((d.order||[]).filter(u=>u!==uid)),st=$('fsStage');
+  const key='g|'+cap+'|'+seq.join(',')+'|'+seq.map(u=>(d.pl&&d.pl[u]&&d.pl[u].n)||'').join(',');
+  if(st.dataset.k===key)return;st.dataset.k=key;st.className='fs-stage c'+cap;
+  const pos=cap===3?['bc','tl','tr']:['bl','tl','tr','br'];let h='';
+  for(let i=0;i<cap;i++){const u=seq[i],p=u&&d.pl&&d.pl[u],me=u===uid,t=p&&p.rk>=0?p.rk+1:0;
+    const svg=famStu({id:'fsg'+i,g:p&&+p.g===1?1:0,t:Math.max(0,Math.min(6,t))});
+    h+='<div class="fs-seat fs-half '+pos[i]+(me?' me':'')+(u?'':' dim')+'" data-u="'+(u||'')+'">'+(me?'<div class="fs-sen">SEN</div>':'')+'<div class="fs-svg">'+svg+'</div><div class="fs-nm'+(u?'':' fs-wait')+'"><span>'+(u?esc((p&&p.n)||(me?'Sen':'Oyuncu')):(i+1)+'. oyuncu bekleniyor')+'</span><small class="fs-sc"></small></div><i class="fs-ok"></i></div>'}
+  h+='<div class="fs-center" id="fsCenter"></div>';st.innerHTML=h}
+function famGStep(){const d=famG&&famG.doc;if(!d)return;const s=famSceneEnsure();famGSeats(d);s.classList.add('on');
+  $('fsPw').textContent=d.pw;$('fsStake').textContent=d.stake+' dirhemlik yarışma · '+d.cap+' kişilik';
+  if(d.st==='lobby'){const n=(d.order||[]).length,c=$('fsCenter');s.classList.remove('playing');c.className='fs-center';c.innerHTML='<b>'+n+' / '+d.cap+'</b><span>kişi hazır</span><small>'+d.cap+' kişi tamamlanınca yarışma başlar</small>';return}
+  if(!famG.on){famG.on=true;famGBegin()}
+  famGLive()}
+function famGBegin(){const s=$('famScene');s.classList.add('playing');
+  if(famG.hid===uid){clearTimeout(famTm);famRoom=null;try{F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}catch(e){}try{$('frm').classList.remove('on');$('famMkP').hidden=true;famUi()}catch(e){}}
+  else{try{$('frm').classList.remove('on')}catch(e){}}
+  let n=3;const tick=()=>{if(!famG)return;const c=$('fsCenter');if(!c)return;if(n>0){c.className='fs-center';c.innerHTML='<div class="fg-cd">'+n+'</div><small>Hazır ol!</small>';n--;famG.t1=setTimeout(tick,1000)}else famGShowQ(0)};tick()}
+function famGShowQ(i){if(!famG)return;const d=famG.doc;if(i>=famNQ(d)){famGFinish();return}
+  famG.qi=i;famG.adv=false;famG.ans=null;clearInterval(famG.tm);const q=d.q[i],TQ=+d.tq||10,c=$('fsCenter');
+  c.className='fs-center fg';
+  c.innerHTML='<div class="fg-meta"><span>Soru '+(i+1)+' / '+famNQ(d)+'</span><b id="fgT">'+TQ+'</b></div><div class="fg-bar"><i id="fgBar"></i></div><div class="fg-qt">'+esc(q.q)+'</div><div class="fg-o" id="fgO">'+q.o.map((o,k)=>'<button type="button" data-i="'+k+'">'+'ABCDE'[k]+'. '+esc(o)+'</button>').join('')+'</div>';
+  $('fgO').onclick=e=>{const b=e.target.closest('[data-i]');if(b)famGAnswer(+b.dataset.i)};
+  famG.qT0=Date.now();
+  famG.tm=setInterval(()=>{if(!famG)return;const l=Math.max(0,TQ-(Date.now()-famG.qT0)/1000),t=$('fgT'),b=$('fgBar');if(t)t.textContent=String(Math.ceil(l));if(b)b.style.transform='scaleX('+(l/TQ)+')';if(l<=0&&!famG.ans)famGAnswer(-1);famGForce()},250);
+  famGLive()}
+function famGAnswer(i){if(!famG||famG.ans||famG.qi<0)return;const d=famG.doc,q=famG.qi,Q=d.q[q],TQ=+d.tq||10,ms=i<0?TQ*1000:Math.min(TQ*1000,Date.now()-famG.qT0),rec={i:i,ms:Math.round(ms),ok:i===Q.a};
+  famG.ans=rec;famG.loc[q]=rec;const o=$('fgO');if(o)[...o.children].forEach((b,k)=>{b.disabled=true;if(k===i)b.classList.add(rec.ok?'ok':'no')});
+  try{navigator.vibrate&&navigator.vibrate(rec.ok?15:40)}catch(e){}
+  const hid=famG.hid,w=()=>F.updateDoc(F.doc(db,'famRooms',hid),{['a.'+q+'_'+uid]:rec});
+  w().catch(()=>setTimeout(()=>{if(famG)w().catch(e=>console.warn('famCevap',e))},800));
+  famGLive()}
+function famGForce(){/* cevap/süre kaydı gelmeyen oyuncu (bağlantısı kopan) için süre doldu say */
+  if(!famG||!famG.doc||famG.qi<0)return;const d=famG.doc,q=famG.qi,TQ=+d.tq||10;if(Date.now()-famG.qT0<TQ*1000+7000)return;
+  (d.order||[]).forEach(u=>{if(famGAnsd(d,q,u)||famG['f'+q+u])return;famG['f'+q+u]=1;const hid=famG.hid;
+    F.runTransaction(db,async tx=>{const r=F.doc(db,'famRooms',hid),sn=await tx.get(r);if(!sn.exists())return;const x=sn.data(),k=q+'_'+u;if(x.a&&x.a[k])return;tx.update(r,{['a.'+k]:{i:-1,ms:TQ*1000,ok:false,f:1}})}).catch(e=>console.warn('famForce',e))})}
+function famGLive(){if(!famG||!famG.doc)return;const d=famG.doc,st=$('fsStage');if(!st)return;
+  st.querySelectorAll('.fs-seat[data-u]').forEach(el=>{const u=el.dataset.u;if(!u)return;const sc=el.querySelector('.fs-sc'),lf=!!(d.x&&d.x[u]);if(sc&&famG.on)sc.textContent=famGSc(d,u)+' P';el.classList.toggle('left',lf);el.classList.toggle('done',famG.qi>=0&&!famG.adv&&!lf&&famGAnsd(d,famG.qi,u))});
+  if(famG.qi<0||famG.adv||famG.fin)return;const q=famG.qi;
+  if((d.order||[]).every(u=>famGAnsd(d,q,u))){famG.adv=true;const o=$('fgO');if(o)[...o.children].forEach((b,k)=>{b.disabled=true;if(k===d.q[q].a)b.classList.add('ok')});
+    st.querySelectorAll('.fs-seat.done').forEach(el=>el.classList.remove('done'));
+    famG.t2=setTimeout(()=>famGShowQ(q+1),1700)}}
+function famGFinish(){if(!famG||famG.fin)return;famG.fin=true;clearInterval(famG.tm);const d=famG.doc,hid=famG.hid;
+  const rows=(d.order||[]).map(u=>({u,n:(d.pl&&d.pl[u]&&d.pl[u].n)||'Oyuncu',s:famGSc(d,u),x:!!(d.x&&d.x[u])})).sort((a,b)=>(a.x-b.x)||(b.s-a.s));
+  const act=rows.filter(r=>!r.x),top=act.length?act[0].s:0,win=act.filter(r=>r.s===top).map(r=>r.u),allTie=act.length>1&&win.length===act.length,iW=win.includes(uid)&&!allTie,iT=allTie&&win.includes(uid);
+  const stake=+d.stake||0,gk='ibfam_'+hid+'_'+d.ts;let amt=0,done=null;try{done=localStorage.getItem(gk)}catch(e){}
+  if(stake&&!allTie){
+    if(done!=null&&done!=='')amt=+done||0;
+    else{amt=win.includes(uid)?Math.floor(stake*(rows.length-win.length)/win.length):-Math.min(stake,rdW());
+      try{(typeof rawSet!=='undefined'?rawSet:Storage.prototype.setItem).call(localStorage,gk,String(amt))}catch(e){}
+      if(amt)try{localStorage.setItem(WK,String(Math.max(0,rdW()+amt)))}catch(e){}}}
+  try{window.__pStat(iW?'w':iT?'t':'l');window.__pOnStat(iW?'w':iT?'t':'l')}catch(e){}
+  const c=$('fsCenter');c.className='fs-center fg fgr';
+  c.innerHTML='<div class="fgr-t">'+(allTie?'🤝 Berabere':iW?'🏆 Kazandın!':'Yarışma bitti')+'</div><div class="fgr-l">'+rows.map((r,i)=>'<div class="fgr-r'+(r.u===uid?' me':'')+(win.includes(r.u)&&!allTie&&!r.x?' w':'')+'"><i>'+(i+1)+'</i><span>'+esc(r.n)+(r.u===uid?' <em>SEN</em>':'')+(r.x?' (ayrıldı)':'')+'</span><b>'+r.s+'</b></div>').join('')+'</div>'+(stake?'<div class="fgr-d">'+(allTie||!amt?'Dirhem değişmedi':amt>0?'+'+amt+' 🪙 dirhem':'−'+(-amt)+' 🪙 dirhem')+'</div>':'')+'<button type="button" class="fgr-b" id="fgDone">Kapat</button>';
+  $('fgDone').onclick=()=>famLeave(true)}
+async function famLeave(fin){
+  if(!famG){famClose();return}
+  const g=famG,d=g.doc;
+  if(d&&d.st==='play'&&!g.fin&&!fin){
+    if(!confirm('Çıkarsan bahis dirhemini kaybedersin. Çıkılsın mı?'))return;
+    try{const st=+d.stake||0,gk='ibfam_'+g.hid+'_'+d.ts;if(st&&!localStorage.getItem(gk)){const a=-Math.min(st,rdW());try{(typeof rawSet!=='undefined'?rawSet:Storage.prototype.setItem).call(localStorage,gk,String(a))}catch(e){}if(a)localStorage.setItem(WK,String(Math.max(0,rdW()+a)))}}catch(e){}
+    try{await F.updateDoc(F.doc(db,'famRooms',g.hid),{['x.'+uid]:true})}catch(e){}
+  }else if(d&&d.st==='lobby'){
+    if(g.hid===uid){try{await F.deleteDoc(F.doc(db,'famRooms',g.hid))}catch(e){}}
+    else{try{await F.runTransaction(db,async tx=>{const r=F.doc(db,'famRooms',g.hid),sn=await tx.get(r);if(!sn.exists())return;const x=sn.data();if(x.st!=='lobby')return;tx.update(r,{order:(x.order||[]).filter(u=>u!==uid),['pl.'+uid]:F.deleteField()})})}catch(e){}}
+  }
+  const host=g.hid===uid&&d&&d.st==='lobby';
+  famGStop();try{famSceneHide()}catch(e){}
+  if(host)famClose(true)}
+async function famJoinMulti(r){
+  const lv=TIERS.findIndex(t=>t.c===+r.stake),T1=TIERS[lv];if(!T1){msg('Oda bilgisi geçersiz.');return}
+  if(gw()<T1.c){msg('Bu oda için '+T1.c+' dirhem gerekli (bakiyen '+gw()+').');return}
+  const hid=r.uid;msg('Odaya katılınıyor…');
+  try{
+    const res=await F.runTransaction(db,async tx=>{const ref=F.doc(db,'famRooms',hid),sn=await tx.get(ref);if(!sn.exists())return 'yok';const d=sn.data();
+      if((d.order||[]).includes(uid))return 'ok';if(d.st!=='lobby')return 'basladi';if((d.order||[]).length>=d.cap)return 'dolu';
+      const order=[...(d.order||[]),uid],upd={order,['pl.'+uid]:famPl()};if(order.length>=d.cap){upd.st='play'}
+      tx.update(ref,upd);return 'ok'});
+    if(res==='yok'){msg('Oda bulunamadı.');return}
+    if(res==='basladi'||res==='dolu'){msg('Bu oda dolu ya da yarışma başlamış.');return}
+    msg('');try{$('frm').classList.remove('on')}catch(e){}famWatch(hid)
+  }catch(e){console.warn('famJoinMulti',e);msg('Odaya katılınamadı ('+String((e&&(e.code||e.message))||e).slice(0,40)+'). Firebase kurallarını kontrol et.')}}
 $('frFam').onclick=()=>famGo('fam');
+{const cp=$('famCap');if(cp)cp.addEventListener('click',e=>{const b=e.target.closest('[data-n]');if(!b)return;famCap=+b.dataset.n;cp.querySelectorAll('[data-n]').forEach(x=>x.classList.toggle('on',x===b))})}
 $('famTabMk').onclick=async()=>{msg('');if(famRoom){famFm='mk';famUi();return}if(needTier())return;if(famBusy)return;famBusy=true;msg('Oda kuruluyor…');try{await famMake()}catch(e){console.warn('famMake',e);msg('Oda açılamadı: '+((e&&e.message)||e))}finally{famBusy=false}};
 $('famBack').onclick=()=>{msg('');famFm='';famUi()};
 $('famTabJn').onclick=()=>{msg('');famFm='jn';famUi();setTimeout(()=>{try{$('famInP').focus()}catch(e){}},60)};
@@ -8477,6 +8581,72 @@ html body #frm .frp .frtabs button#frFam{grid-column:1/-1!important}
 #frm .fam-st{margin-top:8px;font-size:12px;font-weight:800;color:#c9d9ff;text-align:center}
 #frm .fam-pane input{display:block;width:100%;box-sizing:border-box;margin:8px 0 0;padding:12px;border-radius:12px;border:2px solid #4b66c9;background:#061238;color:#fff;font:800 16px inherit;font-family:inherit;text-align:center}
 #frm .fam-pane #famGo{display:block;width:100%;margin-top:10px}
+</style>
+<style id="fam-seats-css">
+#frm .famcap{display:flex;flex-direction:column;align-items:center;gap:6px;margin:8px 0 2px}
+#frm .famcap[hidden]{display:none}
+#frm .famcap small{font:900 12px "Nunito",system-ui,sans-serif;letter-spacing:.06em;color:#c9d9ff}
+#frm .famcap>div{display:flex;gap:8px;width:100%}
+#frm .famcap button{flex:1;min-height:42px;border:2px solid rgba(255,224,138,.45);border-radius:13px;background:rgba(255,255,255,.07);color:#ffe9a8;font:900 14px "Nunito",system-ui,sans-serif;cursor:pointer}
+#frm .famcap button.on{border-color:#ffe08a;background:linear-gradient(#ffe48a,#d99419);color:#2e1a00;box-shadow:0 3px 0 #80500a}
+#famScene .fs-svg{width:100%}
+#famScene .fs-stage:not(.c2) .fs-svg{width:min(32vw,19vh,140px)}
+#famScene .fs-stage.c3,#famScene .fs-stage.c4{position:absolute;inset:0;display:block;padding:0}
+#famScene .fs-stage.c3 .fs-half,#famScene .fs-stage.c4 .fs-half{position:absolute;flex:none;padding:0;width:auto;align-items:center}
+#famScene .fs-stage .fs-half.tl,#famScene .fs-stage .fs-half.tr{top:calc(env(safe-area-inset-top,0px) + 128px)}
+#famScene .fs-stage .fs-half.bl,#famScene .fs-stage .fs-half.br,#famScene .fs-stage .fs-half.bc{bottom:calc(env(safe-area-inset-bottom,0px) + 3vh)}
+#famScene .fs-stage .fs-half.tl,#famScene .fs-stage .fs-half.bl{left:3vw}
+#famScene .fs-stage .fs-half.tr,#famScene .fs-stage .fs-half.br{right:3vw}
+#famScene .fs-stage .fs-half.bc{left:50%;transform:translateX(-50%)}
+#famScene .fs-stage:not(.c2) .fs-nm{font-size:12px;padding:4px 10px;max-width:34vw}
+#famScene .fs-center{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;width:min(66vw,280px);padding:14px 14px 12px;border:2px solid rgba(255,217,102,.7);border-radius:20px;background:rgba(10,6,40,.72);box-shadow:0 0 22px rgba(255,200,80,.25);text-align:center}
+#famScene .fs-center b{font:900 30px/1 "Nunito",system-ui,sans-serif;color:#ffd966}
+#famScene .fs-center span{font:900 13px "Nunito",system-ui,sans-serif;color:#ffe9a8}
+#famScene .fs-center small{font:700 11px/1.35 "Nunito",system-ui,sans-serif;color:#9fc3ff}
+#famScene .fs-sen{position:relative;margin-bottom:9px;padding:3px 13px;border-radius:999px;background:linear-gradient(#ffe48a,#d99419);color:#382100;font:900 12px "Nunito",system-ui,sans-serif;letter-spacing:.14em;box-shadow:0 3px 0 #80500a,0 0 16px rgba(255,217,102,.65);animation:fsSen 1.6s ease-in-out infinite}
+#famScene .fs-sen::after{content:"";position:absolute;left:50%;bottom:-6px;margin-left:-6px;border:6px solid transparent;border-bottom:0;border-top-color:#d99419}
+#famScene .fs-half.me .fs-svg svg{filter:drop-shadow(0 0 14px rgba(255,217,102,.6)) drop-shadow(0 10px 14px rgba(0,0,0,.35))}
+#famScene .fs-half.me .fs-nm{border-color:#ffd966;background:rgba(70,46,0,.6);box-shadow:0 0 14px rgba(255,217,102,.45)}
+@keyframes fsSen{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@media(prefers-reduced-motion:reduce){#famScene .fs-sen{animation:none}}
+</style>
+<style id="fam-multi-css">
+#famScene.playing .fs-top{display:none}
+#famScene.playing .fs-stage .fs-half.tl,#famScene.playing .fs-stage .fs-half.tr{top:calc(env(safe-area-inset-top,0px) + 54px)}
+#famScene.playing .fs-stage .fs-half.bl,#famScene.playing .fs-stage .fs-half.br,#famScene.playing .fs-stage .fs-half.bc{bottom:calc(env(safe-area-inset-bottom,0px) + 1.5vh)}
+#famScene.playing .fs-stage:not(.c2) .fs-svg{width:min(21vw,10.5vh,88px)}
+#famScene.playing .fs-sen{margin-bottom:7px;padding:2px 9px;font-size:10px}
+#famScene.playing .fs-stage:not(.c2) .fs-nm{max-width:28vw;padding:3px 8px;font-size:11px}
+#famScene .fs-sc{font:900 11px "Nunito",system-ui,sans-serif;color:#fff}
+#famScene .fs-sc:empty{display:none}
+#famScene .fs-ok{display:none;position:absolute;top:2px;right:-4px;width:24px;height:24px;border-radius:50%;background:#2fd47a;border:2px solid #fff;box-shadow:0 2px 6px #0008}
+#famScene .fs-ok::after{content:"";position:absolute;left:7px;top:3px;width:5px;height:10px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg)}
+#famScene .fs-seat.done .fs-ok{display:block}
+#famScene .fs-seat.left{opacity:.35;filter:grayscale(1)}
+#famScene .fg-cd{font:900 72px/1 "Nunito",system-ui,sans-serif;color:#ffd966;text-shadow:0 3px 0 rgba(0,0,0,.5)}
+#famScene .fs-center.fg{top:calc(env(safe-area-inset-top,0px) + 222px);bottom:calc(env(safe-area-inset-bottom,0px) + 212px);transform:translateX(-50%);width:min(94vw,430px);justify-content:flex-start;align-items:stretch;gap:8px;padding:12px;overflow-y:auto;text-align:left}
+#famScene .fg-meta{display:flex;justify-content:space-between;align-items:center;font:900 12px "Nunito",system-ui,sans-serif;color:#9fc3ff}
+#famScene .fg-meta b{font:900 22px/1 "Nunito",system-ui,sans-serif;color:#ffd966}
+#famScene .fg-bar{height:6px;border-radius:4px;background:rgba(255,255,255,.14);overflow:hidden;flex:none}
+#famScene .fg-bar i{display:block;height:100%;background:linear-gradient(90deg,#ffd966,#f0a23a);transform-origin:left;transition:transform .25s linear}
+#famScene .fg-qt{font:800 14px/1.35 "Nunito",system-ui,sans-serif;color:#fff4d6}
+#famScene .fg-o{display:grid;gap:6px}
+#famScene .fg-o button{padding:8px 10px;border:2px solid rgba(255,224,138,.4);border-radius:12px;background:rgba(255,255,255,.08);color:#fff4d6;font:800 13px/1.25 "Nunito",system-ui,sans-serif;text-align:left;cursor:pointer}
+#famScene .fg-o button:disabled{opacity:1;cursor:default}
+#famScene .fg-o button.ok{background:#1f9d5b;border-color:#b9ffd8}
+#famScene .fg-o button.no{background:#b3243b;border-color:#ffb4a8}
+#famScene .fs-center.fgr{gap:6px;align-items:stretch}
+#famScene .fgr-t{font:900 22px/1.1 "Nunito",system-ui,sans-serif;color:#ffd966;text-align:center}
+#famScene .fgr-r{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.07);font:800 13px "Nunito",system-ui,sans-serif;color:#fff4d6}
+#famScene .fgr-r i{font-style:normal;width:20px;color:#9fc3ff}
+#famScene .fgr-r span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#famScene .fgr-r em{font-style:normal;margin-left:4px;padding:1px 7px;border-radius:999px;background:#ffd966;color:#382100;font-size:10px;letter-spacing:.1em}
+#famScene .fgr-r b{color:#ffd966}
+#famScene .fgr-r.w{background:rgba(255,217,102,.2);border:1px solid #ffd966}
+#famScene .fgr-r.me{outline:2px solid rgba(255,217,102,.7)}
+#famScene .fgr-d{text-align:center;font:900 15px "Nunito",system-ui,sans-serif;color:#b9ffd8}
+#famScene .fgr-b{align-self:center;min-width:150px;padding:9px 20px;border:2px solid #ffe08a;border-radius:13px;background:linear-gradient(#ffe48a,#d99419);color:#382100;font:900 15px "Nunito",system-ui,sans-serif;box-shadow:0 3px 0 #80500a;cursor:pointer}
+@media(max-height:700px){#famScene.playing .fs-stage:not(.c2) .fs-svg{width:min(18vw,9vh,72px)}#famScene .fs-center.fg{top:calc(env(safe-area-inset-top,0px) + 190px);bottom:calc(env(safe-area-inset-bottom,0px) + 178px)}#famScene .fg-o button{padding:6px 9px;font-size:12px}}
 </style>
 <style id="fam-room-css2">#frm .fam-codes.one{grid-template-columns:1fr}#frm .fam-codes.one b{font-size:34px;letter-spacing:.3em;text-indent:.3em}#frm .fam-join{margin-top:12px}#frm .fam-join .fam-sub{margin-bottom:0}#frm .fam-pane+.fam-join{padding-top:10px;border-top:1px dashed rgba(255,211,106,.4)}#frm .fam-join input{display:block;width:100%;box-sizing:border-box;margin:8px 0 0;padding:12px;border-radius:12px;border:2px solid #4b66c9;background:#061238;color:#fff;font:800 18px inherit;font-family:inherit;text-align:center;letter-spacing:.2em}#frm .fam-join #famGo{display:block;width:100%;margin-top:10px}</style>
 <style id="fam-room-css3">

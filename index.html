@@ -5725,7 +5725,7 @@ async function list(){
   L.innerHTML=rows.map(r=>'<div class="fr '+(r.active?'fr-online':'fr-offline')+'"><i>'+esc((r.name||'?').charAt(0).toLocaleUpperCase('tr'))+'</i><div class="fr-info"><b>'+esc(r.name||'Oyuncu')+'</b><small>ID '+esc(r.id)+' · ✨ '+(+r.pts||0)+' P</small><span class="fr-presence '+(r.active?'active':'inactive')+'"><em></em>'+(r.active?'Aktif':'Pasif')+'</span></div><div class="fb"><button class="fr-invite" data-c="'+esc(r.uid||'')+'" data-n="'+esc(r.name||'Oyuncu')+'" aria-label="Davet et">Davet Et</button><button class="fr-remove" data-d="'+esc(r.id)+'" aria-label="Arkadaşlıktan çıkar">×</button></div></div>').join('')
 }
 function fl(on){$('frFrTab').classList.toggle('on',on);$('frL').style.display=on?'grid':'none'}
-async function openFr(){window.__famDuelOn=false;tier=-1;{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}$('frm').classList.add('on');setId();msg('');paintT();fl(false);try{famPanel(false)}catch(e){}await boot()}
+async function openFr(){window.__famDuelOn=true;tier=-1;{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}$('frm').classList.add('on');setId();msg('');paintT();fl(false);try{famPanel(false)}catch(e){}await boot()}
 /* Arkadaşlık isteği gönderildi: sayfanın ortasında, arka plan buğulu bilgi penceresi */
 function frSentPop(name){
   try{
@@ -5979,7 +5979,7 @@ function oppAv(rk,av){const w=$('dOav'),im=$('dOavI');if(!w||!im)return;try{if(w
 function watch(m){mid0=m;clearInterval(hlT);hlT=setInterval(heal,1500);try{const q=myRk();F.updateDoc(F.doc(db,'matches',m),{['rk.'+uid]:q.r,['av.'+uid]:q.g}).catch(()=>{})}catch(e){}watchU=F.onSnapshot(F.doc(db,'matches',m),sn=>{const d=sn.data();if(!d)return;if(shown){if(d.paid){M=d;loserPayFb(d);updDirhem(d)}return}M=d;oppU=d.p.find(x=>x!==uid);
   if(d.st==='no'){reset();dShow('s','<b>Davet kabul edilmedi</b><button class="dbt" id="dClose">Kapat</button>');return}
   if(d.st==='play'&&!started){if(d.rk&&typeof d.rk[oppU]==='number'){clearTimeout(stW);stW=null;started=true;ask()}else if(!stW){stW=setTimeout(()=>{stW=null;if(!started&&!shown&&M&&M.st==='play'){started=true;ask();chk()}},2500)}}
-  $('dOn').textContent=opponentName.toUpperCase().slice(0,12);$('dOn').dataset.friendUid=oppU;$('dOn').dataset.friendName=opponentName;$('dOn').setAttribute('role','button');$('dOn').tabIndex=0;try{oppAv(d.rk&&d.rk[oppU],d.av&&d.av[oppU])}catch(e){}chk()})}
+  const opponentName=String((d.names&&d.names[oppU])||'Rakip');$('dOn').textContent=opponentName.toUpperCase().slice(0,12);$('dOn').dataset.friendUid=oppU;$('dOn').dataset.friendName=opponentName;$('dOn').setAttribute('role','button');$('dOn').tabIndex=0;try{oppAv(d.rk&&d.rk[oppU],d.av&&d.av[oppU])}catch(e){}try{window.__famFx&&window.__famFx.duel(d,uid,oppU)}catch(e){}chk()})}
 /* Bekçi: cevabım sunucuya ulaşmadıysa yeniden yazar, geçiş takılırsa zorlar, rakip kaydı çok uzun süre gelmezse yerelde süre doldu sayar */
 function heal(){if(shown||!M||!started||!db||!mid0)return;
   try{sync();if(shown)return;
@@ -6283,7 +6283,7 @@ function famGForce(){/* cevap/süre kaydı gelmeyen oyuncu (bağlantısı kopan)
 function famGLive(){if(!famG||!famG.doc)return;const d=famG.doc,st=$('fsStage');if(!st)return;
   st.querySelectorAll('.fs-seat[data-u]').forEach(el=>{const u=el.dataset.u;if(!u)return;const sc=el.querySelector('.fs-sc'),lf=!!(d.x&&d.x[u]);if(sc&&famG.on)sc.textContent=famGSc(d,u)+' P';el.classList.toggle('left',lf);el.classList.toggle('done',famG.qi>=0&&!famG.adv&&!lf&&famGAnsd(d,famG.qi,u))});
   if(famG.qi<0||famG.adv||famG.fin)return;const q=famG.qi;
-  if((d.order||[]).every(u=>famGAnsd(d,q,u))){famG.adv=true;const o=$('fgO');if(o)[...o.children].forEach((b,k)=>{b.disabled=true;if(k===d.q[q].a)b.classList.add('ok')});
+  if((d.order||[]).every(u=>famGAnsd(d,q,u))){famG.adv=true;try{window.__famFx&&window.__famFx.room((d.order||[]).map(u=>{const r=(d.a&&d.a[q+'_'+u])||(u===uid&&famG.loc[q])||null;let c=0;for(let k=0;k<=q;k++){const x=(d.a&&d.a[k+'_'+u])||(u===uid&&famG.loc[k]);if(x&&x.ok)c++}return{u:u,ok:!!(r&&r.ok),ms:r?+r.ms||0:0,cnt:c,tq:+d.tq||10}}))}catch(e){console.warn('famFx',e)}const o=$('fgO');if(o)[...o.children].forEach((b,k)=>{b.disabled=true;if(k===d.q[q].a)b.classList.add('ok')});
     st.querySelectorAll('.fs-seat.done').forEach(el=>el.classList.remove('done'));
     famG.t2=setTimeout(()=>famGShowQ(q+1),1700)}}
 function famGFinish(){if(!famG||famG.fin)return;famG.fin=true;clearInterval(famG.tm);const d=famG.doc,hid=famG.hid;
@@ -6369,7 +6369,7 @@ $('invYes').onclick=async()=>{const d=invData;$('invBn').classList.remove('on');
   try{const r=F.doc(db,'matches',d.mid),sn=await F.getDoc(r);F.deleteDoc(F.doc(db,'invites',uid)).catch(()=>{});
     if(!sn.exists()||sn.data().st!=='wait'){alert('Davet artık geçerli değil.');return}
     const stk=+sn.data().stake||0;if(gw()<stk){alert('Bu yarışma için '+stk+' dirhem gerekli. Bakiyen: '+gw());try{await F.updateDoc(r,{st:'no'})}catch(e){}return}
-    reset();window.__famDuelOn=!!(d&&d.fam);$('frm').classList.remove('on');dShow('s','<b>Başlıyor…</b>');await F.updateDoc(r,{st:'play'});watch(d.mid)}catch(e){console.warn(e)}};
+    reset();window.__famDuelOn=true;$('frm').classList.remove('on');dShow('s','<b>Başlıyor…</b>');await F.updateDoc(r,{st:'play'});watch(d.mid)}catch(e){console.warn(e)}};
 $('invNo').onclick=async()=>{const d=invData;$('invBn').classList.remove('on');if(!d)return;try{await F.updateDoc(F.doc(db,'matches',d.mid),{st:'no'})}catch(e){}F.deleteDoc(F.doc(db,'invites',uid)).catch(()=>{})};
 /* ===== ARKADAŞLIK İSTEĞİ: profilden gönder → karşıda ortada Kabul/Reddet → kabul edilince iki taraf kendi listesine ekler ===== */
 let frOn=0,frInb=[];
@@ -13660,12 +13660,67 @@ html body #frm .frp .famcap small{font-size:21px!important;font-weight:900!impor
 #duel .dopav .fs-glow{animation:fsGl 2.8s ease-in-out infinite}
 </style>
 <script>
-/* Ailenle Oyna (2 kişi): düelloda da rahle + talebe SVG olarak görünür kalır */
+/* Tüm düellolar (aile, arkadaş, rastgele): rahle + talebe SVG olarak görünür kalır */
+window.__famDuelOn=true;
 window.__famDuelPaint=function(w,g,t){
   var h=w.querySelector('.fd-svg');
-  if(!window.__famDuelOn||typeof window.__famStu!=='function'){if(h)h.remove();w.classList.remove('fdsvg');return false}
+  if(!window.__famDuelOn||typeof window.__famStu!=='function'){if(h)h.remove();w.classList.remove('fdsvg');document.querySelectorAll('#duel .fx-cnt').forEach(function(e){e.remove()});return false}
   var key=g+'|'+t;
   if(!h){h=document.createElement('span');h.className='fd-svg';w.appendChild(h)}
   if(h.dataset.k!==key){h.dataset.k=key;h.innerHTML=window.__famStu({id:'fd'+(w.id||'x'),g:g,t:t})}
   w.classList.add('fdsvg');w.hidden=false;return true};
+</script>
+<style id="fam-fx-css">
+#famScene .fs-svg{position:relative}
+.fx-pop{position:absolute;left:50%;top:34%;z-index:30;display:flex;align-items:center;gap:6px;white-space:nowrap;pointer-events:none;font:900 26px/1 "Nunito",system-ui,sans-serif;color:#3dff8f;text-shadow:0 2px 0 #04361c,0 0 14px rgba(61,255,143,.9);animation:fxRise 1.8s ease-out forwards}
+.fx-pop small{font:900 13px/1 "Nunito",system-ui,sans-serif;color:#eafff3;background:rgba(8,90,48,.8);border:1px solid #3dff8f;border-radius:999px;padding:3px 8px;text-shadow:none}
+.fx-pop.bad{font-size:24px;color:#ff6b6b;text-shadow:0 2px 0 #3a0a0a,0 0 12px rgba(255,90,90,.8);animation:fxBad 1.2s ease-out forwards}
+@keyframes fxRise{0%{opacity:0;transform:translate(-50%,18px) scale(.5)}14%{opacity:1;transform:translate(-50%,0) scale(1.3)}28%{transform:translate(-50%,-4px) scale(1)}78%{opacity:1}100%{opacity:0;transform:translate(-50%,-52px) scale(1)}}
+@keyframes fxBad{0%{opacity:0;transform:translate(-50%,6px) scale(.6)}20%{opacity:1;transform:translate(-50%,0) scale(1.2)}100%{opacity:0;transform:translate(-50%,-20px) scale(1)}}
+.fx-flash{animation:fxFlash .9s ease}
+.fx-flashbad{animation:fxFlashBad .7s ease}
+@keyframes fxFlash{0%{filter:none}30%{filter:drop-shadow(0 0 14px #3dff8f) drop-shadow(0 0 28px #3dff8f)}100%{filter:none}}
+@keyframes fxFlashBad{0%{filter:none}30%{filter:drop-shadow(0 0 12px #ff5a5a)}100%{filter:none}}
+.fx-cnt{display:inline-block;margin-top:3px;padding:1px 10px;border-radius:999px;font:900 12px/1.4 "Nunito",system-ui,sans-serif;color:#3dff8f;background:rgba(8,90,48,.55);border:1px solid rgba(61,255,143,.65)}
+.fx-cnt.up{animation:fxCnt .5s ease}
+@keyframes fxCnt{0%{transform:scale(1)}40%{transform:scale(1.35)}100%{transform:scale(1)}}
+#famScene .fs-nm .fx-cnt{margin-top:2px;font-size:11px;padding:0 8px}
+@media(prefers-reduced-motion:reduce){.fx-pop,.fx-flash,.fx-flashbad,.fx-cnt.up{animation-duration:.01s}}
+</style>
+<script>
+/* Ailenle Oyna: doğru cevaplayana herkesin gördüğü yeşil +puan ve "✓ doğru sayısı" */
+window.__famFx=(function(){
+  var seen={},key='';
+  function pts(ms,tq){return 100+Math.round(50*Math.max(0,1-(+ms||0)/(tq*1000)))}
+  function pop(host,ok,p,cnt){
+    if(!host)return;
+    var e=document.createElement('span');e.className='fx-pop'+(ok?'':' bad');
+    e.innerHTML=ok?((p-100>=40?'⚡':'')+'+'+p+'<small>✓ '+cnt+'</small>'):'✗';
+    host.appendChild(e);
+    host.classList.remove('fx-flash','fx-flashbad');void host.offsetWidth;host.classList.add(ok?'fx-flash':'fx-flashbad');
+    try{navigator.vibrate&&ok&&navigator.vibrate(12)}catch(x){}
+    setTimeout(function(){e.remove();host.classList.remove('fx-flash','fx-flashbad')},1900)}
+  function chip(host,cnt){
+    if(!host)return;var c=host.querySelector('.fx-cnt');
+    if(!c){c=document.createElement('span');c.className='fx-cnt';host.appendChild(c)}
+    var t='✓ '+cnt;if(c.textContent!==t){c.textContent=t;if(cnt){c.classList.remove('up');void c.offsetWidth;c.classList.add('up')}}}
+  return{
+    duel:function(d,me,op){
+      if(!window.__famDuelOn||!d||!op)return;
+      var s=d.s||{},tq=+d.tq||15,kk=String(d.ts||'')+'|'+me,first=false;
+      if(kk!==key){key=kk;seen={};first=true}
+      var hm=document.getElementById('dMav'),ho=document.getElementById('dOav'),cm=0,co=0;
+      for(var q=0;q<10;q++){
+        var A=s['a'+q+'_'+me],B=s['a'+q+'_'+op];if(!(A&&B))break;
+        if(A.ok)cm++;if(B.ok)co++;
+        if(!seen[q]){seen[q]=1;if(!first){pop(hm,!!A.ok,pts(A.ms,tq),cm);pop(ho,!!B.ok,pts(B.ms,tq),co)}}}
+      if(hm&&hm.parentElement)chip(hm.parentElement.querySelector('.dopt'),cm);
+      if(ho&&ho.parentElement)chip(ho.parentElement.querySelector('.dopt'),co)},
+    room:function(list){
+      var st=document.getElementById('fsStage');if(!st)return;
+      list.forEach(function(r){
+        var seat=st.querySelector('.fs-seat[data-u="'+r.u+'"]');if(!seat)return;
+        pop(seat.querySelector('.fs-svg'),r.ok,pts(r.ms,r.tq),r.cnt);
+        chip(seat.querySelector('.fs-nm'),r.cnt)})}
+  }})();
 </script>

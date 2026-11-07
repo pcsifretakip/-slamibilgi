@@ -5477,7 +5477,7 @@ const oldAgain=$('bAgain');if(oldAgain)oldAgain.onclick=function(){open()};
 .fr b{display:block;font-size:15px}.fr small{font-size:11px;font-weight:800;color:#9fc3ff}
 .fr button{width:30px;height:30px;border-radius:50%;border:0;background:rgba(255,255,255,.12);color:#ffb0c0;font-size:13px}
 </style>
-<div class="lbm" id="frm"><div class="frp" role="dialog" aria-label="Çevrim içi düello"><div class="frcrest" aria-hidden="true"><i><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="frSwG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#f2b53a"/><stop offset="1" stop-color="#b8780f"/></linearGradient><g id="frSw"><path d="M32 3l4 6v31h-8V9z"/><rect x="21" y="40" width="22" height="4.5" rx="2.2"/><rect x="29.5" y="44.5" width="5" height="11" rx="1.5"/><circle cx="32" cy="58.5" r="3.2"/></g></defs><g fill="url(#frSwG)" stroke="#7a4d0e" stroke-width="1"><use href="#frSw" transform="rotate(-42 32 32)"/><use href="#frSw" transform="rotate(42 32 32)"/></g></svg></i></div><button class="frx" id="frX" aria-label="Kapat">×</button><div class="frtitle"><span class="frtl"><b><span>ÇEVRİM İÇİ DÜELLO</span></b></span></div><div class="frsub"><i></i><span>Zorluk seviyeni seç</span><i></i></div><div class="frtg" id="frTg"></div><div class="frtabs"><button type="button" id="frRand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg><span>Rastgele Eşleş</span></button><button type="button" id="frFrTab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="9" r="2.6"/><path d="M17.4 14c2.8 0 4.6 1.9 4.6 4.8"/></svg><span>Arkadaşınla Oyna</span></button><button type="button" id="frFam"><span>👨‍👩‍👧 Ailenle Oyna</span></button></div><div class="frmsg" id="frMsg"></div><div class="frl" id="frL" style="display:none"></div><div class="famb" id="famBox" hidden><div class="fam-pane" id="famMkP" hidden><div class="fam-sub">Oda kuruldu! Bu şifreyi aile üyene ver. O da "Ailenle Oyna"da şifreyi girince oyun başlar.</div><div class="fam-stake" id="famStake"></div><div class="fam-codes one"><div><small>ODA ŞİFRESİ</small><b id="famPw">—</b></div></div><div class="fam-st">Rakip bekleniyor…</div><div class="fam-btns"><button type="button" id="famCp">Kopyala</button><button type="button" id="famCl">Odayı Kapat</button></div></div><div class="fam-join"><div class="fam-sub" id="famJSub">Şifren mi var? Gir ve odaya katıl.</div><input id="famInP" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" autocomplete="off"><button type="button" id="famGo">Şifreyle Katıl</button></div></div><div class="frfoot" aria-hidden="true"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5z"/><path d="M12 6l4.2 1.6v3.6c0 2.7-1.7 4.8-4.2 5.9-2.5-1.1-4.2-3.2-4.2-5.9V7.6z" stroke-width="1.2"/></svg><span>Doğru cevaplarla rakibinden önce puan topla!</span><i></i></div></div></div><style id="duel-cleanup">
+<div class="lbm" id="frm"><div class="frp" role="dialog" aria-label="Çevrim içi düello"><div class="frcrest" aria-hidden="true"><i><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="frSwG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff0b0"/><stop offset=".55" stop-color="#f2b53a"/><stop offset="1" stop-color="#b8780f"/></linearGradient><g id="frSw"><path d="M32 3l4 6v31h-8V9z"/><rect x="21" y="40" width="22" height="4.5" rx="2.2"/><rect x="29.5" y="44.5" width="5" height="11" rx="1.5"/><circle cx="32" cy="58.5" r="3.2"/></g></defs><g fill="url(#frSwG)" stroke="#7a4d0e" stroke-width="1"><use href="#frSw" transform="rotate(-42 32 32)"/><use href="#frSw" transform="rotate(42 32 32)"/></g></svg></i></div><button class="frx" id="frX" aria-label="Kapat">×</button><div class="frtitle"><span class="frtl"><b><span>ÇEVRİM İÇİ DÜELLO</span></b></span></div><div class="famb" id="famTop"><div class="fam-pane" id="famMkP" hidden><div class="fam-sub">Oda kuruldu! Bu şifreyi aile üyene ver. O da "Odaya Gir" sekmesinde şifreyi girince oyun başlar.</div><div class="fam-stake" id="famStake"></div><div class="fam-codes one"><div><small>ODA ŞİFRESİ</small><b id="famPw">—</b></div></div><div class="fam-st">Rakip bekleniyor…</div><div class="fam-btns"><button type="button" id="famCp">Kopyala</button><button type="button" id="famCl">Odayı Kapat</button></div></div></div><div class="frsub"><i></i><span id="frSubT">Dirhem miktarını seç</span><i></i></div><div class="frtg" id="frTg"></div><div class="frtabs"><button type="button" id="frRand"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.1-8.6c.7-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg><span>Rastgele Eşleş</span></button><button type="button" id="frFrTab"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.4"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.2" cy="9" r="2.6"/><path d="M17.4 14c2.8 0 4.6 1.9 4.6 4.8"/></svg><span>Arkadaşınla Oyna</span></button><button type="button" id="frFam"><span>👨‍👩‍👧 Ailenle Oyna</span></button></div><div class="frtabs" id="famTabs"><button type="button" id="famTabMk"><span>🏠 Oda Kur</span></button><button type="button" id="famTabJn"><span>🔑 Odaya Gir</span></button></div><div class="frmsg" id="frMsg"></div><div class="frl" id="frL" style="display:none"></div><div class="famb" id="famBox" hidden><div class="fam-join"><div class="fam-sub" id="famJSub">Oda şifresini gir ve odaya katıl.</div><input id="famInP" inputmode="numeric" maxlength="4" placeholder="4 haneli şifre" autocomplete="off"><button type="button" id="famGo">Odaya Gir</button></div></div><div class="frfoot" aria-hidden="true"><i></i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9-8 11-4.6-2-8-6-8-11V5z"/><path d="M12 6l4.2 1.6v3.6c0 2.7-1.7 4.8-4.2 5.9-2.5-1.1-4.2-3.2-4.2-5.9V7.6z" stroke-width="1.2"/></svg><span>Doğru cevaplarla rakibinden önce puan topla!</span><i></i></div></div></div><style id="duel-cleanup">
 /* Online düello: ekrandaki dirhem (coin) rozeti, ilerleme çubuğu ve rakip adının altındaki 0/10 kaldırıldı */
 body:has(#duel.on) #homeWalletChip{display:none!important}
 </style>
@@ -5781,7 +5781,7 @@ const STAR='<svg viewBox="0 0 24 24"><path d="M12 2.2l2.95 6.3 6.85.8-5.1 4.7 1.
 const QSEC=10,INTRO_MS=3200,NUM_MS=1400,CD_C=2*Math.PI*44;/* QSEC: soru süresi (sn) — bildirim ve yuvarlak sayaç bunu kullanır */
 const TIERS=[{n:'Kolay',c:50,d:0,tq:QSEC},{n:'Orta',c:100,d:1,tq:QSEC},{n:'Zor',c:150,d:2,tq:QSEC},{n:'Çok Zor',c:200,d:2,tq:QSEC}];
 let tier=-1;/* her açılışta seçimsiz başlar */
-function needTier(){if(tier>=0&&tier<TIERS.length)return false;msg('⚠️ önce dirhem miktarını seç: 50, 100, 150 veya 200 dirhem.');const g=$('frTg'),m=document.getElementById('frMsg');if(m)m.classList.add('warn');if(g){g.classList.remove('shake');void g.offsetWidth;g.classList.add('shake')}try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}return true}
+function needTier(){if(tier>=0&&tier<TIERS.length)return false;msg('⚠️ Önce dirhem miktarını seç: 50, 100, 150 veya 200 dirhem.');const g=$('frTg'),m=document.getElementById('frMsg');if(m)m.classList.add('warn');if(g){g.classList.remove('shake');void g.offsetWidth;g.classList.add('shake')}try{navigator.vibrate&&navigator.vibrate(60)}catch(e){}return true}
 const gw=rdW;
 function paintT(){const w=gw();$('frTg').innerHTML=TIERS.map((t,i)=>'<button data-t="'+i+'" class="k'+i+(i===tier?' on':'')+(w<t.c?' lo':'')+'" aria-label="'+t.n+' · '+t.c+' dirhem"><span class="tcb"><span class="tc"><span class="stars">'+STAR.repeat(i+1)+'</span><span class="nm"><b>'+t.n+'</b></span><span class="cn"><img class="fr-coin" src="'+document.getElementById('dirhemIc').src+'" alt="Dirhem">'+t.c+'</span></span></span></button>').join('');paintTabs()}
 function paintTabs(){const off=!(tier>=0&&tier<TIERS.length);['frRand','frFrTab'].forEach(i=>{const e=$(i);if(e)e.classList.toggle('off',off)})}
@@ -6082,10 +6082,24 @@ const GENDER_MSG='Erkekler yalnızca erkeklere, hanımlar yalnızca hanımlara a
 function ibMyG(){return(typeof avGet==='function'&&avGet()===1)?1:0}
 function ibGenderOK(d){return((+(d&&d.av)===1)?1:0)===ibMyG()}
 window.__ibGender=ibGenderOK;window.__ibGenderMsg=GENDER_MSG;
-let famRoom=null,famTm=null;const FAM_MS=15*60000,famT=pw=>10000+(+pw);
-function famPanel(on){const b=$('famBox'),t=$('frFam');if(b)b.hidden=!on;if(t)t.classList.toggle('on',on);if(on){try{fl(false)}catch(e){}$('famMkP').hidden=!famRoom;if(famRoom)famShow()}}
+let famRoom=null,famTm=null,famFs=0,famFm='',famBusy=false,famPend='';const FAM_MS=15*60000,famT=pw=>10000+(+pw);
+/* Online ekranı adımları: 0 = sadece "Ailenle Oyna" · 1 = dirhem seç · 2 = "Oda Kur" / "Odaya Gir" sekmeleri */
+function famUi(){const f=$('frm');if(!f)return;f.classList.remove('f0','f1','f2');f.classList.add('f'+famFs);f.classList.toggle('fjn',famFs===2&&famFm==='jn');f.classList.toggle('froom',famFs===2&&famFm==='mk'&&!!famRoom);
+  $('frFam').classList.toggle('on',famPend==='fam');$('famTabMk').classList.toggle('on',famFs===2&&famFm==='mk');$('famTabJn').classList.toggle('on',famFs===2&&famFm==='jn');
+  if(famRoom)famShow();else $('famMkP').hidden=true}
+function famPanel(on){if(!on){famFs=famRoom?2:0;famFm=famRoom?'mk':'';famPend=famRoom?'fam':''}famUi()}
+function famGo(k){/* k: 'rand' | 'fr' | 'fam' — dirhem seçiliyse çalıştır, seçili değilse önce dirhem seçtir */
+  msg('');famPend=k;try{fl(false)}catch(e){}
+  if(k==='fam'&&famRoom){famFs=2;famFm='mk';famUi();return}
+  if(!(tier>=0&&tier<TIERS.length)){famFs=1;famFm='';famUi();return}
+  famRun(k)}
+async function famRun(k){
+  if(k==='rand'){famFs=1;famFm='';famUi();rand();return}
+  if(k==='fr'){famFs=1;famFm='';famUi();if(!await boot())return;if(famPend!=='fr')return;fl(true);await list();return}
+  if(k==='fam'){famFs=2;famFm='';famUi()}}
+function famAfterTier(){if(famPend&&famFs>=1)famRun(famPend)}
 function famShow(){if(!famRoom)return;$('famMkP').hidden=false;$('famPw').textContent=famRoom.pw;$('famStake').textContent='Bahis: '+famRoom.stake+' dirhem'}
-function famClose(silent){clearTimeout(famTm);const had=famRoom;famRoom=null;try{$('famMkP').hidden=true}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
+function famClose(silent){clearTimeout(famTm);const had=famRoom;famRoom=null;famFm='';try{$('famMkP').hidden=true;famUi()}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
 async function famMake(){
   const T0=TIERS[tier];
   if(gw()<T0.c){msg('Bu oda için '+T0.c+' dirhem gerekli (bakiyen '+gw()+').');return}
@@ -6098,7 +6112,7 @@ async function famMake(){
   if(!pw){msg('Şifre üretilemedi, tekrar dene.');return}
   try{await F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c})}
   catch(e){console.warn('fam make',e);msg('Oda kurulamadı. Firestore kurallarını kontrol et.');return}
-  clearTimeout(famTm);famRoom={h:'p'+pw,pw,lv:tier,stake:T0.c,ts:Date.now()};famTm=setTimeout(()=>famClose(true),FAM_MS);msg('');famPanel(true)}
+  clearTimeout(famTm);famRoom={h:'p'+pw,pw,lv:tier,stake:T0.c,ts:Date.now()};famTm=setTimeout(()=>famClose(true),FAM_MS);msg('');famFs=2;famFm='mk';famUi()}
 function famAuto(d){
   if(!famRoom||mid0||!d||d.famh!==famRoom.h||Date.now()-famRoom.ts>FAM_MS)return false;
   invData=d;try{$('invBn').classList.remove('on')}catch(e){}
@@ -6121,12 +6135,10 @@ async function famJoin(){
       dShow('s',waitHtml(fn));watch(m)}
     catch(e){console.warn(e);reset();$('duel').classList.remove('on');$('frm').classList.add('on');msg('Odaya katılınamadı. Kuralları kontrol et.')}
   }catch(e){console.warn('fam join',e);msg('Odaya katılınamadı. İnterneti kontrol et.')}}
-$('frFam').onclick=async()=>{
-  const box=$('famBox');if(box&&!box.hidden){famPanel(false);return}
-  msg('');
-  if(!famRoom&&tier>=0&&tier<TIERS.length){await famMake();return}
-  famPanel(true);if(!famRoom)msg('Oda kurmak için önce dirhem seç. Şifren varsa aşağıya girip katıl.')};
-$('frFrTab').addEventListener('click',()=>famPanel(false));$('frRand').addEventListener('click',()=>famPanel(false));
+$('frFam').onclick=()=>famGo('fam');
+$('famTabMk').onclick=async()=>{msg('');if(famRoom){famFm='mk';famUi();return}if(needTier())return;if(famBusy)return;famBusy=true;try{await famMake()}finally{famBusy=false}};
+$('famTabJn').onclick=()=>{msg('');famFm='jn';famUi();setTimeout(()=>{try{$('famInP').focus()}catch(e){}},60)};
+
 $('famGo').onclick=famJoin;$('famCl').onclick=()=>famClose();
 $('famCp').onclick=async()=>{if(!famRoom)return;const t='Aile odası şifresi: '+famRoom.pw;try{await navigator.clipboard.writeText(t);msg('Kopyalandı. Aile üyene gönder.')}catch(e){msg(t)}};
 $('famInP').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'')};$('famInP').onkeydown=e=>{if(e.key==='Enter')famJoin()};
@@ -6151,8 +6163,8 @@ function listenFr(){if(frOn||!db)return;frOn=1;const C=F.collection(db,'friendRe
 $('frReqYes').onclick=async()=>{const r=frInb[0];if(!r||!db)return;$('frReq').classList.remove('on');frInb=frInb.filter(x=>x.id!==r.id);
   try{await F.setDoc(F.doc(db,'users',uid,'friends',r.fromPid),{uid:r.from,name:r.fromName||'Oyuncu',added:F.serverTimestamp()});await F.updateDoc(F.doc(db,'friendReqs',r.id),{st:'accepted'});if($('frL').style.display!=='none')list();if(document.getElementById('friendsManageModal')?.classList.contains('on')&&window.__refreshManagedFriends)await window.__refreshManagedFriends()}catch(e){console.warn(e);msg('İstek kabul edilemedi.')}};
 $('frReqNo').onclick=async()=>{const r=frInb[0];if(!r||!db)return;$('frReq').classList.remove('on');frInb=frInb.filter(x=>x.id!==r.id);try{await F.updateDoc(F.doc(db,'friendReqs',r.id),{st:'rejected'})}catch(e){console.warn(e)}};
-$('frFrTab').onclick=async()=>{if($('frFrTab').classList.contains('on')){fl(false);return}if(needTier())return;if(!await boot())return;fl(true);await list()};
-$('frRand').onclick=rand;$('frTg').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tier=+b.dataset.t;msg('');{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}paintT()};$('dX').onclick=()=>closeD(true);
+$('frFrTab').onclick=()=>famGo('fr');
+$('frRand').onclick=()=>famGo('rand');$('frTg').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tier=+b.dataset.t;msg('');{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}paintT();famAfterTier()};$('dX').onclick=()=>closeD(true);
 $('dO').onclick=e=>{const b=e.target.closest('[data-i]');if(b)pk(+b.dataset.i)};
 $('dSt').onclick=e=>{if(e.target.closest('#dClose,.ws-x'))closeD(false);else if(e.target.closest('#dAgain')){closeD(false).then(openFr)}};
 $('frL').addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)challenge(c.dataset.c,c.dataset.n)});
@@ -8333,6 +8345,14 @@ html body #frm .frp .frtabs button#frFam{grid-column:1/-1!important}
 #frm .fam-pane #famGo{display:block;width:100%;margin-top:10px}
 </style>
 <style id="fam-room-css2">#frm .fam-codes.one{grid-template-columns:1fr}#frm .fam-codes.one b{font-size:34px;letter-spacing:.3em;text-indent:.3em}#frm .fam-join{margin-top:12px}#frm .fam-join .fam-sub{margin-bottom:0}#frm .fam-pane+.fam-join{padding-top:10px;border-top:1px dashed rgba(255,211,106,.4)}#frm .fam-join input{display:block;width:100%;box-sizing:border-box;margin:8px 0 0;padding:12px;border-radius:12px;border:2px solid #4b66c9;background:#061238;color:#fff;font:800 18px inherit;font-family:inherit;text-align:center;letter-spacing:.2em}#frm .fam-join #famGo{display:block;width:100%;margin-top:10px}</style>
+<style id="fam-room-css3">
+html body #frm #famTop,html body #frm #famBox,html body #frm #famTabs{display:none!important}
+html body #frm.f2 #famTabs{display:grid!important}
+html body #frm.froom #famTop{display:block!important;margin:10px 14px 0}
+html body #frm.fjn #famBox{display:block!important}
+html body #frm.f0 .frsub,html body #frm.f0 .frtg,html body #frm.fjn .frsub,html body #frm.fjn .frtg,html body #frm.froom .frsub,html body #frm.froom .frtg{display:none!important}
+html body #frm .frtabs#famTabs{margin-top:12px}
+</style>
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */

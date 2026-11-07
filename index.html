@@ -6166,6 +6166,7 @@ async function famRun(k){
 function famAfterTier(){if(famPend&&famFs>=1)famRun(famPend)}
 function famShow(){if(!famRoom)return;$('famMkP').hidden=false;$('famPw').textContent=famRoom.pw;$('famStake').textContent='Bahis: '+famRoom.stake+' dirhem';try{famSceneShow()}catch(e){console.warn('famScene',e)}}
 function famClose(silent){clearTimeout(famTm);const had=famRoom;famRoom=null;famFm='';try{famSceneHide()}catch(e){}try{$('famMkP').hidden=true;famUi()}catch(e){}if(had&&db){F.deleteDoc(F.doc(db,'queue',uid)).catch(()=>{})}if(!silent)msg('Oda kapatıldı.')}
+async function qPut(pw,T0){const put=()=>F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c});try{await put()}catch(e){if(!e||e.code!=='permission-denied')throw e;console.warn('queue yazma reddedildi, Firebase yeniden kuruluyor',e);const od=db;db=null;pid='';invOn=0;frOn=0;wReady=false;try{await F.terminate(od)}catch(x){}try{const A=await import(G+'firebase-app.js');await A.deleteApp(A.getApp())}catch(x){console.warn('deleteApp',x)}if(!await boot()||!pid)throw e;await put()}}
 async function famMake(){
   const T0=TIERS[tier];
   if(gw()<T0.c){msg('Bu oda için '+T0.c+' dirhem gerekli (bakiyen '+gw()+').');return}
@@ -6181,9 +6182,9 @@ async function famMake(){
       if(!busy)break;pw=String(1000+Math.floor(Math.random()*9000))}
     if(famRoom!==room)return;
     room.pw=pw;room.h='p'+pw;famShow();
-    await F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c});
+    await qPut(pw,T0);
     if(famRoom===room)room.ts=Date.now()
-  }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);let au='?';try{au=(await import(G+'firebase-auth.js')).getAuth().currentUser.uid}catch(x){}msg('Oda kurulamadı ('+String((e&&(e.code||e.message))||e).slice(0,40)+') uid:'+String(uid).slice(0,5)+' auth:'+String(au).slice(0,5))}}}
+  }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);let au='yok';try{au=AUTHREF.currentUser.uid}catch(x){}msg('Oda kurulamadı ('+String((e&&(e.code||e.message))||e).slice(0,40)+') uid:'+String(uid).slice(0,5)+' auth:'+String(au).slice(0,5))}}}
 function famAuto(d){
   if(!famRoom||mid0||!d||d.famh!==famRoom.h||Date.now()-famRoom.ts>FAM_MS)return false;
   invData=d;try{$('invBn').classList.remove('on')}catch(e){}

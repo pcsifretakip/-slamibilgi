@@ -6210,7 +6210,7 @@ function famAuto(d){
   if(!famRoom||mid0||!d||d.famh!==famRoom.h||Date.now()-famRoom.ts>FAM_MS)return false;
   invData=d;try{$('invBn').classList.remove('on')}catch(e){}
   Promise.resolve($('invYes').onclick()).catch(()=>{}).then(()=>famClose(true));return true}
-async function famJoin(rr){
+async function famJoin(rr){if(rr&&!(rr.uid&&rr.stake))rr=null;
   const p=rr?String((+rr.tier||0)%10000):$('famInP').value.trim();
   if(!rr&&!/^\d{4}$/.test(p)){msg('4 haneli şifreyi gir.');return}
   if(!rr&&famRoom&&famRoom.pw===p){msg('Bu senin kendi odan.');return}
@@ -6358,7 +6358,7 @@ $('famTabMk').onclick=async()=>{msg('');if(famRoom){famFm='mk';famUi();return}if
 $('famBack').onclick=()=>{msg('');if(famDirect){famDirect=false;famPanel(false);famSubOn=true;famUi();return}famFm='';famUi()};
 $('famTabJn').onclick=()=>{msg('');famDirect=false;famFm='jn';famUi();setTimeout(()=>{try{$('famInP').focus()}catch(e){}},60)};
 
-$('famGo').onclick=famJoin;$('famCl').onclick=()=>famClose();
+$('famGo').onclick=()=>famJoin();$('famCl').onclick=()=>famClose();
 $('famCp').onclick=async()=>{if(!famRoom)return;const t='Aile odası şifresi: '+famRoom.pw;try{await navigator.clipboard.writeText(t);msg('Kopyalandı. Aile üyene gönder.')}catch(e){msg(t)}};
 $('famInP').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'')};$('famInP').onkeydown=e=>{if(e.key==='Enter')famJoin()};
 function listenInv(){if(invOn||!db)return;invOn=1;F.onSnapshot(F.doc(db,'invites',uid),sn=>{const d=sn.data(),b=$('invBn');if(d&&d.fam){if(!famAuto(d))b.classList.remove('on');return}if(!d||d.ts<Date.now()-300000||mid0){b.classList.remove('on');return}invData=d;$('invT').textContent='⚔️ '+d.name+' seni '+(d.stake||0)+' dirhemlik yarışmaya çağırıyor!';b.classList.add('on')})}

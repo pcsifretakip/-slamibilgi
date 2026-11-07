@@ -6182,7 +6182,7 @@ async function famMake(){
     room.pw=pw;room.h='p'+pw;famShow();
     await F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c});
     if(famRoom===room)room.ts=Date.now()
-  }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);msg('Oda kurulamadı. Firestore kurallarını kontrol et.')}}}
+  }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);msg('Oda kurulamadı ('+String((e&&(e.code||e.message))||e).slice(0,70)+'). Firestore kurallarını kontrol et.')}}}
 function famAuto(d){
   if(!famRoom||mid0||!d||d.famh!==famRoom.h||Date.now()-famRoom.ts>FAM_MS)return false;
   invData=d;try{$('invBn').classList.remove('on')}catch(e){}

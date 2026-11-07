@@ -6084,7 +6084,7 @@ function ibGenderOK(d){return((+(d&&d.av)===1)?1:0)===ibMyG()}
 window.__ibGender=ibGenderOK;window.__ibGenderMsg=GENDER_MSG;
 let famRoom=null,famTm=null,famFs=0,famFm='',famBusy=false,famPend='';const FAM_MS=15*60000,famT=pw=>10000+(+pw);
 /* Online ekranı adımları: 0 = sadece "Ailenle Oyna" · 1 = dirhem seç · 2 = "Oda Kur" / "Odaya Gir" sekmeleri */
-function famUi(){const f=$('frm');if(!f)return;f.classList.remove('f0','f1','f2');f.classList.add('f'+famFs);f.classList.toggle('fjn',famFs===2&&famFm==='jn');f.classList.toggle('froom',famFs===2&&famFm==='mk'&&!!famRoom);
+function famUi(){const f=$('frm');if(!f)return;f.classList.remove('f0','f1','f2');f.classList.add('f'+famFs);f.classList.toggle('ffam',famPend==='fam');f.classList.toggle('fjn',famFs===2&&famFm==='jn');f.classList.toggle('froom',famFs===2&&famFm==='mk'&&!!famRoom);
   $('frFam').classList.toggle('on',famPend==='fam');$('famTabMk').classList.toggle('on',famFs===2&&famFm==='mk');$('famTabJn').classList.toggle('on',famFs===2&&famFm==='jn');
   if(famRoom)famShow();else $('famMkP').hidden=true}
 function famPanel(on){if(!on){famFs=famRoom?2:0;famFm=famRoom?'mk':'';famPend=famRoom?'fam':''}famUi()}
@@ -8352,6 +8352,8 @@ html body #frm.froom #famTop{display:block!important;margin:10px 14px 0}
 html body #frm.fjn #famBox{display:block!important}
 html body #frm.f0 .frsub,html body #frm.f0 .frtg,html body #frm.fjn .frsub,html body #frm.fjn .frtg,html body #frm.froom .frsub,html body #frm.froom .frtg{display:none!important}
 html body #frm .frtabs#famTabs{margin-top:12px}
+html body #frm.ffam .frtabs:not(#famTabs){display:none!important}
+html body #frm.ffam.f2 .frsub,html body #frm.ffam.f2 .frtg{display:none!important}
 </style>
 </body>
 </html><style>

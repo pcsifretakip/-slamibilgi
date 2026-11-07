@@ -6174,6 +6174,7 @@ async function famMake(){
   clearTimeout(famTm);const room={h:'p'+pw,pw,lv:tier,stake:T0.c,ts:Date.now()};famRoom=room;famTm=setTimeout(()=>famClose(true),FAM_MS);
   famFs=2;famFm='mk';msg('');famUi();
   try{
+    try{const cu=db&&(await import(G+'firebase-auth.js')).getAuth().currentUser;if(cu&&cu.uid!==uid){db=null;pid='';invOn=0;frOn=0}}catch(x){console.warn('uid sync',x)}
     if(!await boot()||!pid){if(famRoom===room){famClose(true);if(!pid)msg('Hesap ID\'n henüz hazır değil. Birkaç saniye sonra tekrar dene.')}return}
     for(let k=0;k<6;k++){let busy=false;
       try{const sn=await F.getDocs(F.query(F.collection(db,'queue'),F.where('tier','==',famT(pw)),F.limit(5)));sn.forEach(d=>{const x=d.data();if(x&&x.uid!==uid&&Date.now()-(+x.ts||0)<FAM_MS+30000)busy=true})}catch(e){}
@@ -6182,7 +6183,7 @@ async function famMake(){
     room.pw=pw;room.h='p'+pw;famShow();
     await F.setDoc(F.doc(db,'queue',uid),{uid,name:nm(),ts:Date.now(),sts:F.serverTimestamp(),tier:famT(pw),stake:T0.c});
     if(famRoom===room)room.ts=Date.now()
-  }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);msg('Oda kurulamadı ('+String((e&&(e.code||e.message))||e).slice(0,70)+'). Firestore kurallarını kontrol et.')}}}
+  }catch(e){console.warn('fam make',e);if(famRoom===room){famClose(true);let au='?';try{au=(await import(G+'firebase-auth.js')).getAuth().currentUser.uid}catch(x){}msg('Oda kurulamadı ('+String((e&&(e.code||e.message))||e).slice(0,40)+') uid:'+String(uid).slice(0,5)+' auth:'+String(au).slice(0,5))}}}
 function famAuto(d){
   if(!famRoom||mid0||!d||d.famh!==famRoom.h||Date.now()-famRoom.ts>FAM_MS)return false;
   invData=d;try{$('invBn').classList.remove('on')}catch(e){}

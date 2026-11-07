@@ -8731,6 +8731,31 @@ html body #frm .frp .frtabs button#frFam,html body #frm .frp .frtabs button#frFa
 #famScene .fgr-b{align-self:center;min-width:150px;padding:9px 20px;border:2px solid #ffe08a;border-radius:13px;background:linear-gradient(#ffe48a,#d99419);color:#382100;font:900 15px "Nunito",system-ui,sans-serif;box-shadow:0 3px 0 #80500a;cursor:pointer}
 @media(max-height:700px){#famScene.playing .fs-stage:not(.c2) .fs-svg{width:min(18vw,9vh,72px)}#famScene .fs-center.fg{top:calc(env(safe-area-inset-top,0px) + 190px);bottom:calc(env(safe-area-inset-bottom,0px) + 178px)}#famScene .fg-o button{padding:6px 9px;font-size:12px}}
 </style>
+<style id="online-question-layout-fix">
+/* ===== AİLENLE OYNA: soru kutusu rahle + öğrencilerin ARASINDA ortalanır, öğrenciler görünür kalır ===== */
+#famScene.playing{--sw:min(24vw,12vh,104px)}
+@media(max-height:700px){#famScene.playing{--sw:min(20vw,10vh,80px)}}
+#famScene.playing .fs-stage:not(.c2) .fs-svg{width:var(--sw)}
+#famScene.playing .fs-stage .fs-half.tl,#famScene.playing .fs-stage .fs-half.tr{top:calc(env(safe-area-inset-top,0px) + 10px);z-index:3}
+#famScene.playing .fs-stage .fs-half.bl,#famScene.playing .fs-stage .fs-half.br,#famScene.playing .fs-stage .fs-half.bc{bottom:calc(env(safe-area-inset-bottom,0px) + 1.5vh);z-index:3}
+#famScene.playing .fs-center.fg{top:calc(env(safe-area-inset-top,0px) + 10px + var(--sw)*1.4 + 44px);bottom:calc(env(safe-area-inset-bottom,0px) + 1.5vh + var(--sw)*1.4 + 74px);z-index:2}
+/* ===== KANKA ONLINE (düello): üstte rakip, altta sen (rahle + öğrenci tam görünür), soru ortada; yüzde ve çubuk yok ===== */
+#duel #dG .tug,#duel #dG .dvs,#duel #dG #dMe,#duel #dG #dOp{display:none!important}
+#duel #dG[style*="block"]{display:flex!important;flex-direction:column;align-items:stretch;gap:6px;padding-top:6px}
+#duel #dG .dtop{display:contents}
+#duel #dG .dopp{flex:none;flex-direction:column;align-items:center;justify-content:center;gap:2px;margin:0;text-align:center}
+#duel #dG .dopp:not(.dme){order:1}
+#duel #dG .dq{order:2;flex:none;min-height:0;padding:12px;font-size:16px}
+#duel #dG .do{order:3;flex:1 1 auto;min-height:130px;overflow-y:auto;align-content:start;margin-top:6px;gap:8px}
+#duel #dG .do button{padding:11px 12px;font-size:14px}
+#duel #dG .dopp.dme{order:4}
+#duel #dG .dopp .dopav{order:1;flex:none;width:auto;height:min(17vh,140px);border-radius:0;border:0;background:none;box-shadow:none;overflow:visible}
+#duel #dG .dopp .dopt{order:2}
+#duel #dG .dopav img,#duel #dG .dopav.rk img{display:block;position:static;width:auto;height:100%;max-width:100%;left:auto;top:auto;object-fit:contain;margin:0 auto}
+#duel #dG .dopt small{margin:0}
+#duel #dG .dcd{position:absolute;top:max(10px,env(safe-area-inset-top));left:14px;width:48px;height:48px;margin:0;z-index:3}
+#duel #dG .dcd b{font-size:20px}
+</style>
 <style id="fam-room-css2">#frm .fam-codes.one{grid-template-columns:1fr}#frm .fam-codes.one b{font-size:34px;letter-spacing:.3em;text-indent:.3em}#frm .fam-join{margin-top:12px}#frm .fam-join .fam-sub{margin-bottom:0}#frm .fam-pane+.fam-join{padding-top:10px;border-top:1px dashed rgba(255,211,106,.4)}#frm .fam-join input{display:block;width:100%;box-sizing:border-box;margin:8px 0 0;padding:12px;border-radius:12px;border:2px solid #4b66c9;background:#061238;color:#fff;font:800 18px inherit;font-family:inherit;text-align:center;letter-spacing:.2em}#frm .fam-join #famGo{display:block;width:100%;margin-top:10px}</style>
 <style id="fam-room-css3">
 html body #frm #famTop,html body #frm #famBox,html body #frm #famTabs{display:none!important}

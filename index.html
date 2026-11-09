@@ -5995,9 +5995,15 @@ function oppAv(rk,av){const w=$('dOav'),im=$('dOavI');if(!w||!im)return;try{if(w
   w.classList.toggle('rk',rk>=0);w.hidden=false;
   if(rk>=0&&typeof RANKS!=='undefined'&&RANKS[rk]){const sp=document.createElement('span');sp.className='dork';sp.textContent=String(RANKS[rk]).toLocaleUpperCase('tr');$('dOn').appendChild(sp)}}
 let replaySwitching=false;
+function duelHome(){
+  reset();
+  $('duel').classList.remove('on');
+  try{$('frm').classList.remove('on')}catch(e){}
+  try{if(typeof goHome==='function')goHome();else if(typeof window.show==='function')window.show('sLogin')}catch(e){}
+}
 async function famDuelReplay(want){
   if(!mid0||!M||!db)return;
-  const oldMid=mid0,old=M,op=oppU;
+  const oldMid=mid0,old=M;
   const yes=$('dAgain'),no=$('dClose');
   if(yes)yes.disabled=true;if(no)no.disabled=true;
   if(want){
@@ -6011,20 +6017,21 @@ async function famDuelReplay(want){
       const d=sn.data();if(d.replay&&d.replay.next){outcome='next';return}if(d.replay&&d.replay.closed){outcome='closed';return}
       const players=d.p||[];if(!players.includes(uid))return;
       const votes=Object.assign({},(d.replay&&d.replay.votes)||{});votes[uid]=!!want;
-      const both=players.length===2&&players.every(u=>Object.prototype.hasOwnProperty.call(votes,u));
-      if(both&&players.every(u=>votes[u]===true)){
+      /* Bir oyuncu ana sayfayı seçerse maç hemen kapanır; diğer oyuncu da dinleyici üzerinden ana sayfaya döner. */
+      if(!want){
+        tx.update(ref,{replay:{votes,closed:true,closedBy:uid}});
+        outcome='closed';
+      }else if(players.length===2&&players.every(u=>votes[u]===true)){
         const nextMid=oldMid+'_r_'+Date.now();
         tx.set(F.doc(db,'matches',nextMid),{p:players,names:d.names||{},st:'play',q:preparedQ,stake:+d.stake||0,lv:+d.lv||0,tq:+d.tq||15,ts:Date.now(),s:{},n:{},d:{},x:{},paid:false});
         tx.update(ref,{replay:{votes,next:nextMid}});outcome='next';
-      }else if(both){tx.update(ref,{replay:{votes,closed:true}});outcome='closed'}
-      else tx.update(ref,{replay:{votes}});
+      }else tx.update(ref,{replay:{votes}});
     });
-    if(!want){await closeD(false);return}
-    if(outcome==='closed'){await closeD(false);return}
+    if(!want||outcome==='closed'){duelHome();return}
     if(outcome==='next'&&M&&M.replay&&M.replay.next){return}
   }catch(e){console.warn('famDuelReplay',e);const w=$('dSt');if(w){const t=w.querySelector('.duel-replay-wait');if(t)t.remove()}if(yes)yes.disabled=false;if(no)no.disabled=false;}
 }
-function watch(m){mid0=m;clearInterval(hlT);hlT=setInterval(heal,1500);try{const q=myRk();F.updateDoc(F.doc(db,'matches',m),{['rk.'+uid]:q.r,['av.'+uid]:q.g}).catch(()=>{})}catch(e){}watchU=F.onSnapshot(F.doc(db,'matches',m),sn=>{const d=sn.data();if(!d)return;if(shown){if(d.replay&&d.replay.next&&!replaySwitching){replaySwitching=true;const nx=d.replay.next,nm2=String((d.names&&d.names[oppU])||'Rakip');reset();window.__famDuelOn=true;dShow('s',waitHtml(nm2));replaySwitching=false;watch(nx);return}if(d.replay&&d.replay.closed){reset();$('duel').classList.remove('on');try{openFr()}catch(e){}return}if(d.paid){M=d;loserPayFb(d);updDirhem(d)}return}M=d;oppU=d.p.find(x=>x!==uid);
+function watch(m){mid0=m;clearInterval(hlT);hlT=setInterval(heal,1500);try{const q=myRk();F.updateDoc(F.doc(db,'matches',m),{['rk.'+uid]:q.r,['av.'+uid]:q.g}).catch(()=>{})}catch(e){}watchU=F.onSnapshot(F.doc(db,'matches',m),sn=>{const d=sn.data();if(!d)return;if(shown){if(d.replay&&d.replay.next&&!replaySwitching){replaySwitching=true;const nx=d.replay.next,nm2=String((d.names&&d.names[oppU])||'Rakip');reset();window.__famDuelOn=true;dShow('s',waitHtml(nm2));replaySwitching=false;watch(nx);return}if(d.replay&&d.replay.closed){duelHome();return}if(d.paid){M=d;loserPayFb(d);updDirhem(d)}return}M=d;oppU=d.p.find(x=>x!==uid);
   if(d.st==='no'){reset();dShow('s','<b>Davet kabul edilmedi</b><button class="dbt" id="dClose">Kapat</button>');return}
   if(d.st==='play'&&!started){if(d.rk&&typeof d.rk[oppU]==='number'){clearTimeout(stW);stW=null;started=true;ask()}else if(!stW){stW=setTimeout(()=>{stW=null;if(!started&&!shown&&M&&M.st==='play'){started=true;ask();chk()}},2500)}}
   const opponentName=String((d.names&&d.names[oppU])||'Rakip');$('dOn').textContent=opponentName.toUpperCase().slice(0,12);$('dOn').dataset.friendUid=oppU;$('dOn').dataset.friendName=opponentName;$('dOn').setAttribute('role','button');$('dOn').tabIndex=0;try{oppAv(d.rk&&d.rk[oppU],d.av&&d.av[oppU])}catch(e){}try{window.__famFx&&window.__famFx.duel(d,uid,oppU)}catch(e){}wrongMark();chk()})}
@@ -6045,10 +6052,10 @@ function res(l){if(shown)return;shown=true;clearInterval(tm);clearTimeout(grT);c
     dShow('s','<div class="wsc" role="dialog" aria-label="Kazandın"><div class="result-icon result-icon-win" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M19 8h26v10c0 12-5.5 19-13 19s-13-7-13-19V8Z"/><path d="M19 13H9v5c0 9 5 14 13 14M45 13h10v5c0 9-5 14-13 14M32 37v10M23 55h18M26 47h12l3 8H23l3-8Z"/><path d="m27 20 4 4 8-9"/></svg></div><h2 class="result-heading">KAZANDIN!</h2><p class="result-caption">'+(ko?'K.O. İLE KAZANDIN':'MAÇ SONUCU')+'</p><span class="ws-t ws-n ws-a">SEN</span><span class="ws-t ws-s ws-a">'+a+'</span><span class="ws-t ws-n ws-b'+(nm2.length>9?' l':'')+'">'+nm2+'</span><span class="ws-t ws-s ws-b">'+b+'</span>'
       +(M.stake?'<div class="ws-dirhem" id="dDirhem"><i></i><span class="ws-amt" id="wsAmt">…</span><span class="ws-ci"></span><span class="ws-ct">dirhem</span><i></i></div>':'')
       +(l?'<div class="ws-note">Rakip yarışmadan ayrıldı</div>':'')
-      +'<button type="button" class="ws-x" aria-label="Kapat"></button><button type="button" id="dAgain" aria-label="Tekrar Oyna">Tekrar Oyna</button><button type="button" id="dClose" aria-label="Odadan Çık">Odadan Çık</button></div>')}
-  else if(!t)dShow('s','<div class="lsc" role="dialog" aria-label="Kaybettin"><div class="result-icon result-icon-lose" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M32 6 52 14v14c0 14-8 23-20 30C20 51 12 42 12 28V14L32 6Z"/><path d="m23 22 7 7-5 5 8 8 5-7 6 6M42 20 22 42"/><path d="M18 13 9 8M46 13l9-5"/></svg></div><h2 class="result-heading">BU MAÇI KAYBETTİN</h2><p class="result-caption">'+(ko?'K.O. OLDUN':'BİR SONRAKİ MAÇTA YENİDEN DENE')+'</p><span class="ls-t ls-n ls-a">SEN</span><span class="ls-t ls-s ls-a">'+a+'</span><span class="ls-t ls-n ls-b'+(on.length>9?' l':'')+'">'+on.toUpperCase().slice(0,12)+'</span><span class="ls-t ls-s ls-b">'+b+'</span>'+(M.stake?'<div id="dDirhem">…</div>':'')+'<button type="button" id="dAgain" aria-label="Tekrar Oyna">Tekrar Oyna</button><button type="button" id="dClose" aria-label="Odadan Çık">Odadan Çık</button></div>');
+      +'<button type="button" class="ws-x" aria-label="Kapat"></button><button type="button" id="dAgain" aria-label="Tekrar Oyna">Tekrar Oyna</button><button type="button" id="dClose" aria-label="Ana Sayfaya Dön">Ana Sayfaya Dön</button></div>')}
+  else if(!t)dShow('s','<div class="lsc" role="dialog" aria-label="Kaybettin"><div class="result-icon result-icon-lose" aria-hidden="true"><svg viewBox="0 0 64 64" focusable="false"><path d="M32 6 52 14v14c0 14-8 23-20 30C20 51 12 42 12 28V14L32 6Z"/><path d="m23 22 7 7-5 5 8 8 5-7 6 6M42 20 22 42"/><path d="M18 13 9 8M46 13l9-5"/></svg></div><h2 class="result-heading">BU MAÇI KAYBETTİN</h2><p class="result-caption">'+(ko?'K.O. OLDUN':'BİR SONRAKİ MAÇTA YENİDEN DENE')+'</p><span class="ls-t ls-n ls-a">SEN</span><span class="ls-t ls-s ls-a">'+a+'</span><span class="ls-t ls-n ls-b'+(on.length>9?' l':'')+'">'+on.toUpperCase().slice(0,12)+'</span><span class="ls-t ls-s ls-b">'+b+'</span>'+(M.stake?'<div id="dDirhem">…</div>':'')+'<button type="button" id="dAgain" aria-label="Tekrar Oyna">Tekrar Oyna</button><button type="button" id="dClose" aria-label="Ana Sayfaya Dön">Ana Sayfaya Dön</button></div>');
   else
-  dShow('s','<div class="dsp">'+(t?'🤝':w?'🏆':'💔')+'</div><b>'+(t?'BERABERE':w?'KAZANDIN!':'KAYBETTİN')+'</b><div class="dsc"><span>SEN<b>'+a+'</b></span><span>'+on.toUpperCase().slice(0,12)+'<b>'+b+'</b></span></div>'+dirhemLine+(l?'<small>Rakip yarışmadan ayrıldı</small>':'')+'<button class="dbt" id="dAgain">Tekrar Oyna</button><button class="dbt g" id="dClose">Odadan Çık</button>');
+  dShow('s','<div class="dsp">'+(t?'🤝':w?'🏆':'💔')+'</div><b>'+(t?'BERABERE':w?'KAZANDIN!':'KAYBETTİN')+'</b><div class="dsc"><span>SEN<b>'+a+'</b></span><span>'+on.toUpperCase().slice(0,12)+'<b>'+b+'</b></span></div>'+dirhemLine+(l?'<small>Rakip yarışmadan ayrıldı</small>':'')+'<button class="dbt" id="dAgain">Tekrar Oyna</button><button class="dbt g" id="dClose">Ana Sayfaya Dön</button>');
   lastRes={w:!!w,t:!!t};try{window.__pStat(w?'w':t?'t':'l');window.__pOnStat(w?'w':t?'t':'l')}catch(e){}
   if(M.stake&&!t){if(w){const m1=mid0,s1=+M.stake||0;settle(uid,oppU).then(a=>a==null?settleFb(m1,s1):a).then(a=>{const e=$('dDirhem'),W=$('wsAmt');if(!e)return;if(W){if(a==null)e.innerHTML='<span class="ws-ct" style="font-size:3.6cqw">Dirhem aktarılamadı</span>';else W.textContent='+'+a;return}if(a==null){e.textContent='Dirhem aktarılamadı';return}e.className='ddirhem p';e.textContent='+'+a+' 🪙 dirhem'});}else if(M.paid)updDirhem(M)}}
 /* ===== MORTAL KOMBAT TARZI ORTAK BAR (CANLI) =====
@@ -6449,7 +6456,7 @@ $('frReqNo').onclick=async()=>{const r=frInb[0];if(!r||!db)return;$('frReq').cla
 $('frFrTab').onclick=()=>famGo('fr');
 $('frRand').onclick=()=>lobOpen();$('frTg').onclick=e=>{const b=e.target.closest('[data-t]');if(!b)return;tier=+b.dataset.t;msg('');{const m=document.getElementById('frMsg');if(m)m.classList.remove('warn')}paintT();famAfterTier()};$('dX').onclick=()=>closeD(true);
 $('dO').onclick=e=>{const b=e.target.closest('[data-i]');if(b)pk(+b.dataset.i)};
-$('dSt').onclick=e=>{if(e.target.closest('.ws-x')){closeD(false);return}if(e.target.closest('#dClose')){if(window.__famDuelOn&&shown)famDuelReplay(false);else closeD(false);return}if(e.target.closest('#dAgain')){if(window.__famDuelOn&&shown)famDuelReplay(true);else closeD(false)}};
+$('dSt').onclick=e=>{if(e.target.closest('.ws-x')){if(window.__famDuelOn&&shown)famDuelReplay(false);else closeD(false);return}if(e.target.closest('#dClose')){if(window.__famDuelOn&&shown)famDuelReplay(false);else closeD(false);return}if(e.target.closest('#dAgain')){if(window.__famDuelOn&&shown)famDuelReplay(true);else closeD(false)}};
 $('frL').addEventListener('click',e=>{const c=e.target.closest('[data-c]');if(c)challenge(c.dataset.c,c.dataset.n)});
 const pdoc=()=>{try{const q=window.periodPts(),ob=window.__onBase?window.__onBase():{p:0,w:0};return{dk:q.dk,dpts:q.d,wk:q.wk,wpts:q.w,onp:ob.p,onw:ob.w,av:+(window.avGet?window.avGet():0)||0}}catch(e){return{}}};
 let lastLb=0;

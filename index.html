@@ -6007,7 +6007,7 @@ async function famDuelReplay(want){
   const yes=$('dAgain'),no=$('dClose');
   if(yes)yes.disabled=true;if(no)no.disabled=true;
   if(want){
-    const box=$('dSt');if(box)box.insertAdjacentHTML('beforeend','<p class="duel-replay-wait">Diğer oyuncunun kararı bekleniyor…</p>');
+    const box=$('dSt');if(box)box.insertAdjacentHTML('beforeend','<p class="duel-replay-wait">Rakip bekleniyor…</p>');
   }
   const preparedQ=pick(+old.lv||0);
   try{
@@ -6208,7 +6208,7 @@ window.__famStu=famStu;function famMyLook(){let g=0,t=0;try{g=ibMyG()===1?1:0}ca
 function famSceneEnsure(){let s=$('famScene');if(s)return s;
  s=document.createElement('div');s.id='famScene';s.setAttribute('role','dialog');s.setAttribute('aria-label','Aile odası');
  s.innerHTML='<div class="fs-top"><div class="fs-pw"><small>ODA ŞİFRESİ</small><b id="fsPw">----</b></div><div id="fsStake"></div></div><button type="button" class="fs-x" id="fsCl" aria-label="Odayı kapat">×</button><div class="fs-stage" id="fsStage"></div>';
- document.body.appendChild(s);$('fsCl').onclick=()=>{if(famG)famLeave();else famClose()};return s}
+ document.body.appendChild(s);$('fsCl').onclick=()=>{if(famG){if(famG.fin)famGReplay(false);else famLeave()}else famClose()};return s}
 function famSceneShow(){if(famG&&famG.doc){famGStep();return}if(!famRoom)return;const s=famSceneEnsure(),L=famMyLook(),cap=Math.max(2,Math.min(4,+famRoom.cap||2));
  $('fsPw').textContent=famRoom.pw;s.classList.toggle('fs-pub',!!famRoom.pub);$('fsStake').textContent=famRoom.stake+' dirhemlik yarışma · '+cap+' kişilik';
  let me0='Sen';try{me0=nm()||'Sen'}catch(e){}
@@ -6298,7 +6298,12 @@ function famGWrong(d,q,u){const r=(d.a&&d.a[q+'_'+u])||(famG&&u===uid&&famG.loc[
 function famGAnsd(d,q,u){return !!((d.a&&d.a[q+'_'+u])||(famG&&u===uid&&famG.loc[q])||(d.x&&d.x[u]))}
 function famGSc(d,u){let s=0;const T=(+d.tq||10)*1000;for(let q=0;q<famNQ(d);q++){const r=(d.a&&d.a[q+'_'+u])||(famG&&u===uid&&famG.loc[q]);if(r&&r.ok)s+=100+Math.round(50*Math.max(0,1-(+r.ms||0)/T))}return s}
 function famWatch(hid){famGStop();famG={hid,doc:null,u:null,on:false,qi:-1,loc:{},adv:false,ans:null,tm:null,t1:null,t2:null,qT0:0,fin:false};
-  famG.u=F.onSnapshot(F.doc(db,'famRooms',hid),sn=>{if(!famG||famG.hid!==hid)return;if(!sn.exists()){famGGone();return}famG.doc=sn.data();try{famGStep()}catch(e){console.warn('famGStep',e)}},e=>console.warn('famRoom dinleme',e))}
+  famG.u=F.onSnapshot(F.doc(db,'famRooms',hid),sn=>{if(!famG||famG.hid!==hid)return;if(!sn.exists()){famGGone();return}const nd=sn.data(),pd=famG.doc;
+    if(pd&&pd.round!==undefined&&nd.round!==undefined&&pd.round!==nd.round){
+      clearInterval(famG.tm);clearTimeout(famG.t1);clearTimeout(famG.t2);
+      famG.on=false;famG.qi=-1;famG.loc={};famG.adv=false;famG.ans=null;famG.fin=false;
+    }
+    famG.doc=nd;try{famGStep()}catch(e){console.warn('famGStep',e)}},e=>console.warn('famRoom dinleme',e))}
 function famGStop(){if(!famG)return;try{famG.u&&famG.u()}catch(e){}clearInterval(famG.tm);clearTimeout(famG.t1);clearTimeout(famG.t2);famG=null}
 function famGGone(){const had=famG;famGStop();try{famSceneHide()}catch(e){}if(had&&!had.fin)window.ibConfirm({icon:'🚪',title:'Oda kapatıldı',text:'Bu oda kapatıldığı için oyun sona erdi.',yes:'Tamam',single:true});try{openFr()}catch(e){}}
 function famGSeats(d){
@@ -6310,7 +6315,9 @@ function famGSeats(d){
     const svg=famStu({id:'fsg'+i,g:p&&+p.g===1?1:0,t:Math.max(0,Math.min(6,t))});
     h+='<div class="fs-seat fs-half '+pos[i]+(me?' me':'')+(u?'':' dim')+'" data-u="'+(u||'')+'">'+(me?'<div class="fs-sen">SEN</div>':'')+'<div class="fs-svg">'+svg+'</div><div class="fs-nm'+(u?'':' fs-wait')+'"><span>'+(u?esc((p&&p.n)||(me?'Sen':'Oyuncu')):(i+1)+'. oyuncu bekleniyor')+'</span><small class="fs-sc"></small></div><i class="fs-ok"></i></div>'}
   h+='<div class="fs-center" id="fsCenter"></div>';st.innerHTML=h}
-function famGStep(){const d=famG&&famG.doc;if(!d)return;const s=famSceneEnsure();famGSeats(d);s.classList.add('on');
+function famGStep(){const d=famG&&famG.doc;if(!d)return;
+  if(d.replay&&d.replay.closed){famGStop();try{famSceneHide()}catch(e){}try{openFr()}catch(e){}return}
+  const s=famSceneEnsure();famGSeats(d);s.classList.add('on');
   $('fsPw').textContent=d.pw;s.classList.toggle('fs-pub',!!d.pub);$('fsStake').textContent=d.stake+' dirhemlik yarışma · '+d.cap+' kişilik';
   if(d.st==='lobby'){const n=(d.order||[]).length,c=$('fsCenter');s.classList.remove('playing');c.className='fs-center';c.innerHTML='<b>'+n+' / '+d.cap+'</b><span>kişi hazır</span><small>'+d.cap+' kişi tamamlanınca yarışma başlar</small>';return}
   if(!famG.on){famG.on=true;famGBegin()}
@@ -6354,8 +6361,49 @@ function famGFinish(){if(!famG||famG.fin)return;famG.fin=true;clearInterval(famG
       if(amt)try{localStorage.setItem(WK,String(Math.max(0,rdW()+amt)))}catch(e){}}}
   try{window.__pStat(iW?'w':iT?'t':'l');window.__pOnStat(iW?'w':iT?'t':'l')}catch(e){}
   const c=$('fsCenter');c.className='fs-center fg fgr';
-  c.innerHTML='<div class="fgr-t">'+(allTie?'🤝 Berabere':iW?'🏆 Kazandın!':'Yarışma bitti')+'</div><div class="fgr-l">'+rows.map((r,i)=>'<div class="fgr-r'+(r.u===uid?' me':'')+(win.includes(r.u)&&!allTie&&!r.x?' w':'')+'"><i>'+(i+1)+'</i><span>'+esc(r.n)+(r.u===uid?' <em>SEN</em>':'')+(r.x?' (ayrıldı)':'')+'</span><b>'+r.s+'</b></div>').join('')+'</div>'+(stake?'<div class="fgr-d">'+(allTie||!amt?'Dirhem değişmedi':amt>0?'+'+amt+' 🪙 dirhem':'−'+(-amt)+' 🪙 dirhem')+'</div>':'')+'<button type="button" class="fgr-b" id="fgDone">Kapat</button>';
-  $('fgDone').onclick=()=>famLeave(true)}
+  c.innerHTML='<div class="fgr-t">'+(allTie?'🤝 Berabere':iW?'🏆 Kazandın!':'Yarışma bitti')+'</div><div class="fgr-l">'+rows.map((r,i)=>'<div class="fgr-r'+(r.u===uid?' me':'')+(win.includes(r.u)&&!allTie&&!r.x?' w':'')+'"><i>'+(i+1)+'</i><span>'+esc(r.n)+(r.u===uid?' <em>SEN</em>':'')+(r.x?' (ayrıldı)':'')+'</span><b>'+r.s+'</b></div>').join('')+'</div>'+(stake?'<div class="fgr-d">'+(allTie||!amt?'Dirhem değişmedi':amt>0?'+'+amt+' 🪙 dirhem':'−'+(-amt)+' 🪙 dirhem')+'</div>':'')+'<div class="fgr-actions"><button type="button" class="fgr-b" id="fgAgain">Tekrar Oyna</button><button type="button" class="fgr-b" id="fgHome">Ana Sayfaya Dön</button></div>';
+  $('fgAgain').onclick=()=>famGReplay(true);
+  $('fgHome').onclick=()=>famGReplay(false)}
+async function famGReplay(want){
+  if(!famG||!famG.doc||!db)return;
+  const g=famG,d=g.doc,hid=g.hid;
+  const a=$('fgAgain'),h=$('fgHome');if(a)a.disabled=true;if(h)h.disabled=true;
+  if(want){const c=$('fsCenter');if(c)c.insertAdjacentHTML('beforeend','<small class="duel-replay-wait">Diğer oyuncuların kararı bekleniyor…</small>')}
+  try{
+    let result='wait';
+    await F.runTransaction(db,async tx=>{
+      const ref=F.doc(db,'famRooms',hid),sn=await tx.get(ref);if(!sn.exists()){result='closed';return}
+      const x=sn.data();if(x.replay&&x.replay.closed){result='closed';return}
+      if(x.replay&&x.replay.nextRound){result='started';return}
+      const order=x.order||[];if(!order.includes(uid)){result='closed';return}
+      const votes=Object.assign({},(x.replay&&x.replay.votes)||{});
+      const left=Object.assign({},x.x||{});
+      if(want)votes[uid]=true;else{votes[uid]=false;left[uid]=true}
+      const active=order.filter(u=>!left[u]);
+      if(active.length<3){
+        tx.update(ref,{x:left,replay:{votes,closed:true,closedBy:uid}});
+        result='closed';return;
+      }
+      const allVoted=active.every(u=>votes[u]===true);
+      if(allVoted){
+        const nextRound=(+x.round||1)+1;
+        tx.update(ref,{
+          order:active,cap:active.length,x:{},a:{},q:pick(+x.lv||0),st:'play',
+          ts:Date.now(),round:nextRound,replay:{votes,nextRound}
+        });
+        result='started';
+      }else{
+        tx.update(ref,{x:left,replay:{votes}});
+        result='wait';
+      }
+    });
+    if(!want||result==='closed'){famGStop();try{famSceneHide()}catch(e){}try{openFr()}catch(e){}return}
+  }catch(e){
+    console.warn('famGReplay',e);
+    const c=$('fsCenter'),w=c&&c.querySelector('.duel-replay-wait');if(w)w.remove();
+    if(a)a.disabled=false;if(h)h.disabled=false;
+  }
+}
 async function famLeave(fin){
   if(!famG){famClose();return}
   const g=famG,d=g.doc;
@@ -6411,7 +6459,7 @@ $('lobBack').onclick=()=>{msg('');lobOn=false;famUi()};
 /* Android geri tuşu: masa/maç → oda sahnesi → oda listesi/alt menüler → online menü → ana sayfa */
 window.__onlineBack=function(){try{
 const d=$('duel');if(d&&d.classList.contains('on')){closeD(true);return true}
-const sc=document.getElementById('famScene');if(sc&&sc.classList.contains('on')){const x=$('fsCl');if(x)x.click();return true}
+const sc=document.getElementById('famScene');if(sc&&sc.classList.contains('on')){if(famG&&famG.fin){famGReplay(false);return true}const x=$('fsCl');if(x)x.click();return true}
 const f=$('frm');if(!f||!f.classList.contains('on'))return false;
 if(lobOn){$('lobBack').click();return true}
 if(famFs===2&&famFm==='jn'&&!famRoom){$('famBack').click();return true}
@@ -8808,6 +8856,8 @@ html body #frm .frp .frtabs button#frFam,html body #frm .frp .frtabs button#frFa
 #famScene .fgr-r.me{outline:2px solid rgba(255,217,102,.7)}
 #famScene .fgr-d{text-align:center;font:900 15px "Nunito",system-ui,sans-serif;color:#b9ffd8}
 #famScene .fgr-b{align-self:center;min-width:150px;padding:9px 20px;border:2px solid #ffe08a;border-radius:13px;background:linear-gradient(#ffe48a,#d99419);color:#382100;font:900 15px "Nunito",system-ui,sans-serif;box-shadow:0 3px 0 #80500a;cursor:pointer}
+#famScene .fgr-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;width:100%}
+#famScene .fgr-actions .fgr-b{flex:1 1 140px;min-width:0}
 @media(max-height:700px){#famScene.playing .fs-stage:not(.c2) .fs-svg{width:min(18vw,9vh,72px)}#famScene .fs-center.fg{top:calc(env(safe-area-inset-top,0px) + 190px);bottom:calc(env(safe-area-inset-bottom,0px) + 178px)}#famScene .fg-o button{padding:6px 9px;font-size:12px}}
 </style>
 <style id="online-question-layout-fix">

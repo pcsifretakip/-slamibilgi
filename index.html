@@ -3204,7 +3204,45 @@ function afterFacebook(user){
     }
     if(!n){ERR.textContent='Lütfen kullanıcı adınızı giriniz';NMI.classList.remove('bad');void NMI.offsetWidth;NMI.classList.add('bad');vib(120);try{NMI.focus()}catch(e){}return}
     if(selAv<0){ERR.textContent='Lütfen cinsiyetinizi seçiniz';try{vib(120)}catch(e){}return}
-    
+    var localTaken=false;
+    try{
+      var cur0=(localStorage.getItem(NM_KEY)||'').toLocaleLowerCase('tr'),w0=n.toLocaleLowerCase('tr'),us0=JSON.parse(localStorage.getItem(USER_KEY)||'[]');if(!Array.isArray(us0))us0=[];
+      localTaken=w0!==cur0&&(us0.some(function(u){return String(u).toLocaleLowerCase('tr')===w0})||lbGet().some(function(r){return String(r.n||'').toLocaleLowerCase('tr')===w0}))
+    }catch(e){}
+    if(localTaken){nameTaken();return}
+    claimThen(n,function(){finishGo(n)})}
+  function nameTaken(){ERR.textContent='Bu kullanıcı adı daha önce alınmış. Başka bir ad seç.';NMI.classList.remove('bad');void NMI.offsetWidth;NMI.classList.add('bad');try{NMI.focus()}catch(e){}}
+  /* Kullanıcı adı tüm cihazlarda benzersiz: Firestore'da usernames/{ad} kaydı tek seferde (transaction) rezerve edilir */
+  var claiming=false;
+  function nameKey(s){return encodeURIComponent(String(s).trim().toLocaleLowerCase('tr')).replace(/\./g,'%2E')}
+  async function claimName(n){
+    var GU='https://www.gstatic.com/firebasejs/10.12.2/';
+    var fa=await window.ibFbAuth(),U=fa.U,au=fa.au;
+    await au.authStateReady();if(!au.currentUser)await U.signInAnonymously(au);
+    var uid=au.currentUser.uid;
+    var mods=await Promise.all([import(GU+'firebase-app.js'),import(GU+'firebase-firestore.js')]),A=mods[0],S=mods[1];
+    var db=S.getFirestore(A.getApp()),ref=S.doc(db,'usernames',nameKey(n));
+    return await S.runTransaction(db,async function(tx){
+      var s=await tx.get(ref);
+      if(s.exists()&&s.data().uid!==uid)return 'taken';
+      tx.set(ref,{uid:uid,name:n,t:S.serverTimestamp()});return 'ok'})}
+  function claimThen(n,cb){
+    if(claiming)return;
+    var cur='';try{cur=localStorage.getItem(NM_KEY)||''}catch(e){}
+    if(cur&&cur.toLocaleLowerCase('tr')===n.toLocaleLowerCase('tr')){cb();return}
+    claiming=true;ERR.textContent='Kullanıcı adı kontrol ediliyor…';
+    var to=new Promise(function(_,rej){setTimeout(function(){rej({code:'timeout'})},12000)});
+    Promise.race([claimName(n),to]).then(function(r){
+      claiming=false;
+      if(r==='taken'){nameTaken();return}
+      ERR.textContent='';cb()
+    }).catch(function(e){
+      claiming=false;var c=String(e&&e.code||e&&e.message||'').toLowerCase();
+      if(c.indexOf('network')>-1||c.indexOf('unavailable')>-1||c.indexOf('timeout')>-1||c.indexOf('offline')>-1){
+        ERR.textContent='Kullanıcı adı kontrol edilemedi. İnternet bağlantını kontrol et.';return}
+      /* Firestore kuralı henüz eklenmemişse (permission-denied) kayıt engellenmesin */
+      console.warn('kullanıcı adı rezervasyonu yapılamadı',e);ERR.textContent='';cb()})}
+  function finishGo(n){
     try{
       var current=localStorage.getItem(NM_KEY)||'',wanted=n.toLocaleLowerCase('tr'),users=JSON.parse(localStorage.getItem(USER_KEY)||'[]');if(!Array.isArray(users))users=[];
       var taken=users.some(function(u){return String(u).toLocaleLowerCase('tr')===wanted})||lbGet().some(function(r){return String(r.n||'').toLocaleLowerCase('tr')===wanted});
@@ -5716,6 +5754,7 @@ async function walletInit(){const r=F.doc(db,'wallets',uid);
   catch(e){console.warn('walletInit',e);return}
   wReady=true;wUnsub&&wUnsub();wUnsub=F.onSnapshot(r,sn=>{if(!sn.exists()||inflight||pend)return;setLoc(+sn.data().dirhems||0)});wFlush()}
 const msg=t=>{[$('frMsg'),$('pfMsg')].forEach(e=>{if(e)e.textContent=t||''})};
+const unKey=s=>encodeURIComponent(String(s).trim().toLocaleLowerCase('tr')).replace(/\./g,'%2E');
 const nm=()=>(localStorage.getItem('islamibilgi_name')||'Misafir').trim().slice(0,14)||'Misafir';
 const prof=()=>({name:nm(),pts:+(window.homePts?window.homePts():0)||0,av:+(window.avGet?window.avGet():0)||0,facebookUid:(localStorage.getItem('islamibilgi_fb_graph_uid')||'')||null});
 let bootP=null,mking=false;
@@ -5728,6 +5767,7 @@ async function boot0(){
     const[A,U,S]=await Promise.all([import(G+'firebase-app.js'),import(G+'firebase-auth.js'),import(G+'firebase-firestore.js')]);
     const app=A.getApps().length?A.getApp():A.initializeApp(FB),au=U.getAuth(app);AUTHREF=au;F=S;db=S.getFirestore(app);
     await au.authStateReady();if(!au.currentUser)await U.signInAnonymously(au);uid=au.currentUser.uid;
+    try{const un=(localStorage.getItem('islamibilgi_name')||'').trim();if(un){const uref=F.doc(db,'usernames',unKey(un));await F.runTransaction(db,async tx=>{const s=await tx.get(uref);if(!s.exists())tx.set(uref,{uid,name:un,t:F.serverTimestamp()})})}}catch(x){console.warn('usernames backfill',x)}
     const ur=F.doc(db,'users',uid),sn=await F.getDoc(ur);pid=sn.exists()&&sn.data().pid||'';
     for(let t=0;!pid&&t<10;t++){const c=String(1000000+Math.floor(Math.random()*9000000));
       if(await F.runTransaction(db,async tx=>{const r=F.doc(db,'ids',c);if((await tx.get(r)).exists())return false;tx.set(r,{uid});tx.set(ur,{pid:c,...prof()},{merge:true});return true}))pid=c}
@@ -5737,6 +5777,7 @@ async function boot0(){
   }catch(e){console.warn('online',e);db=null;msg('BAĞLAnılamadı. İnterneti, Anonymous girişini ve Firestore kurallarını kontrol et.');return false}
 }
 window.__ibWipe=async function(){
+  let UN0='';try{UN0=(localStorage.getItem('islamibilgi_name')||'').trim()}catch(e){}
   clearTimeout(wTimer);wReady=false;try{wUnsub&&wUnsub()}catch(e){}
   if(!await boot())throw Object.assign(new Error('Firestore BAĞLAntısı kurulamadı'),{code:'firestore/unavailable'});
   const U0=uid,P0=pid,D0=db;
@@ -5744,7 +5785,7 @@ window.__ibWipe=async function(){
     ...['friends','blocked'].map(async sub=>{const sn=await F.getDocs(F.collection(D0,'users',U0,sub));await Promise.all(sn.docs.map(d=>F.deleteDoc(d.ref)))}),
     (async()=>{const reqs=await Promise.all(['from','to'].map(field=>F.getDocs(F.query(F.collection(D0,'friendReqs'),F.where(field,'==',U0)))));const m=new Map();reqs.forEach(sn=>sn.docs.forEach(d=>m.set(d.ref.path,d.ref)));await Promise.all([...m.values()].map(ref=>F.deleteDoc(ref)))})()
   ]);
-  await Promise.all([F.deleteDoc(F.doc(D0,'wallets',U0)),P0?F.deleteDoc(F.doc(D0,'ids',P0)):null]);
+  await Promise.all([F.deleteDoc(F.doc(D0,'wallets',U0)),P0?F.deleteDoc(F.doc(D0,'ids',P0)):null,UN0?F.deleteDoc(F.doc(D0,'usernames',unKey(UN0))).catch(()=>{}):null]);
   await F.deleteDoc(F.doc(D0,'users',U0));
   try{wUnsub&&wUnsub()}catch(e){}
   return true};

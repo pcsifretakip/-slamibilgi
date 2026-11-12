@@ -3230,17 +3230,17 @@ function afterFacebook(user){
     if(claiming)return;
     var cur='';try{cur=localStorage.getItem(NM_KEY)||''}catch(e){}
     if(cur&&cur.toLocaleLowerCase('tr')===n.toLocaleLowerCase('tr')){cb();return}
+    /* GitHub/Vercel dışında (file:// gibi) Firebase kontrolü yapılamaz: girişi engelleme */
+    if(!/^https?:$/.test(location.protocol)){cb();return}
     claiming=true;ERR.textContent='Kullanıcı adı kontrol ediliyor…';
-    var to=new Promise(function(_,rej){setTimeout(function(){rej({code:'timeout'})},12000)});
+    var to=new Promise(function(_,rej){setTimeout(function(){rej({code:'timeout'})},5000)});
     Promise.race([claimName(n),to]).then(function(r){
       claiming=false;
       if(r==='taken'){nameTaken();return}
       ERR.textContent='';cb()
     }).catch(function(e){
       claiming=false;var c=String(e&&e.code||e&&e.message||'').toLowerCase();
-      if(c.indexOf('network')>-1||c.indexOf('unavailable')>-1||c.indexOf('timeout')>-1||c.indexOf('offline')>-1){
-        ERR.textContent='Kullanıcı adı kontrol edilemedi. İnternet bağlantını kontrol et.';return}
-      /* Firestore kuralı henüz eklenmemişse (permission-denied) kayıt engellenmesin */
+      /* Kontrol yapılamadıysa (ağ, zaman aşımı, yetkisiz alan adı vb.) giriş engellenmesin; yalnızca 'taken' engeller */
       console.warn('kullanıcı adı rezervasyonu yapılamadı',e);ERR.textContent='';cb()})}
   function finishGo(n){
     try{
@@ -14830,6 +14830,29 @@ html body #hcHome .hc-card.hc-gizli b{color:#fff0b8;letter-spacing:.06em}
 
 .gk-htt.long{font-size:11px;letter-spacing:.06em;line-height:1.25}
 .gk-hm b{overflow-wrap:anywhere}
+
+/* sıralı kilit + açılış animasyonu */
+.gk-hi{position:relative}
+.gk-hic{position:relative}
+.gk-hi.gk-lk{opacity:.6;filter:saturate(.55);border-style:dashed}
+.gk-lk .gk-hic{border-color:rgba(243,215,134,.4);background:radial-gradient(circle at 50% 35%,#1c2a55,#0a1230 80%)}
+.gk-lkic{display:grid;place-items:center}
+.gk-hic .gk-lkic svg,.gk-hic .gk-lkout svg{width:22px;height:22px;stroke:#c9b98a;stroke-width:2.1}
+.gk-hr.lk{background:rgba(255,255,255,.06);color:#9fb6f0;padding:5px 12px}
+.gk-hr.lk svg{display:block;margin:0 auto}
+@keyframes gkShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(3px)}}
+.gk-hi.gk-shake{animation:gkShake .42s}
+@keyframes gkUnl{0%{opacity:.55;filter:saturate(.5);transform:scale(.96);box-shadow:0 0 0 0 rgba(243,215,134,0)}45%{opacity:1;filter:saturate(1.2);transform:scale(1.035);box-shadow:0 0 0 7px rgba(243,215,134,.3),0 0 24px rgba(243,215,134,.45)}100%{opacity:1;filter:none;transform:scale(1);box-shadow:0 0 0 0 rgba(243,215,134,0)}}
+.gk-hi.gk-unl{animation:gkUnl 1.1s .35s cubic-bezier(.2,.8,.2,1) both}
+.gk-lkout{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;animation:gkLockOut .9s .35s ease both}
+@keyframes gkLockOut{0%{opacity:1;transform:rotate(0)}15%{transform:rotate(-14deg)}30%{transform:rotate(12deg)}45%{opacity:1;transform:scale(1.1) rotate(0)}100%{opacity:0;transform:scale(1.8) translateY(-6px)}}
+.gk-unl .gk-hic b{animation:gkQin .5s .75s ease both}
+@keyframes gkQin{0%{opacity:0;transform:scale(.3)}70%{transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
+.gk-unl .gk-hr.go{animation:gkPop .5s .8s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes gkPop{0%{transform:scale(.5);opacity:0}100%{transform:scale(1);opacity:1}}
+.gk-hi.gk-unl::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,244,214,.38) 50%,transparent 65%);background-size:250% 100%;background-position:150% 0;animation:gkShine .9s .75s ease both}
+@keyframes gkShine{to{background-position:-50% 0}}
+@media(prefers-reduced-motion:reduce){.gk-hi.gk-unl,.gk-lkout,.gk-unl .gk-hic b,.gk-unl .gk-hr.go,.gk-hi.gk-unl::after,.gk-hi.gk-shake{animation:none}}
 </style>
 <script id="gizli-kimlik-js">
 /* ===== GİZLİ KİMLİK modu =====
@@ -14916,11 +14939,51 @@ var PEOPLE=[
  o:['Piri Reis','Seydi Ali Reis','Barbaros Hayreddin','Turgut Reis'],
  c:['Gelibolu’da doğdum; amcam Kemal Reis’tir.','Gençliğimde amcamla Akdeniz’de denizcilik yaptım.','1513’te çizdiğim dünya haritasında Amerika kıyıları da yer alır.','“Kitâb-ı Bahriye” adlı Akdeniz rehberini yazdım.','Haritamı 1517’de Yavuz Sultan Selim’e sundum.'],
  b:'Piri Reis (yaklaşık 1470–1553), Osmanlı denizcisi, haritacı ve coğrafyacıdır. Gelibolu’da doğdu; amcası Kemal Reis ile denizlerde bulundu. 1513’te hazırladığı dünya haritası Atlas Okyanusu ve Amerika kıyılarını gösterir; harita 1517’de Yavuz Sultan Selim’e sunuldu, 1929’da Topkapı Sarayı’nda bulundu. Akdeniz limanlarını ve kıyılarını anlatan “Kitâb-ı Bahriye”yi yazdı. 1553’te Mısır’da idam edildi.'},
-{n:"Bilâl-i Habeşî",cat:"İslam Tarihi",ic:"bow",
+{n:"Hz. Ebubekir",cat:"İslam Tarihi",ic:"book",
+ o:["Hz. Ebubekir", "Hz. Ömer bin Hattâb", "Hz. Ali", "Ebû Ubeyde bin Cerrâh"],
+ c:["Hayatım boyunca doğruluktan ayrılmamaya gayret ettim.", "İslam’ın ilk yıllarında en zor zamanlarda Peygamberimizin yanında yer aldım.", "Hicret yolculuğunda ona eşlik ettim.", "Peygamberimizin vefatından sonra Müslümanların ilk halifesi oldum.", "Sıddık lakabıyla tanınırım."],
+ b:"Hz. Ebubekir (yaklaşık 573–634), Peygamberimizin en yakın dostu ve İslam’ın ilk halifesidir. İslam’ın ilk yıllarında Peygamberimizin yanında yer aldı, Hicret yolculuğunda ona eşlik etti. Peygamberimizin vefatından sonra halife seçildi; hilafeti döneminde Kur’an-ı Kerim ilk kez bir araya toplandı. Doğruluğu ve tasdik edişi sebebiyle “Sıddık” lakabıyla anılır. 634’te Medine’de vefat etti."},
+{n:"Hz. Ömer bin Hattâb",cat:"İslam Tarihi",ic:"sword",
+ o:["Hz. Ömer bin Hattâb", "Hz. Ebubekir", "Hz. Osman bin Affân", "Muaviye bin Ebû Süfyân"],
+ c:["Adalet anlayışımla tarihe geçtim.", "Benim dönemimde İslam devleti geniş topraklara ulaştı.", "Hicri takvimin kullanılmaya başlanması benim dönemimdedir.", "İslam’ın ikinci halifesiyim.", "Faruk lakabıyla tanınırım."],
+ b:"Hz. Ömer (yaklaşık 584–644), İslam’ın ikinci halifesidir. Adaleti ve devlet idaresindeki başarısıyla tanınır. Hilafeti döneminde İslam devleti Suriye, Mısır ve İran’a doğru genişledi, Kudüs fethedildi. Hicri takvimin başlatılması da onun dönemindedir. “Hak ile batılı ayıran” anlamında “Faruk” lakabıyla anılır. 644’te Medine’de şehit edildi."},
+{n:"Hz. Osman bin Affân",cat:"İslam Tarihi",ic:"book",
+ o:["Hz. Osman bin Affân", "Hz. Ömer bin Hattâb", "Hz. Ali", "Abdurrahman bin Avf"],
+ c:["Hayırseverliğimle tanınırım.", "Müslümanların ihtiyaçları için önemli bağışlarda bulundum.", "Kur’an nüshalarının çoğaltılıp farklı merkezlere gönderilmesini sağladım.", "İslam’ın üçüncü halifesiyim.", "Zinnureyn lakabıyla tanınırım."],
+ b:"Hz. Osman bin Affân (yaklaşık 576–656), İslam’ın üçüncü halifesidir. Zenginliğini ve hayırseverliğini Müslümanların ihtiyaçları için harcadı. Hilafeti döneminde Kur’an-ı Kerim’in nüshaları çoğaltılıp farklı şehirlere gönderildi. Peygamberimizin iki kızıyla evlendiği için “Zinnureyn” (iki nur sahibi) lakabıyla anılır. 656’da Medine’de şehit edildi."},
+{n:"Hz. Ali",cat:"İslam Tarihi",ic:"sword",
+ o:["Hz. Ali", "Hz. Hamza", "Hz. Ebubekir", "Zübeyr bin Avvâm"],
+ c:["İlim ve cesaretimle tanınırım.", "Çocuk yaşta İslam’ı kabul eden ilk kişilerden biriyim.", "Peygamberimizin amcasının oğluyum ve damadıyım.", "İslam’ın dördüncü halifesiyim.", "Hz. Hasan ve Hz. Hüseyin’in babasıyım."],
+ b:"Hz. Ali (yaklaşık 600–661), Peygamberimizin amcası Ebû Tâlib’in oğlu ve damadıdır. Çocuk yaşta Müslüman olan ilk kişiler arasındadır. İlmi ve cesaretiyle tanınır. Hz. Fâtıma ile evlendi; Hz. Hasan ve Hz. Hüseyin’in babasıdır. İslam’ın dördüncü halifesi oldu. 661’de Kûfe’de uğradığı suikast sonucu vefat etti."},
+{n:"Halid bin Velid",cat:"İslam Tarihi",ic:"helmet",
+ o:["Halid bin Velid", "Amr bin Âs", "Sa‘d bin Ebî Vakkâs", "Ebû Ubeyde bin Cerrâh"],
+ c:["Askerî stratejilerimle tarihte iz bıraktım.", "İslam ordularının birçok önemli savaşında görev aldım.", "Mute ve Yermük savaşlarında önemli rol oynadım.", "Peygamberimiz bana özel bir unvan verdi.", "Seyfullah, yani Allah’ın kılıcı olarak tanınırım."],
+ b:"Halid bin Velid (yaklaşık 592–642), İslam tarihinin en büyük komutanlarından biridir. Mekkeli bir ailede doğdu, 629’da Müslüman oldu. Mûte Savaşı’nda ordunun başına geçerek müslümanları toparladı; Peygamberimiz ona “Seyfullah” (Allah’ın kılıcı) unvanını verdi. Ridde savaşlarında ve Yermûk Savaşı’nda (636) önemli roller üstlendi. 642’de Humus’ta vefat etti."},
+{n:"Selahaddin Eyyubi",cat:"İslam Tarihi",ic:"sword",
+ o:["Selahaddin Eyyubi", "Sultan Baybars", "Nureddin Zengi", "Alparslan"],
+ c:["Kudüs’ün yeniden Müslümanların hâkimiyetine girmesinde önemli rol oynadım.", "Haçlılarla mücadele ettim.", "Hıttin Savaşı’nda büyük bir zafer kazandım.", "Eyyubi Devleti’nin kurucusuyum.", "1187 yılında Kudüs’ü fethettim."],
+ b:"Selahaddin Eyyubi (1137/38–1193), Eyyubi Devleti’nin kurucusu ve Haçlılara karşı mücadelesiyle tanınan hükümdardır. Mısır ve Suriye’yi birleştirdi. 1187’deki Hıttin Savaşı’nda Haçlı ordusunu yenip aynı yıl Kudüs’ü fethetti. Üçüncü Haçlı Seferi’ne karşı direndi ve 1192’de Remle Antlaşması’nı imzaladı. 1193’te Şam’da vefat etti."},
+{n:"Fatih Sultan Mehmet",cat:"İslam Tarihi",ic:"castle",
+ o:["Fatih Sultan Mehmet", "Yıldırım Bayezid", "II. Murad", "Kanuni Sultan Süleyman"],
+ c:["Genç yaşta büyük bir imparatorluğun hükümdarı oldum.", "Bilime, sanata ve eğitime önem verdim.", "İstanbul’un fethi için büyük toplar döktürdüm.", "1453 yılında İstanbul’u fethettim.", "Fatih unvanıyla tanınırım."],
+ b:"Fatih Sultan Mehmet (1432–1481), Osmanlı’nın yedinci padişahıdır. Genç yaşta tahta çıktı. 1453’te İstanbul’u fethederek Bizans İmparatorluğu’na son verdi ve şehri Osmanlı’nın başkenti yaptı. Bilime, sanata ve eğitime önem verdi; Sahn-ı Seman medreselerini kurdurdu. “Fatih” unvanıyla anılır. 1481’de vefat etti."},
+{n:"Yavuz Sultan Selim Han",cat:"İslam Tarihi",ic:"helmet",
+ o:["Yavuz Sultan Selim Han", "Kanuni Sultan Süleyman", "II. Bayezid", "Fatih Sultan Mehmet"],
+ c:["Kısa süren hükümdarlığımda Osmanlı topraklarını önemli ölçüde genişlettim.", "Çaldıran Savaşı’nda Safevilerle karşılaştım.", "Mercidabık ve Ridaniye savaşlarını kazandım.", "Mısır seferiyle Memlük Devleti’ne son verdim.", "Osmanlı’nın dokuzuncu padişahıyım."],
+ b:"Yavuz Sultan Selim (1470/71–1520), Osmanlı’nın dokuzuncu padişahıdır. 1512–1520 yılları arasında hüküm sürdü. 1514’te Çaldıran’da Safevileri yendi; 1516’da Mercidabık, 1517’de Ridaniye savaşlarıyla Memlük Devleti’ne son vererek Suriye, Filistin ve Mısır’ı Osmanlı topraklarına kattı. Kutsal emanetler İstanbul’a getirildi. 1520’de vefat etti."},
+{n:"İmam Gazali",cat:"İslam Tarihi",ic:"book",
+ o:["İmam Gazali", "İbn Rüşd", "Fahreddin er-Râzî", "İmam Nevevî"],
+ c:["Eserlerim İslam düşünce dünyasında büyük etki bıraktı.", "Nizamiye medreselerinde ders verdim.", "Tasavvuf ve ahlak konularında önemli çalışmalar yaptım.", "İhya-u Ulumiddin adlı eserimle tanınırım.", "Hüccetü’l-İslam unvanıyla anılırım."],
+ b:"İmam Gazali (1058–1111), fıkıh, kelâm, felsefe ve tasavvuf alanlarında eser veren büyük bir âlimdir. Tûs’ta doğdu, Bağdat’taki Nizamiye Medresesi’nde ders verdi. “İhyâu Ulûmi’d-Dîn” adlı eseriyle ahlak ve tasavvuf düşüncesine yön verdi. “Hüccetü’l-İslâm” unvanıyla anılır. 1111’de Tûs’ta vefat etti."},
+{n:"İbn Sina",cat:"İslam Tarihi",ic:"book",
+ o:["İbn Sina", "Zekeriyyâ er-Râzî", "Fârâbî", "İbn Rüşd"],
+ c:["Çok küçük yaşlarda ilim öğrenmeye başladım.", "Tıp, felsefe ve matematik alanlarında çalışmalar yaptım.", "El-Kanun fi’t-Tıb adlı eserim yüzyıllarca tıp eğitiminde kullanıldı.", "Batı dünyasında Avicenna adıyla tanındım.", "Büyük İslam hekimlerinden biriyim."],
+ b:"İbn Sina (980–1037), Buhara yakınlarında doğan büyük hekim ve filozoftur. Çok genç yaşta tıp ve felsefe öğrendi. “el-Kanun fi’t-Tıb” adlı eseri yüzyıllarca Doğu’da ve Batı’da tıp eğitiminde kullanıldı; “eş-Şifâ” adlı eseriyle felsefede de iz bıraktı. Batı’da “Avicenna” adıyla bilinir. 1037’de Hemedan’da vefat etti."},
+{n:"Bilâl-i Habeşî",cat:"Sahabeler",ic:"bow",
  o:["Bilâl-i Habeşî", "Zeyd bin Hârise", "Ammâr bin Yâsir", "Ebû Zer el-Gıfârî"],
  c:["Mekke’de Habeşli bir köle olarak yaşadım.", "Müslüman olunca efendim Ümeyye bin Halef bana işkence etti.", "Göğsüme ağır kayalar konulsa da “Ehad, Ehad” demekten vazgeçmedim.", "Hz. Ebû Bekir beni satın alıp azat etti.", "İslam’ın ilk müezzini oldum."],
  b:"Bilâl-i Habeşî (yaklaşık 580–640), Mekke’de köle olarak yaşadı. Müslüman olunca sahibi Ümeyye bin Halef tarafından işkenceye uğratıldı; Hz. Ebû Bekir onu satın alıp azat etti. Medine’de ilk müezzin olarak ezan okudu ve Peygamberimizin yanında birçok savaşa katıldı. Peygamberimizin vefatından sonra Şam’a gitti; yaklaşık 640’ta orada vefat etti."},
-{n:"Salmân-ı Fârisî",cat:"İslam Tarihi",ic:"book",
+{n:"Salmân-ı Fârisî",cat:"Sahabeler",ic:"book",
  o:["Salmân-ı Fârisî", "Bilâl-i Habeşî", "Ebû Zer el-Gıfârî", "Mikdâd bin Esved"],
  c:["İran’da, ateşe tapan bir ailede büyüdüm.", "Gerçek dini ararken Hıristiyan rahiplerin yanında yıllarca bulundum.", "Köle olarak Medine’ye getirildim ve orada Müslüman oldum.", "Hendek Savaşı’nda Medine’nin etrafına hendek kazılmasını önerdim.", "Peygamberimiz benim için “Salmân bizdendir” buyurdu."],
  b:"Salmân-ı Fârisî (7. yüzyıl), İran asıllı büyük sahabedir. Doğru dini ararken Hıristiyan rahiplerin yanında bulundu, sonra köle olarak Medine’ye getirildi ve Müslüman oldu. Hendek Savaşı’nda şehrin etrafına hendek kazılması fikrini sundu. Peygamberimizin “Salmân bizdendir” sözüyle anılır. 7. yüzyılın ortalarında vefat etti."},
@@ -15083,21 +15146,37 @@ function myAv(){var a=$('hAv');return(a&&a.getAttribute('src'))||''}
 /* ---------- Görünüm ---------- */
 var scr=null,view='home',curCat='',cur=0,celebrate=false,busy=false;
 function head(t,big){var lg=(!big&&String(t).length>20)?' long':'';return '<div class="gk-head"><button type="button" class="gk-back" data-a="back" aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="gk-htt'+(big?' big':'')+lg+'">'+t+'</div><span class="gk-hsp"></span></div>'}
-function sil(cls){return '<div class="gk-sil '+(cls||'')+'"><svg viewBox="0 0 200 200" role="img" aria-label="Gizli kişi silueti"><defs><radialGradient id="gkSg" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#2a4690"/><stop offset="1" stop-color="#0a1230"/></radialGradient><clipPath id="gkSc"><circle cx="100" cy="100" r="92"/></clipPath></defs><circle cx="100" cy="100" r="97" fill="none" stroke="#f3d786" stroke-width="3"/><circle cx="100" cy="100" r="92" fill="url(#gkSg)"/><g clip-path="url(#gkSc)"><circle cx="100" cy="80" r="33" fill="#050a1f"/><path d="M28 200c4-50 34-72 72-72s68 22 72 72z" fill="#050a1f"/></g><text class="gk-q" x="100" y="96" text-anchor="middle" font-size="46" font-weight="900" fill="#f3d786" font-family="Nunito,system-ui,sans-serif">?</text></svg></div>'}
+function sil(cls){return '<div class="gk-sil '+(cls||'')+'"><svg viewBox="0 0 200 200" role="img" aria-label="Kim bu? silueti"><defs><radialGradient id="gkSg" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#2a4690"/><stop offset="1" stop-color="#0a1230"/></radialGradient><clipPath id="gkSc"><circle cx="100" cy="100" r="92"/></clipPath></defs><circle cx="100" cy="100" r="97" fill="none" stroke="#f3d786" stroke-width="3"/><circle cx="100" cy="100" r="92" fill="url(#gkSg)"/><g clip-path="url(#gkSc)"><circle cx="100" cy="80" r="33" fill="#050a1f"/><path d="M28 200c4-50 34-72 72-72s68 22 72 72z" fill="#050a1f"/></g><text class="gk-q" x="100" y="96" text-anchor="middle" font-size="46" font-weight="900" fill="#f3d786" font-family="Nunito,system-ui,sans-serif">?</text></svg></div>'}
 var LOCK='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 function steps(r){var h='<div class="gk-steps">';for(var i=1;i<=5;i++){var c=i<r.c?'ok':(i===r.c?'on':(i===r.c+1?'nx':'lk'));h+='<button type="button" class="gk-st '+c+'" data-a="clue" data-k="'+i+'" aria-label="İpucu '+i+', '+SC[i-1]+' puan'+(i>r.c?', kilitli':'')+'"><i>'+(i>r.c?LOCK:i)+'</i><small>'+SC[i-1]+'</small></button>'}return h+'</div>'}
+var GKL={'İslam Tarihi':'İslam’ın İz Bırakanları','Osmanlı Tarihi':'Osmanlı’nın İz Bırakanları'};
+function gkLbl(c){return GKL[c]||'Kim Bu? Sıradaki Şahsiyet'}
 function homeV(){
  var h='';
  CATS.forEach(function(c){var ids=inCat(c);if(!ids.length)return;var d=0,pts=0;ids.forEach(function(i){var r=rec(i);if(r&&r.d){d++;pts+=r.pts|0}});
-  h+='<button type="button" class="gk-hi" data-a="cat" data-c="'+esc(c)+'"><span class="gk-hic">'+svgI(PEOPLE[ids[0]].ic)+'</span><span class="gk-hm"><b>'+esc(c)+'</b><small>'+d+' / '+ids.length+' kişi çözüldü</small></span>'+(d===ids.length?'<span class="gk-hr win">✓</span>':'<span class="gk-hr go">AÇ</span>')+'</button>'});
+  h+='<button type="button" class="gk-hi" data-a="cat" data-c="'+esc(c)+'"><span class="gk-hic">'+svgI(PEOPLE[ids[0]].ic)+'</span><span class="gk-hm"><b>'+esc(c)+'</b><small>'+d+' / '+ids.length+' kişi çözüldü</small></span>'+(OPEN.indexOf(c)<0?'<span class="gk-hr lk">'+LOCK+'</span>':(d===ids.length?'<span class="gk-hr win">✓</span>':'<span class="gk-hr go">AÇ</span>'))+'</button>'});
  return head('GİZLİ KİMLİK',1)+'<div class="gk-scroll"><p class="gk-sub">İpuçlarını çöz, kim olduğunu bul!</p><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">KATEGORİ SEÇ</div><div class="gk-list">'+h+'</div><p class="gk-foot">Gizli Kimlik puanları ayrı tutulur; İlim Puanı ve Dirhem’e eklenmez. Her kişiden puan yalnızca bir kez kazanılır.</p></div>'}
+var SEENK='gkUnlockSeenV2';
+var OPEN=['İslam Tarihi']; /* şimdilik yalnızca bu kategori oynanabilir; yenisini açmak için listeye ekle */
+/* Sıralı kilit: kategoride ilk kişi açık; diğerleri önceki kişi çözülünce (veya zaten başlanmışsa) açılır */
+function unl(i){if(OPEN.indexOf(PEOPLE[i].cat)<0)return false;var ids=inCat(PEOPLE[i].cat),n=ids.indexOf(i);if(n<=0)return true;var pr=rec(ids[n-1]);return !!((pr&&pr.d)||rec(i))}
+function seenGet(){var a=null;try{a=JSON.parse(localStorage.getItem(SEENK)||'null')}catch(e){}
+ if(!Array.isArray(a)){a=[];PEOPLE.forEach(function(p,i){if(unl(i))a.push(p.n)});try{localStorage.setItem(SEENK,JSON.stringify(a))}catch(e){}}
+ return a}
 function catV(){
- var h='';
- inCat(curCat).forEach(function(i,n){var p=PEOPLE[i],r=rec(i),d=r&&r.d,st,rs;
-  if(d){st=esc(p.n);rs=r.ok?'<span class="gk-hr win">+'+r.pts+'</span>':'<span class="gk-hr lose">0</span>'}
-  else{st='Gizli Kişi '+(n+1);rs='<span class="gk-hr go">'+(r?'DEVAM':'OYNA')+'</span>'}
-  h+='<button type="button" class="gk-hi" data-a="open" data-i="'+i+'"><span class="gk-hic'+(d?'':' q')+'">'+(d?svgI(p.ic):'<b>?</b>')+'</span><span class="gk-hm"><b>'+st+'</b><small>'+esc(curCat)+(r&&!d?' · İpucu '+r.c+'/5':'')+'</small></span>'+rs+'</button>'});
- return head(esc(curCat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">GİZLİ KİŞİLER</div><div class="gk-list">'+h+'</div></div>'}
+ var h='',seen=seenGet(),ns=[];
+ inCat(curCat).forEach(function(i,n){
+  var p=PEOPLE[i],r=rec(i),d=r&&r.d,u=unl(i),st,rs,ic,cls='gk-hi',sm=esc(curCat),da='open';
+  if(!u){cls+=' gk-lk';da='locked';st=gkLbl(curCat);rs='<span class="gk-hr lk">'+LOCK+'</span>';ic='<span class="gk-lkic">'+LOCK+'</span>';sm='Önceki kişi çözülünce açılır'}
+  else{
+   if(d){st=esc(p.n);rs=r.ok?'<span class="gk-hr win">+'+r.pts+'</span>':'<span class="gk-hr lose">0</span>';ic=svgI(p.ic)}
+   else{st=gkLbl(curCat);rs='<span class="gk-hr go">'+(r?'DEVAM':'OYNA')+'</span>';ic='<b>?</b>';if(r)sm+=' · İpucu '+r.c+'/5'}
+   if(!d&&!r&&seen.indexOf(p.n)<0){cls+=' gk-unl';ic='<b>?</b><span class="gk-lkout">'+LOCK+'</span>';ns.push(p.n)}
+  }
+  h+='<button type="button" class="'+cls+'" data-a="'+da+'" data-i="'+i+'"'+(u?'':' aria-disabled="true"')+'><span class="gk-hic'+(d&&u?'':' q')+'">'+ic+'</span><span class="gk-hm"><b>'+st+'</b><small>'+sm+'</small></span>'+rs+'</button>'});
+ if(ns.length){seen=seen.concat(ns);try{localStorage.setItem(SEENK,JSON.stringify(seen))}catch(e){}}
+ return head(esc(curCat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">KİM BU?</div><div class="gk-list">'+h+'</div></div>'}
+
 function playV(newClue){
  var p=PEOPLE[cur],r=ensure(cur),ord=order(cur);
  var cl='';
@@ -15107,11 +15186,11 @@ function playV(newClue){
  var guessed=r.gc===r.c,op='';
  ord.forEach(function(oi){var w=r.w.indexOf(oi)>=0;op+='<button type="button" class="gk-opt'+(w?' x':'')+'" data-a="guess" data-o="'+oi+'"'+((w||guessed)?' disabled':'')+'>'+esc(p.o[oi])+'</button>'});
  var last=r.c>=5,msg=guessed?'Yanlış tahmin! '+(last?'Cevap gösteriliyor…':'Yeni ipucu için üstteki puana tıklayın.'):'';
- return head('GİZLİ KİŞİ '+(inCat(PEOPLE[cur].cat).indexOf(cur)+1))+'<div class="gk-play"><div class="gk-stepsw">'+steps(r)+'<div class="gk-tap">'+(last?'Son ipucu · doğru kişiyi seç':'İpucu için puanlara tıklayın')+'</div></div><div class="gk-scroll"><div class="gk-catw"><span class="gk-cat">'+esc(p.cat)+'</span></div><div class="gk-clues">'+cl+'</div></div><div class="gk-dock"><div class="gk-worth">Şimdi bilirsen <b>'+SC[r.c-1]+' puan</b></div><div class="gk-opts">'+op+'</div><div class="gk-msg'+(guessed?' bad':'')+'" id="gkMsg">'+msg+'</div></div></div>'}
+ return head(gkLbl(PEOPLE[cur].cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-play"><div class="gk-stepsw">'+steps(r)+'<div class="gk-tap">'+(last?'Son ipucu · doğru kişiyi seç':'İpucu için puanlara tıklayın')+'</div></div><div class="gk-scroll"><div class="gk-catw"><span class="gk-cat">'+esc(p.cat)+'</span></div><div class="gk-clues">'+cl+'</div></div><div class="gk-dock"><div class="gk-worth">Şimdi bilirsen <b>'+SC[r.c-1]+' puan</b></div><div class="gk-opts">'+op+'</div><div class="gk-msg'+(guessed?' bad':'')+'" id="gkMsg">'+msg+'</div></div></div>'}
 function resV(i,anim){
  var p=PEOPLE[i],r=rec(i),b='';
  if(r&&r.d){b=r.ok?'<div class="gk-badge win"><span>'+r.sc+'. ipucunda buldun</span><b>+'+r.pts+' puan</b></div>':'<div class="gk-badge lose"><span>Bu sefer bulunamadı</span><b>0 puan</b></div>'}
- var ci=inCat(p.cat),pos=ci.indexOf(i),nx=(pos+1<ci.length)?'<button type="button" class="gk-btn2" data-a="open" data-i="'+ci[pos+1]+'">SONRAKİ KİŞİ</button>':'';
+ var ci=inCat(p.cat),pos=ci.indexOf(i),nx=(pos+1<ci.length&&unl(ci[pos+1]))?'<button type="button" class="gk-btn2" data-a="open" data-i="'+ci[pos+1]+'">SONRAKİ KİŞİ</button>':'';
  return head(esc(p.cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-res">'+(anim?'<div class="gk-ring"></div>':'')+'<div class="gk-port'+(anim?' rev':'')+'">'+svgI(p.ic)+'</div><div class="gk-rname">'+esc(p.n)+'</div><div class="gk-rcat"><span class="gk-cat">'+esc(p.cat)+'</span></div>'+b+'<div class="gk-bio"><h4>KISA BİYOGRAFİ</h4>'+esc(p.b)+'</div><div class="gk-row2"'+(nx?'':' style="grid-template-columns:1fr"')+'><button type="button" class="gk-btn2" data-a="cat">KİŞİLER</button>'+nx+'</div></div></div>'}
 function render(opt){
  if(!scr)return;opt=opt||{};
@@ -15139,7 +15218,7 @@ function openClue(k){
  if(k<=r.c)return;
  if(k>r.c+1){var m=$('gkMsg');if(m){m.className='gk-msg bad';m.textContent='Önce sıradaki ipucunu aç.'}return}
  r.c++;save();render({newClue:true})}
-function openPerson(i){cur=i;curCat=PEOPLE[i].cat;var r=rec(i);if(r&&r.d)go('res');else{ensure(i);go('play',{newClue:true})}}
+function openPerson(i){if(!unl(i))return;cur=i;curCat=PEOPLE[i].cat;var r=rec(i);if(r&&r.d)go('res');else{ensure(i);go('play',{newClue:true})}}
 
 function open(){build();view='home';render();if(typeof window.show==='function')window.show('sGizli')}
 function back(){if(!scr||!scr.classList.contains('on'))return false;if(view==='play'||view==='res'){go('cat');return true}if(view==='cat'){go('home');return true}if(typeof window.show==='function')window.show('sLogin');return true}
@@ -15148,7 +15227,7 @@ function build(){
  scr=document.createElement('section');scr.className='screen';scr.id='sGizli';scr.setAttribute('aria-label','Gizli Kimlik');
  scr.addEventListener('click',function(e){
   var b=e.target.closest('[data-a]');if(!b||!scr.contains(b))return;var a=b.getAttribute('data-a');
-  if(a==='back')back();else if(a==='open')openPerson(+b.getAttribute('data-i'));else if(a==='guess')guess(+b.getAttribute('data-o'));else if(a==='clue')openClue(+b.getAttribute('data-k'));
+  if(a==='back')back();else if(a==='open')openPerson(+b.getAttribute('data-i'));else if(a==='locked'){b.classList.remove('gk-shake');void b.offsetWidth;b.classList.add('gk-shake');try{if(navigator.vibrate)navigator.vibrate(60)}catch(x){}}else if(a==='guess')guess(+b.getAttribute('data-o'));else if(a==='clue')openClue(+b.getAttribute('data-k'));
   else if(a==='cat'){if(b.getAttribute('data-c'))curCat=b.getAttribute('data-c');go('cat')}else if(a==='home')go('home');
  });
  document.body.appendChild(scr);

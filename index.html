@@ -2943,8 +2943,8 @@ s.insertAdjacentHTML('beforeend',h)})();
   var mode=0,busy=false,hi=-1,ai=-1;
   function render(){
     var d=new Date(),n=Math.floor(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate())/864e5);
-    if(hi<0){hi=n%H.length;ai=n%AY.length}
-    var isA=mode===1,h=isA?AY[ai]:H[hi];
+    /* Günlük set: 2 hadis + 1 ayet, yalnızca gün değişince yenilenir (sıra: hadis, ayet, hadis) */
+    var isA=mode===1,h=isA?AY[n%AY.length]:H[(2*n+(mode===2?1:0))%H.length];
     var p=document.getElementById('hqT');if(!p)return;
     p.innerHTML='';
     var k=document.createElement('b');k.textContent=isA?'GÜNÜN AYETİ':'GÜNÜN HADİSİ';
@@ -2958,7 +2958,7 @@ s.insertAdjacentHTML('beforeend',h)})();
     busy=true;
     if(q){q.classList.remove('mirror-pass');void q.offsetWidth;q.classList.add('mirror-pass');setTimeout(function(){q.classList.remove('mirror-pass')},1100)}
     p.style.transition='opacity .28s ease';p.style.opacity='0';
-    setTimeout(function(){if(mode){hi=(hi+1)%H.length;ai=(ai+1)%AY.length}mode=mode?0:1;render();p.style.opacity='1';setTimeout(function(){busy=false},320)},280);
+    setTimeout(function(){mode=(mode+1)%3;render();p.style.opacity='1';setTimeout(function(){busy=false},320)},280);
   }
   render();setInterval(swap,10000);document.addEventListener('visibilitychange',function(){if(!document.hidden)render()});
   var q=document.querySelector('#sLogin .hq2'),im=q&&q.querySelector('img');
@@ -14658,5 +14658,376 @@ html body #frm{background:#07123a!important;-webkit-backdrop-filter:none!importa
   window.__androidBack=function(){if(running){finish();return true}return typeof prevBack==='function'?prevBack.apply(this,arguments):false};
   /* test: konsoldan ibTour.start() veya adrese ?tour=1 ekle */
   window.ibTour={start:function(){start(0)},skip:finish};
+})();
+</script>
+
+<style id="gizli-kimlik-css">
+/* ===== GİZLİ KİMLİK modu (yerel test sürümü: veriler cihazda tutulur) ===== */
+#sGizli{position:fixed;top:0;bottom:0;left:50%;width:100%;max-width:440px;transform:translateX(-50%);overflow:hidden;gap:0;padding:0;z-index:5;color:#fff4d6;font-family:"Nunito",system-ui,sans-serif;background:radial-gradient(110% 55% at 50% 0%,#1d3370 0%,#0000 62%),radial-gradient(80% 40% at 100% 85%,#0b6b7a33,#0000 70%),linear-gradient(180deg,#0a1230,#0c1a40 55%,#070d22)}
+#sGizli *{box-sizing:border-box}
+:where(#sGizli) button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#sGizli button:focus-visible{outline:3px solid #f3d786;outline-offset:2px}
+#sGizli svg{display:block}
+.gk-head{flex:none;display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 14px 8px}
+.gk-back{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:50%;border:1.5px solid rgba(243,215,134,.7);background:rgba(255,255,255,.06);color:#f3d786}
+.gk-back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.gk-htt{flex:1;text-align:center;font-weight:900;font-size:13px;letter-spacing:.2em;color:#f3d786}
+.gk-hsp{width:42px;flex:none}
+.gk-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.gk-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 16px calc(18px + env(safe-area-inset-bottom,0px));scrollbar-width:none}
+.gk-scroll::-webkit-scrollbar{display:none}
+.gk-title{margin:6px 0 4px;text-align:center;font-size:clamp(30px,9vw,38px);font-weight:900;letter-spacing:.1em;line-height:1.05;background:linear-gradient(180deg,#fff2b8,#f0c24a 55%,#b9821a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 8px #000a)}
+.gk-sub{margin:0 0 10px;text-align:center;font-size:14px;font-weight:700;color:#c9d9ff}
+.gk-silw{display:grid;place-items:center;margin:4px 0 6px}
+.gk-sil{width:clamp(130px,38vw,170px);aspect-ratio:1;border-radius:50%;position:relative;animation:gkGlow 3.2s ease-in-out infinite}
+.gk-sil svg{width:100%;height:100%}
+.gk-sil.sm{width:96px}
+@keyframes gkGlow{0%,100%{box-shadow:0 0 22px rgba(240,194,74,.28),0 0 0 0 rgba(240,194,74,.25)}50%{box-shadow:0 0 38px rgba(240,194,74,.5),0 0 0 9px rgba(240,194,74,0)}}
+.gk-q{animation:gkQ 3.2s ease-in-out infinite;transform-origin:100px 96px}
+@keyframes gkQ{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.1)}}
+.gk-lab{margin:2px 0 10px;text-align:center;font-size:12px;font-weight:900;letter-spacing:.26em;color:#f3d786}
+.gk-cat{display:inline-block;margin:0 auto;padding:4px 14px;border:1px solid rgba(243,215,134,.55);border-radius:999px;background:rgba(240,194,74,.12);color:#ffe49a;font-size:12px;font-weight:900;letter-spacing:.04em}
+.gk-catw{text-align:center;margin-bottom:10px}
+.gk-steps{display:flex;justify-content:space-between;gap:6px;margin:6px 0 14px;position:relative}
+.gk-steps::before{content:"";position:absolute;left:8%;right:8%;top:17px;height:2px;background:rgba(243,215,134,.25)}
+.gk-st{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;min-width:0}
+.gk-st i{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900;font-size:15px;border:2px solid rgba(243,215,134,.4);background:#0c1a40;color:#9fb6f0;position:relative;z-index:1}
+.gk-st small{font-size:11px;font-weight:800;color:#8f9dc7}
+.gk-st.ok i{background:#1b2f66;border-color:#f3d786;color:#f3d786}
+.gk-st.on i{background:linear-gradient(180deg,#ffe48a,#d99419);border-color:#fff0b8;color:#2c1d00;box-shadow:0 0 16px rgba(240,194,74,.7);animation:gkPop .5s cubic-bezier(.2,1.6,.4,1) both}
+.gk-st.win i{background:linear-gradient(180deg,#7cf7b0,#1fae62);border-color:#c8ffe0;color:#04301a;box-shadow:0 0 16px rgba(62,224,138,.6)}
+.gk-st.lose i{background:#3a1220;border-color:#ff8f9f;color:#ffb3bd}
+.gk-st.on small,.gk-st.win small,.gk-st.ok small{color:#f3d786}
+@keyframes gkPop{0%{transform:scale(.6)}100%{transform:scale(1)}}
+.gk-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.gk-stat{padding:10px 8px;border:1.5px solid rgba(243,215,134,.45);border-radius:16px;text-align:center;background:linear-gradient(180deg,rgba(240,194,74,.12),rgba(10,18,48,.7))}
+.gk-stat b{display:block;font-size:24px;font-weight:900;color:#fff0b8;line-height:1.1}
+.gk-stat small{display:block;margin-top:3px;font-size:10.5px;font-weight:900;letter-spacing:.14em;color:#9fb6f0}
+.gk-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;padding:10px 16px;border:2px solid #fff0b8;border-radius:16px;background:linear-gradient(180deg,#fbe08c,#e0a935 70%,#c98f22);color:#2c1d00;font-weight:900;font-size:17px;letter-spacing:.06em;box-shadow:0 5px 0 #8a6414,0 0 22px #ffb84a55,0 10px 18px #0007;position:relative;overflow:hidden}
+.gk-btn:active{transform:translateY(4px);box-shadow:0 1px 0 #8a6414,0 0 14px #ffb84a55}
+.gk-btn[disabled]{opacity:.5;pointer-events:none}
+.gk-btn2{display:flex;align-items:center;justify-content:center;gap:6px;min-height:50px;padding:8px 6px;border:1.5px solid rgba(243,215,134,.7);border-radius:14px;background:linear-gradient(180deg,rgba(240,194,74,.16),rgba(10,18,48,.8));color:#ffe49a;font-weight:900;font-size:11.5px;letter-spacing:0;white-space:nowrap;min-width:0;overflow:hidden;box-shadow:0 3px 0 rgba(2,6,20,.9)}
+.gk-btn2 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.gk-btn2:active{transform:translateY(3px);box-shadow:none}
+.gk-row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:12px}
+.gk-foot{margin:12px 6px 0;text-align:center;font-size:11px;font-weight:700;line-height:1.4;color:#8f9dc7}
+/* oyun ekranı */
+.gk-play{display:flex;flex-direction:column;flex:1;min-height:0}
+.gk-stepsw{flex:none;padding:0 16px}
+.gk-clues{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.gk-clue{position:relative;overflow:hidden;padding:12px 14px;border:1.5px solid rgba(243,215,134,.3);border-radius:16px;background:rgba(255,255,255,.05)}
+.gk-clue b{display:block;margin-bottom:3px;font-size:11px;font-weight:900;letter-spacing:.2em;color:#b9a25a}
+.gk-clue p{margin:0;font-size:15px;font-weight:700;line-height:1.4;color:#d9e4ff}
+.gk-clue.cur{border-color:#f3d786;background:linear-gradient(180deg,rgba(240,194,74,.2),rgba(10,18,48,.85));box-shadow:0 0 20px rgba(240,194,74,.28)}
+.gk-clue.cur b{color:#f3d786}.gk-clue.cur p{color:#fff4d6;font-size:17px;font-weight:800}
+.gk-clue.new{animation:gkClue .75s cubic-bezier(.2,.9,.3,1.15) both}
+.gk-clue.new::after{content:"";position:absolute;top:0;left:-60%;width:45%;height:100%;background:linear-gradient(100deg,#fff0,#fff7,#fff0);transform:skewX(-18deg);animation:gkSweep 1.1s ease .25s both}
+@keyframes gkClue{0%{opacity:0;transform:translateY(22px) scale(.95);filter:blur(7px)}100%{opacity:1;transform:none;filter:none}}
+@keyframes gkSweep{0%{left:-60%}100%{left:130%}}
+.gk-dock{flex:none;padding:10px 14px calc(12px + env(safe-area-inset-bottom,0px));border-top:1px solid rgba(243,215,134,.25);background:linear-gradient(180deg,rgba(7,13,34,.4),rgba(7,13,34,.96))}
+.gk-worth{margin:0 0 8px;text-align:center;font-size:12px;font-weight:800;color:#c9d9ff}
+.gk-worth b{color:#ffe49a;font-size:14px}
+.gk-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gk-opt{min-height:56px;padding:6px 8px;border:1.5px solid rgba(243,215,134,.6);border-radius:14px;background:linear-gradient(180deg,#1d3a7c,#0f2152);color:#fff4d6;font-weight:900;font-size:14px;line-height:1.15;box-shadow:0 3px 0 rgba(2,6,20,.9);transition:transform .1s}
+.gk-opt:active{transform:translateY(3px);box-shadow:none}
+.gk-opt.x{background:#3a1220;border-color:#ff8f9f;color:#ffb3bd;text-decoration:line-through;animation:gkShake .45s}
+.gk-opt.ok{background:linear-gradient(180deg,#7cf7b0,#1fae62);border-color:#c8ffe0;color:#04301a}
+.gk-opt[disabled]{opacity:.55;pointer-events:none}
+.gk-opt.x[disabled]{opacity:.9}
+@keyframes gkShake{0%,100%{transform:none}20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.gk-msg{min-height:18px;margin:8px 0 6px;text-align:center;font-size:12.5px;font-weight:800;color:#ffb3bd}
+.gk-msg:empty{display:none}
+.gk-next{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin-top:8px;border:2px solid #fff0b8;border-radius:14px;background:linear-gradient(180deg,#fbe08c,#e0a935 70%,#c98f22);color:#2c1d00;font-weight:900;font-size:15px;letter-spacing:.06em;box-shadow:0 4px 0 #8a6414}
+.gk-next:active{transform:translateY(3px);box-shadow:0 1px 0 #8a6414}
+/* sonuç */
+.gk-res{text-align:center;position:relative}
+.gk-port{position:relative;width:clamp(150px,46vw,190px);aspect-ratio:1;margin:8px auto 12px;border-radius:50%;border:3px solid #f3d786;background:radial-gradient(circle at 50% 35%,#2a4690,#0a1230 78%);box-shadow:0 0 0 5px #6b4b13,0 0 34px rgba(240,194,74,.45);display:grid;place-items:center;overflow:hidden}
+.gk-port svg{width:62%;height:62%;fill:none;stroke:#f3d786;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 8px rgba(240,194,74,.7))}
+.gk-port.rev{animation:gkReveal 1.3s cubic-bezier(.2,.8,.2,1) both}
+.gk-port.rev svg{animation:gkRevIc 1.3s ease both}
+@keyframes gkReveal{0%{opacity:0;transform:scale(.55) rotate(-8deg);filter:blur(14px) brightness(.3)}55%{opacity:1;filter:blur(3px) brightness(.8)}100%{transform:none;filter:none}}
+@keyframes gkRevIc{0%{opacity:0;transform:scale(.4)}60%{opacity:.3}100%{opacity:1;transform:none}}
+.gk-rname{font-size:clamp(24px,7.2vw,30px);font-weight:900;line-height:1.1;color:#fff0b8;text-shadow:0 2px 10px #000a}
+.gk-rcat{margin:6px 0 10px}
+.gk-badge{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 12px;padding:10px 12px;border:1.5px solid rgba(243,215,134,.5);border-radius:16px;background:rgba(255,255,255,.06);font-weight:800;font-size:14px;color:#d9e4ff}
+.gk-badge b{color:#ffe49a;font-size:22px;font-weight:900}
+.gk-badge.win{border-color:#7cf7b0;background:rgba(62,224,138,.12)}
+.gk-badge.win b{color:#9bffc6}
+.gk-badge.lose{border-color:#ff8f9f;background:rgba(255,100,120,.1)}
+.gk-bio{margin:0 0 14px;padding:14px;border:1.5px solid rgba(243,215,134,.3);border-radius:16px;background:rgba(255,255,255,.05);text-align:left;font-size:14px;font-weight:600;line-height:1.55;color:#d9e4ff}
+.gk-bio h4{margin:0 0 6px;font-size:11px;font-weight:900;letter-spacing:.2em;color:#f3d786}
+.gk-note{margin:0 0 10px;font-size:12px;font-weight:800;color:#9fb6f0}
+.gk-conf{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.gk-conf i{position:absolute;top:-16px;width:9px;height:15px;border-radius:2px;animation:gkFall 2.2s ease-in forwards}
+@keyframes gkFall{0%{transform:translateY(0) rotate(0);opacity:1}100%{transform:translateY(105vh) rotate(720deg);opacity:.9}}
+.gk-ring{position:absolute;left:50%;top:50%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:3px solid #ffe48a;opacity:0;animation:gkRing 1.2s ease-out .5s both;pointer-events:none}
+@keyframes gkRing{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(9)}}
+/* sıralama + geçmiş */
+.gk-list{display:flex;flex-direction:column;gap:8px}
+.gk-rk{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1.5px solid rgba(243,215,134,.3);border-radius:16px;background:rgba(255,255,255,.05)}
+.gk-rk.me{border-color:#f3d786;background:linear-gradient(180deg,rgba(240,194,74,.18),rgba(10,18,48,.8))}
+.gk-rn{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:50%;background:linear-gradient(180deg,#ffe48a,#d99419);color:#2c1d00;font-weight:900;font-size:16px}
+.gk-av{width:46px;height:46px;flex:none;border-radius:50%;border:2px solid #f3d786;object-fit:cover;background:#0d1b4a}
+.gk-rm{flex:1;min-width:0;text-align:left}.gk-rm b{display:block;font-size:15px;font-weight:900;color:#fff0b8;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.gk-rm small{display:block;margin-top:2px;font-size:11px;font-weight:700;color:#9fb6f0}
+.gk-rp{flex:none;text-align:right;font-weight:900;font-size:20px;color:#ffe49a}.gk-rp small{display:block;font-size:10px;letter-spacing:.14em;color:#9fb6f0}
+.gk-empty{padding:22px 10px;text-align:center;font-size:14px;font-weight:700;line-height:1.5;color:#c9d9ff}
+.gk-sech{margin:2px 0 10px;text-align:center;font-size:13px;font-weight:800;color:#c9d9ff}
+.gk-hi{color:#fff4d6;display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border:1.5px solid rgba(243,215,134,.35);border-radius:16px;background:rgba(255,255,255,.05);text-align:left}
+.gk-hi:active{background:rgba(240,194,74,.14)}
+.gk-hic{width:46px;height:46px;flex:none;border-radius:50%;border:2px solid #f3d786;background:radial-gradient(circle at 50% 35%,#2a4690,#0a1230 80%);display:grid;place-items:center}
+.gk-hic svg{width:28px;height:28px;fill:none;stroke:#f3d786;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+.gk-hm{flex:1;min-width:0}.gk-hm b{display:block;font-size:15px;font-weight:900;color:#fff0b8}.gk-hm small{display:block;margin-top:2px;font-size:11.5px;font-weight:700;color:#9fb6f0}
+.gk-hr{flex:none;min-width:48px;padding:4px 8px;border-radius:999px;text-align:center;font-size:12px;font-weight:900;background:rgba(255,255,255,.08);color:#9fb6f0}
+.gk-hr.win{background:rgba(62,224,138,.16);color:#9bffc6}.gk-hr.lose{background:rgba(255,100,120,.14);color:#ffb3bd}
+@media(max-height:660px){.gk-sil{width:112px}.gk-title{font-size:28px}.gk-sub{font-size:13px;margin-bottom:6px}.gk-btn{min-height:48px}.gk-opt{min-height:50px}}
+@media(prefers-reduced-motion:reduce){#sGizli *{animation:none!important}}
+/* ana menü kartı */
+html body #hcHome .hc-card.hc-gizli{--rgb:240,194,74;border:1.5px solid #f0c24a;background:linear-gradient(115deg,#13285f 0%,#0b1a45 58%,#3a2d0b 130%)}
+html body #hcHome .hc-card.hc-gizli svg{color:#f3d786;filter:drop-shadow(0 0 6px rgba(240,194,74,.8))}
+html body #hcHome .hc-card.hc-gizli b{color:#fff0b8;letter-spacing:.06em}
+
+.gk-hr.go{background:linear-gradient(180deg,#ffe48a,#d99419);color:#2c1d00}
+.gk-hic.q b{font-size:24px;color:#f3d786}
+.gk-list{margin-bottom:12px}
+
+/* v3: dokunulabilir puan adımları, sabit boyutlu ipucu kartı */
+.gk-htt.big{font-size:21px;letter-spacing:.14em;background:linear-gradient(180deg,#fff2b8,#f0c24a 60%,#b9821a);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 6px #000a)}
+.gk-st{background:none;border:0;padding:0;color:inherit}
+.gk-st.nx i{border-color:#fff0b8;color:#fff0b8;box-shadow:0 0 12px rgba(240,194,74,.6);animation:gkNx 1.4s ease-in-out infinite}
+.gk-st.nx small{color:#f3d786}
+.gk-st.lk{opacity:.4}
+.gk-st.sel i{box-shadow:0 0 0 3px rgba(243,215,134,.5)}
+@keyframes gkNx{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.gk-clue{padding:9px 12px;min-height:100px}
+.gk-clue b{font-size:10.5px;margin-bottom:2px}
+.gk-clue p,.gk-clue.cur p{font-size:14.5px;line-height:1.38}
+.gk-sil.sm{width:84px}
+.gk-msg{margin:8px 0 0;min-height:18px;font-size:12px;color:#c9d9ff}
+.gk-msg.bad{color:#ffb3bd}
+.gk-msg:empty{display:block}
+.gk-dock{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+</style>
+<script id="gizli-kimlik-js">
+/* ===== GİZLİ KİMLİK modu =====
+   Yerel test sürümü: 5 kişilik bölüm; tüm veri bu cihazın localStorage'ında ('gizliKimlikV2') tutulur.
+   Firestore'a HİÇBİR yazma/okuma yapılmaz. İleride sunucuya taşınacak noktalar: Store bölümü. */
+(function(){
+'use strict';
+if(window.gizliKimlik)return;
+var KEY='gizliKimlikV2',SC=[100,80,60,40,20];
+var MON=['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+var IC={
+castle:'<path d="M3 21h18M5 21V11h3V8.5h2V11h4V8.5h2V11h3v10M10 21v-4a2 2 0 0 1 4 0v4"/><path d="M13.6 2.6a3 3 0 1 0 0 4.4 2.4 2.4 0 0 1 0-4.4z"/>',
+sword:'<path d="M20 4L9 15M20 4h-5.2M20 4v5.2M6.5 12.5l5 5M7 17l-3.2 3.2M3.6 18.6l1.8 1.8"/>',
+book:'<path d="M12 8c-2-1.5-5-2-8-1.5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5v-13c-3-.5-6 0-8 1.5zM12 8v13"/><path d="M12 1.8l.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2L9.1 4l2-.3z"/>',
+bow:'<path d="M6 3c8 3 8 15 0 18M6 3v18M3 12h16M16 9l3 3-3 3"/>',
+helmet:'<path d="M4 15a8 8 0 0 1 16 0v5h-4v-3.5H8V20H4zM12 3v4M9 3.6c1.2 1.1 4.8 1.1 6 0"/>'};
+/* ans:0 = doğru seçenek (sırası her gün sabit biçimde karıştırılır) */
+var PEOPLE=[
+{n:'Fatih Sultan Mehmed',cat:'Osmanlı Tarihi',ic:'castle',
+ o:['Fatih Sultan Mehmed','Yavuz Sultan Selim','Kanuni Sultan Süleyman','II. Murad'],
+ c:['1432’de Edirne’de doğdum; babam II. Murad’dır.','Hocam Akşemseddin’dir; gençken iki kez tahta çıktım.','Büyük toplar döktürdüm ve gemileri karadan yürüttüm.','1453’te kuşatmayla bir şehri alıp bir çağı kapattım.','Konstantinopolis’i fethettim, Ayasofya’yı camiye çevirdim ve İstanbul’u başkent yaptım.'],
+ b:'Fatih Sultan Mehmed (1432–1481), Osmanlı Devleti’nin yedinci padişahıdır. 29 Mayıs 1453’te İstanbul’u fethederek Bizans İmparatorluğu’na son verdi; bu olay Orta Çağ’ın sonu, Yeni Çağ’ın başlangıcı sayılır. Sırbistan, Mora, Bosna, Trabzon ve Karaman topraklarını Osmanlı’ya kattı. Sahn-ı Semân medreselerini kurdu, kanunnamesini hazırlattı; Doğu ve Batı’dan bilginleri sarayına topladı. 1481’de sefere çıkarken vefat etti.'},
+{n:'Selahaddin Eyyubî',cat:'İslam Tarihi',ic:'sword',
+ o:['Selahaddin Eyyubî','Baybars','Nureddin Zengî','Harun Reşid'],
+ c:['1137–1138 yıllarında Tikrit’te doğdum.','Mısır’da vezir oldum ve 1171’de Fatımî hilafetine son verdim.','1187’de Hıttin Savaşı’nda Haçlı ordusunu yendim.','Aynı yıl Kudüs’ü Haçlılardan geri aldım.','Üçüncü Haçlı Seferi’nde Aslan Yürekli Richard ile karşılaştım; Eyyubî Devleti’nin kurucusuyum.'],
+ b:'Selahaddin Eyyubî (1137/38–1193), Eyyubîler Devleti’nin kurucusudur. Nureddin Zengî’nin komutanlarındandı; Mısır’da vezir olup 1171’de Fatımî hilafetine son verdi. 1187’de Hıttin Savaşı’nda Haçlıları yenerek Kudüs’ü geri aldı. Üçüncü Haçlı Seferi’nde Aslan Yürekli Richard ile mücadele etti; 1192 tarihli Remle Antlaşması ile Kudüs Müslümanlarda kaldı, Hıristiyan hacıların ziyareti serbest bırakıldı. 1193’te Şam’da vefat etti; adaleti ve cömertliğiyle anılır.'},
+{n:'İbn-i Sina',cat:'Bilim İnsanları',ic:'book',
+ o:['İbn-i Sina','El-Harezmî','Biruni','Farabi'],
+ c:['980 yılında Buhara yakınlarındaki Afşana köyünde doğdum.','Gençken Buhara emirini tedavi ettim.','Eş-Şifâ adlı ansiklopedik felsefe eserini yazdım.','El-Kânûn fi’t-Tıb adlı eserim yüzyıllarca tıp okullarında okutuldu.','Batı dünyasında ‘Avicenna’ adıyla tanındım.'],
+ b:'İbn-i Sina (980–1037), İslam dünyasının en büyük hekim ve filozoflarındandır. Küçük yaşta eğitimde çok parladı, genç yaşta hekimliğe başladı. El-Kânûn fi’t-Tıb adlı eseri yüzyıllarca hem İslam dünyasında hem Avrupa’da tıp eğitiminin temel kaynağı oldu. Eş-Şifâ, felsefe ve bilimi kapsayan ansiklopedik bir eserdir. Batı’da Avicenna adıyla bilinir. 1037’de Hemedan’da vefat etti.'},
+{n:'Alp Arslan',cat:'Türk Tarihi',ic:'bow',
+ o:['Alp Arslan','Tuğrul Bey','Melikşah','Sultan Sencer'],
+ c:['Çağrı Bey’in oğluyum; amcam Tuğrul Bey’dir.','Vezirim Nizamülmülk’tür.','1064’te Ani’yi fethettim.','1071’de Bizans imparatoru Romanos Diogenes’i esir aldım.','Malazgirt Zaferi ile Anadolu’nun kapılarını Türklere açtım.'],
+ b:'Alp Arslan (1029–1072), Büyük Selçuklu Devleti’nin ikinci sultanıdır. 1064’te Ani’yi aldı. 26 Ağustos 1071’de Malazgirt Meydan Muharebesi’nde Bizans İmparatoru IV. Romanos Diogenes’i yenip esir aldı; sonra onu serbest bıraktı. Bu zafer Anadolu’nun Türk yurdu olmasının başlangıcı sayılır. Veziri Nizamülmülk ile devleti güçlendirdi. 1072’de Harezm seferi sırasında yaralanarak vefat etti.'},
+{n:'Büyük İskender',cat:'Dünya Tarihi',ic:'helmet',
+ o:['Büyük İskender','Jül Sezar','Napolyon','Hannibal'],
+ c:['M.Ö. 356’da Pella’da doğdum; babam Makedonya Kralı II. Philippos’tur.','Hocam ünlü filozof Aristoteles’tir.','Atım Bukefalos’tu ve yirmi yaşında tahta çıktım.','Gaugamela’da Pers kralı III. Darius’u yendim.','Yunanistan’dan Hindistan’ın kapılarına kadar ilerledim; Mısır’da kurduğum İskenderiye adımı taşır.'],
+ b:'Büyük İskender (M.Ö. 356–323), Makedonya Kralı III. Aleksandros’tur. 20 yaşında tahta çıktı; Granikos, İssos ve Gaugamela’da Pers ordularını yenerek Ahameniş İmparatorluğu’na son verdi. Mısır’dan Hindistan’ın kuzeybatısına uzanan geniş bir imparatorluk kurdu, çok sayıda şehir (İskenderiye gibi) inşa ettirdi; Yunan kültürünün Doğu’da yayılmasıyla Helenistik Çağ başladı. M.Ö. 323’te Babil’de 32 yaşında vefat etti.'},
+{n:'Hz. Ebû Bekir',cat:'İslam Tarihi',ic:'book',
+ o:['Hz. Ebû Bekir','Hz. Ömer','Hz. Osman','Hz. Ali'],
+ c:['Mekke’de Kureyş kabilesinden bir tüccar olarak yaşadım.','Hicret yolculuğunda Peygamberimizle birlikte Sevr Mağarası’na sığındım.','Peygamberimizin vefatından sonra ilk halife seçildim.','Yalancı peygamberlere ve zekât vermeyenlere karşı Ridde Savaşları’nı yönettim.','Lakabım “Sıddîk”tır; Kur’an âyetlerinin bir araya toplanmasını sağladım.'],
+ b:'Hz. Ebû Bekir (573–634), İslam’ın ilk halifesidir. Peygamberimizin yakın dostu ve kayınpederidir; “es-Sıddîk” lakabıyla anılır. 632’de halife seçildi ve Ridde Savaşları’yla devletin birliğini korudu. Yemâme Savaşı’ndan sonra Kur’an âyetlerinin bir araya toplanmasını sağladı. İslam ordularını Suriye ve Irak yönüne gönderdi. 634’te vefat etti ve Peygamberimizin yanına defnedildi.'},
+{n:'Hz. Ömer',cat:'İslam Tarihi',ic:'sword',
+ o:['Hz. Ömer','Hz. Ebû Bekir','Hz. Ali','Muaviye'],
+ c:['Mekke’de Adî kabilesindenim; gençliğimde güçlü ve cesur biriydim.','Önce İslam’a karşıydım, sonra Müslüman oldum.','634’te ikinci halife olarak göreve geldim.','Zamanımda Kudüs ve Mısır fethedildi; hicrî takvimi başlattım.','Lakabım “Fârûk”tur; Divan teşkilatını kurdum ve adaletimle tanındım.'],
+ b:'Hz. Ömer (yaklaşık 584–644), dört büyük halifenin ikincisidir; 634–644 arasında halifelik yaptı. Döneminde Suriye, Kudüs, Mısır, Irak ve İran’ın büyük bölümü İslam topraklarına katıldı. Hicrî takvimi başlattı, Divan teşkilatını kurdu ve eyalet düzenini oluşturdu. “el-Fârûk” lakabıyla anılır, adaletiyle tanınır. 644’te bir suikast sonucu vefat etti.'},
+{n:'Hâlid bin Velîd',cat:'İslam Tarihi',ic:'bow',
+ o:['Hâlid bin Velîd','Amr bin Âs','Tarık bin Ziyad','Sa’d bin Ebî Vakkas'],
+ c:['Mekke’de Mahzum kabilesindenim; çok iyi bir süvari ve komutandım.','Uhud Savaşı’nda Müslümanlara karşı savaştım, sonra Müslüman oldum.','Mûte Savaşı’nda ordunun komutasını devralıp orduyu kurtardım.','Peygamberimiz bana “Allah’ın kılıcı” anlamına gelen bir lakap verdi.','Yermük Savaşı’nda Bizans ordusunu yendim.'],
+ b:'Hâlid bin Velîd (yaklaşık 592–642), İslam tarihinin en başarılı komutanlarındandır. Mekke’de doğdu; Uhud’da Müslümanlara karşı savaştı, 629 dolaylarında İslam’ı kabul etti. Mûte’de orduyu kayıpsız geri çekmeyi başardı ve “Seyfullah” (Allah’ın kılıcı) lakabıyla anıldı. Ridde Savaşları’nda, Irak ve Suriye fetihlerinde, özellikle Yermük’te büyük başarılar gösterdi. 642 civarında Humus’ta vefat etti.'},
+{n:'Harun Reşid',cat:'İslam Tarihi',ic:'castle',
+ o:['Harun Reşid','Me’mun','El-Mansur','Abdülmelik bin Mervan'],
+ c:['Abbasî ailesindenim; babam Halife Mehdî’dir.','Veziri Yahya el-Bermekî ile uzun süre devleti yönettim.','Başkentim Bağdat’tı; Rakka’yı da önemli bir merkez yaptım.','Frank kralı Şarlman ile elçi ve hediye alışverişinde bulundum.','Bin Bir Gece Masalları’nda adı geçen Abbasî halifesiyim.'],
+ b:'Harun Reşid (763/766–809), Abbasî Devleti’nin beşinci halifesidir; 786–809 arasında halifelik yaptı. Döneminde Bağdat ilim, sanat ve ticaretin parlak bir merkezi oldu. Bizans’a karşı seferler düzenledi; Frank kralı Şarlman ile elçi ve hediye alışverişinde bulundu. Bin Bir Gece Masalları’nda adı geçer. 809’da Horasan seferi sırasında Tûs’ta vefat etti.'},
+{n:'Osman Gazi',cat:'Osmanlı Tarihi',ic:'castle',
+ o:['Osman Gazi','Orhan Gazi','Ertuğrul Gazi','I. Murad'],
+ c:['Kayı boyundanım; babamın adı Ertuğrul’dur.','Söğüt çevresinde bir uç beyliği yönettim.','Şeyh Edebali’nin kızı Malhun Hatun ile evlendim.','1302’de Koyunhisar’da Bizans ordusunu yendim.','Adımı taşıyan devletin kurucusuyum.'],
+ b:'Osman Gazi (yaklaşık 1258–1326), Osmanlı Devleti’nin kurucusudur. Kayı boyundan Ertuğrul Gazi’nin oğludur; Söğüt ve çevresinde bir uç beyliği yönetti. 1302 Koyunhisar Savaşı’nda Bizans ordusunu yendi, Bilecik, Yarhisar ve İnegöl gibi yerleri aldı. Oğlu Orhan Bey’in Bursa’yı fethettiği sıralarda vefat etti. Adaleti ve cesaretiyle anılır.'},
+{n:'Yavuz Sultan Selim',cat:'Osmanlı Tarihi',ic:'sword',
+ o:['Yavuz Sultan Selim','Fatih Sultan Mehmed','II. Bayezid','Kanuni Sultan Süleyman'],
+ c:['Babam II. Bayezid’dir; Trabzon’da sancak beyi olarak bulundum.','1512’de tahta çıktım.','1514’te Çaldıran’da Safevî Şahı İsmail’i yendim.','1516–1517’de Mercidabık ve Ridaniye zaferleriyle Memlûk Devleti’ni ortadan kaldırdım.','Mısır’ı Osmanlı’ya kattım ve kutsal emanetleri İstanbul’a getirttim; oğlum Kanuni’dir.'],
+ b:'Yavuz Sultan Selim (1470–1520), Osmanlı’nın dokuzuncu padişahıdır (1512–1520). 1514’te Çaldıran Savaşı’nda Safevîleri yendi. 1516’da Mercidabık, 1517’de Ridaniye zaferleriyle Memlûk Devleti’ne son verdi; Suriye, Filistin, Mısır ve Hicaz Osmanlı’ya katıldı. Kutsal emanetler İstanbul’a getirildi. 1520’de vefat etti; yerine oğlu Kanuni Sultan Süleyman geçti.'},
+{n:'Kanuni Sultan Süleyman',cat:'Osmanlı Tarihi',ic:'bow',
+ o:['Kanuni Sultan Süleyman','Yavuz Sultan Selim','II. Selim','III. Murad'],
+ c:['Babam Yavuz Sultan Selim’dir.','1520’de tahta çıktım ve 46 yıl hüküm sürdüm.','1521’de Belgrad’ı, 1522’de Rodos’u aldım.','1526’da Mohaç Meydan Muharebesi’ni kazandım.','Şiirlerimde “Muhibbî” mahlasını kullandım; hukuk düzenlemelerimle “Kanunî” adını aldım.'],
+ b:'Kanuni Sultan Süleyman (1494–1566), Osmanlı’nın onuncu padişahıdır; 1520–1566 arasında tahtta kaldı. Belgrad (1521), Rodos (1522) ve Mohaç (1526) zaferleriyle Osmanlı’nın gücünü artırdı. Hukuk alanındaki düzenlemeleri nedeniyle “Kanunî” unvanıyla anıldı. Mimar Sinan’ın eserleriyle (Süleymaniye gibi) imparatorluğun sanat ve mimarisi en parlak dönemini yaşadı. Şiirlerinde Muhibbî mahlasını kullandı. 1566’da Zigetvar Seferi sırasında vefat etti.'},
+{n:'Mimar Sinan',cat:'Osmanlı Tarihi',ic:'helmet',
+ o:['Mimar Sinan','Mimar Kemaleddin','Davut Ağa','Vedat Tek'],
+ c:['Kayseri’nin Ağırnas köyünde doğdum.','Devşirme olarak İstanbul’a geldim ve Yeniçeri Ocağı’nda yetiştim.','Seferlerde köprü, kale ve gemi yapımında çalıştım.','Çıraklık eserim Şehzade, kalfalık eserim Süleymaniye Camii’dir.','Ustalık eserim Edirne’deki Selimiye Camii’dir.'],
+ b:'Mimar Sinan (yaklaşık 1489–1588), Osmanlı’nın başmimarıdır. Kayseri’de doğdu; devşirme olarak Yeniçeri Ocağı’na girdi ve seferlerde mühendislik yaptı. 1538’de Hassa Mimarları Ocağı’nın başına geçti. Yaklaşık üç yüz eser yaptığı kabul edilir: Şehzade Camii (çıraklık), Süleymaniye Camii (kalfalık) ve Edirne Selimiye Camii (ustalık eseri). 1588’de İstanbul’da vefat etti.'},
+{n:'Bumin Kağan',cat:'Türk Tarihi',ic:'castle',
+ o:['Bumin Kağan','Bilge Kağan','Mete Han','Tuğrul Bey'],
+ c:['Aşina kabilesinin lideriyim; Juan-juan Devleti’ne bağlı bir boyu yönettim.','Kardeşim İstemi Yabgu devletin batı kanadını yönetti.','552’de Juan-juanları yenerek bağımsızlığımı ilan ettim.','Kağan unvanını alarak yeni bir Türk devleti kurdum.','Kurduğum devlet, “Türk” adını taşıyan ilk Türk devletidir.'],
+ b:'Bumin Kağan (? – 552), Göktürk Devleti’nin kurucusudur. Aşina kabilesinin lideriydi ve Juan-juan (Avar) Devleti’ne bağlıydı. 552’de Juan-juanları yenerek bağımsızlığını ilan etti ve “İlig Kağan” unvanını aldı. Kardeşi İstemi Yabgu devletin batı bölümünü yönetti. Aynı yıl vefat etti; devlet Doğu ve Batı Göktürkleri olarak gelişti. “Türk” adını taşıyan ilk Türk devletinin kurucusudur.'},
+{n:'Bilge Kağan',cat:'Türk Tarihi',ic:'sword',
+ o:['Bilge Kağan','Kül Tigin','Bumin Kağan','Tonyukuk'],
+ c:['Göktürk hanedanındanım; babam İlteriş Kağan’dır.','Kardeşim Kül Tigin ve danışmanım Tonyukuk ile devleti güçlendirdim.','716’dan 734’e kadar kağanlık yaptım.','Adıma dikilen yazıtlar Orhun Vadisi’nde bulunmuştur.','Orhun Yazıtları ile Türk milletine seslendim.'],
+ b:'Bilge Kağan (683–734), İkinci Göktürk Devleti’nin hükümdarıdır; 716–734 arasında kağanlık yaptı. Kardeşi Kül Tigin başkomutan, Tonyukuk ise danışmanıydı. Devleti yeniden güçlendirip halkı birlik içinde tuttu. Adına dikilen Orhun Yazıtları, Türkçenin bilinen en eski yazılı metinlerindendir ve Türk adının geçtiği önemli belgelerdir. 734’te zehirlenerek vefat ettiği kabul edilir.'},
+{n:'Tuğrul Bey',cat:'Türk Tarihi',ic:'bow',
+ o:['Tuğrul Bey','Alp Arslan','Çağrı Bey','Melikşah'],
+ c:['Selçuk Bey’in torunu, Mikail’in oğluyum.','Kardeşim Çağrı Bey ile Gaznelilere karşı savaştım.','1040’ta Dandanakan Savaşı’nı kazandım.','1055’te Bağdat’a girerek Abbasî halifesini koruma altına aldım.','Büyük Selçuklu Devleti’nin kurucusuyum.'],
+ b:'Tuğrul Bey (yaklaşık 990–1063), Büyük Selçuklu Devleti’nin kurucusudur. Kardeşi Çağrı Bey ile 1040’ta Dandanakan Savaşı’nda Gazneli Sultanı Mesud’u yenerek devletin bağımsızlığını sağladı. 1055’te Bağdat’a girdi ve Abbasî halifesinin koruyuculuğunu üstlendi; halife ona “Doğunun ve Batının Sultanı” unvanını verdi. Çocuğu olmadığından yerine yeğeni Alp Arslan geçti. 1063’te Rey’de vefat etti.'},
+{n:'Mete Han',cat:'Türk Tarihi',ic:'helmet',
+ o:['Mete Han','Attila','Bilge Kağan','Kürşad'],
+ c:['M.Ö. 209’da babam Teoman’ın yerine tahta çıktım.','Orduyu onlu sisteme göre düzenledim.','Çin’i yenerek ağır vergi bağladım.','Hun Devleti’ni Orta Asya’nın en büyük gücü yaptım.','Kurduğum devlet, Türk tarihinde Büyük Hun İmparatorluğu olarak bilinir.'],
+ b:'Mete Han (M.Ö. 234–174), Asya Hun Devleti’nin kurucusu ve en büyük hükümdarıdır. M.Ö. 209’da tahta çıktı. Orduyu onlu sisteme göre düzenledi, ülkeyi sağ ve sol kanat olarak yönetti. Çin’i yenerek vergi bağlattı, komşu kavimleri egemenliği altına aldı ve Orta Asya’nın en güçlü devletini kurdu. M.Ö. 174’te vefat etti.'},
+{n:'El-Harezmî',cat:'Bilim İnsanları',ic:'castle',
+ o:['El-Harezmî','İbn-i Sina','Biruni','El-Kindî'],
+ c:['Harezm bölgesinden gelip Bağdat’taki Beytülhikme’de çalıştım.','Halife Me’mun döneminde astronomi ve matematikle uğraştım.','Hint rakamlarına dayanan ondalık sistemin yayılmasında rol oynadım.','Adım Latinceye “algoritma” sözcüğü olarak geçti.','Kitabımın adındaki “el-cebr” sözcüğünden “cebir” kelimesi doğdu.'],
+ b:'El-Harezmî (yaklaşık 780–850), Orta Çağ’ın büyük matematikçi ve astronomlarındandır. Bağdat’taki Beytülhikme’de çalıştı. “el-Cebr ve’l-Mukābele” adlı eseriyle cebir biliminin temelini attı; “cebir” sözcüğü bu eserin adından gelir. Hint rakamlarını ve ondalık sistemi tanıtan eseri Latinceye çevrildi; adı “algoritma” sözcüğünün kaynağıdır. Coğrafya ve astronomi alanlarında da eserler yazdı.'},
+{n:'El-Cezerî',cat:'Bilim İnsanları',ic:'bow',
+ o:['El-Cezerî','Ali Kuşçu','Ez-Zehravî','Takiyyüddin'],
+ c:['Cizre’de doğdum.','Artuklu sarayında baş mühendis olarak çalıştım.','Eserim “Kitâbü’l-Hiyel”, makine ve otomat tasarımlarını anlatır.','Su saatleri, su pompaları ve otomatik aletler tasarladım.','Krank-biyel mili gibi mekanizmaları anlatan ilk mühendislerden biriyim; robot biliminin öncüsü sayılırım.'],
+ b:'El-Cezerî (1136–1206), Artuklu Devleti’nin sarayında mühendislik yapan İslam dünyasının büyük bilginlerindendir. Adını doğduğu Cizre’den alır. “Kitâbü’l-Hiyel” adlı eserinde yaklaşık elli makineyi çizimleriyle anlattı: su saatleri, su pompaları, otomatik aletler… Krank-biyel mili gibi mekanizmaları tarif etmesi nedeniyle modern makine ve robot biliminin öncülerinden sayılır.'},
+{n:'Uluğ Bey',cat:'Bilim İnsanları',ic:'helmet',
+ o:['Uluğ Bey','Ali Kuşçu','Ömer Hayyam','El-Battânî'],
+ c:['Timur’un torunu, Şahruh’un oğluyum.','Semerkant’ta hükümdarlık yaptım.','Semerkant’ta medrese ve büyük bir rasathane kurdurdum.','Rasathanemde yıldızların konumlarını gösteren bir zic hazırladım.','Hazırladığım yıldız cetveli “Zîc-i Cedîd-i Sultânî” Avrupa’da da kullanıldı; adım bir ay kraterine verildi.'],
+ b:'Uluğ Bey (1394–1449), Timur’un torunu ve Şahruh’un oğludur. Semerkant’ta hükümdarlık yaptı; burada medrese ve büyük bir rasathane kurdu. Ali Kuşçu gibi bilginleri çevresinde topladı. “Zîc-i Cedîd-i Sultânî” adlı yıldız cetveli, yaklaşık bin yıldızın konumunu içerir ve uzun süre kullanıldı. Ay’daki bir krater onun adını taşır. 1449’da oğlu Abdüllatif’in düzeniyle öldürüldü.'},
+{n:'Piri Reis',cat:'Bilim İnsanları',ic:'book',
+ o:['Piri Reis','Seydi Ali Reis','Barbaros Hayreddin','Turgut Reis'],
+ c:['Gelibolu’da doğdum; amcam Kemal Reis’tir.','Gençliğimde amcamla Akdeniz’de denizcilik yaptım.','1513’te çizdiğim dünya haritasında Amerika kıyıları da yer alır.','“Kitâb-ı Bahriye” adlı Akdeniz rehberini yazdım.','Haritamı 1517’de Yavuz Sultan Selim’e sundum.'],
+ b:'Piri Reis (yaklaşık 1470–1553), Osmanlı denizcisi, haritacı ve coğrafyacıdır. Gelibolu’da doğdu; amcası Kemal Reis ile denizlerde bulundu. 1513’te hazırladığı dünya haritası Atlas Okyanusu ve Amerika kıyılarını gösterir; harita 1517’de Yavuz Sultan Selim’e sunuldu, 1929’da Topkapı Sarayı’nda bulundu. Akdeniz limanlarını ve kıyılarını anlatan “Kitâb-ı Bahriye”yi yazdı. 1553’te Mısır’da idam edildi.'},
+{n:'Jül Sezar',cat:'Dünya Tarihi',ic:'sword',
+ o:['Jül Sezar','Octavianus','Marcus Antonius','Pompeius'],
+ c:['M.Ö. 100 yılında Roma’da soylu bir ailede doğdum.','Galya’yı fethettim ve bu savaşları kitabımda anlattım.','M.Ö. 49’da Rubicon Nehri’ni geçerek iç savaşı başlattım.','Mısır Kraliçesi Kleopatra ile yakın ilişki kurdum.','M.Ö. 44’te Senato’da, aralarında Brutus’un da bulunduğu kişilerce öldürüldüm.'],
+ b:'Jül Sezar (M.Ö. 100–44), Romalı komutan ve devlet adamıdır. Galya Savaşları’yla Roma topraklarını Atlas Okyanusu’na kadar genişletti. M.Ö. 49’da Rubicon’u geçip Pompeius’a karşı iç savaşı kazandı ve diktatör oldu. Jülyen takvimini düzenledi. M.Ö. 44’te Senato’da suikastla öldürüldü; ölümünden sonra Roma Cumhuriyeti yerini imparatorluğa bıraktı.'},
+{n:'Napolyon Bonapart',cat:'Dünya Tarihi',ic:'castle',
+ o:['Napolyon Bonapart','XIV. Louis','Jül Sezar','Wellington Dükü'],
+ c:['1769’da Korsika Adası’nda doğdum.','Topçu subayı olarak Fransız Devrimi’nden sonra hızla yükseldim.','1804’te kendimi Fransızların imparatoru ilan ettim.','1805’te Austerlitz’te Avusturya ve Rus ordularını yendim.','1812’de Rusya seferinde ordum eridi; 1815’te Waterloo’da yenildim ve Saint Helena’da öldüm.'],
+ b:'Napolyon Bonapart (1769–1821), Fransız komutan ve imparatordur. Korsika’da doğdu; Fransız Devrimi’nden sonra ordu içinde hızla yükseldi. 1799’da yönetimi ele geçirdi, 1804’te imparator oldu. Hazırlattığı Medeni Kanun, birçok ülkenin hukukuna ilham verdi. Austerlitz (1805) en büyük zaferlerindendir. 1812 Rusya seferi ve 1815 Waterloo yenilgisinden sonra Saint Helena Adası’na sürüldü; 1821’de orada vefat etti.'},
+{n:'Cengiz Han',cat:'Dünya Tarihi',ic:'bow',
+ o:['Cengiz Han','Timur','Kubilay Han','Attila'],
+ c:['Gençken adım Temüçin’di.','1206’da kurultayda “Cengiz Han” unvanıyla lider ilan edildim.','Orduyu onlu sisteme göre düzenledim ve Yasa adlı kanunlar koydum.','Harezmşahlar Devleti’ni ortadan kaldırdım.','Moğol İmparatorluğu’nun kurucusuyum.'],
+ b:'Cengiz Han (yaklaşık 1162–1227), Moğol İmparatorluğu’nun kurucusudur. Asıl adı Temüçin’dir. 1206’da kurultayda “Cengiz Han” unvanıyla Moğol kabilelerinin lideri ilan edildi. Orduyu onlu sisteme göre düzenledi, Yasa adlı kanunları uygulattı. Kuzey Çin’i, Orta Asya’yı ve Harezmşahlar Devleti’ni egemenliği altına aldı; imparatorluğu Pasifik’ten Hazar Denizi çevresine uzandı. 1227’de Tangut seferi sırasında vefat etti.'},
+{n:'Kristof Kolomb',cat:'Dünya Tarihi',ic:'helmet',
+ o:['Kristof Kolomb','Vasco da Gama','Macellan','Amerigo Vespucci'],
+ c:['İtalya’nın Cenova şehrinde doğdum.','Hindistan’a batıdan giderek ulaşılabileceğine inandım.','İspanya Kralı Ferdinand ve Kraliçe Isabella’nın desteğini aldım.','1492’de Santa Maria, Pinta ve Nina gemileriyle yola çıktım.','12 Ekim 1492’de Amerika’da bir adaya ayak bastım.'],
+ b:'Kristof Kolomb (1451–1506), Cenovalı denizcidir. Atlas Okyanusu’nu batıya doğru aşarak Hindistan’a ulaşılabileceğini düşündü. İspanya Kralı Ferdinand ve Kraliçe Isabella’nın desteğiyle 1492’de yola çıktı ve 12 Ekim’de Bahama Adaları’nda bir adaya ulaştı. Dört seferinde Karayipler ve Orta-Güney Amerika kıyılarını gezdi. Bu yolculuklar Coğrafi Keşifler’in dönüm noktasıdır. 1506’da İspanya’da vefat etti.'}];
+
+var CATS=['İslam Tarihi','Osmanlı Tarihi','Türk Tarihi','Bilim İnsanları','Dünya Tarihi'];
+function inCat(c){var a=[];PEOPLE.forEach(function(p,i){if(p.cat===c)a.push(i)});return a}
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function svgI(k,vb){return '<svg viewBox="'+(vb||'0 0 24 24')+'" aria-hidden="true">'+IC[k]+'</svg>'}
+
+/* ---------- Store (yerel) ---------- */
+var DB=(function(){var d=null;try{d=JSON.parse(localStorage.getItem(KEY)||'null')}catch(e){}if(!d||typeof d!=='object')d={};if(!d.p)d.p={};return d})();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(DB))}catch(e){}}
+function rec(i){return DB.p[i]||null}
+function ensure(i){var r=DB.p[i];if(!r){r=DB.p[i]={c:1,w:[],gc:0,d:0,ok:0,pts:0,sc:0};save()}return r}
+function total(){var t=0;for(var k in DB.p)t+=(DB.p[k].pts|0);return t}
+function doneCnt(){var n=0;for(var k in DB.p)if(DB.p[k].d)n++;return n}
+function order(p){var n=Math.abs(p*7919+13),a=[0,1,2,3];for(var i=3;i>0;i--){n=(n*1103515245+12345)&0x7fffffff;var j=n%(i+1),t=a[i];a[i]=a[j];a[j]=t}return a}
+function myName(){var n='';try{n=(localStorage.getItem('islamibilgi_name')||'').trim()}catch(e){}return n||'Misafir'}
+function myAv(){var a=$('hAv');return(a&&a.getAttribute('src'))||''}
+
+/* ---------- Görünüm ---------- */
+var scr=null,view='home',curCat='',cur=0,shown=0,celebrate=false,busy=false;
+function head(t,big){return '<div class="gk-head"><button type="button" class="gk-back" data-a="back" aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><div class="gk-htt'+(big?' big':'')+'">'+t+'</div><span class="gk-hsp"></span></div>'}
+function sil(cls){return '<div class="gk-sil '+(cls||'')+'"><svg viewBox="0 0 200 200" role="img" aria-label="Gizli kişi silueti"><defs><radialGradient id="gkSg" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#2a4690"/><stop offset="1" stop-color="#0a1230"/></radialGradient><clipPath id="gkSc"><circle cx="100" cy="100" r="92"/></clipPath></defs><circle cx="100" cy="100" r="97" fill="none" stroke="#f3d786" stroke-width="3"/><circle cx="100" cy="100" r="92" fill="url(#gkSg)"/><g clip-path="url(#gkSc)"><circle cx="100" cy="80" r="33" fill="#050a1f"/><path d="M28 200c4-50 34-72 72-72s68 22 72 72z" fill="#050a1f"/></g><text class="gk-q" x="100" y="96" text-anchor="middle" font-size="46" font-weight="900" fill="#f3d786" font-family="Nunito,system-ui,sans-serif">?</text></svg></div>'}
+function steps(r){var h='<div class="gk-steps">';for(var i=1;i<=5;i++){var c=i<r.c?'ok':(i===r.c?'on':(i===r.c+1?'nx':'lk'));if(i===shown)c+=' sel';h+='<button type="button" class="gk-st '+c+'" data-a="clue" data-k="'+i+'"'+(i>r.c+1?' disabled':'')+' aria-label="İpucu '+i+', '+SC[i-1]+' puan"><i>'+i+'</i><small>'+SC[i-1]+'</small></button>'}return h+'</div>'}
+function homeV(){
+ var h='';
+ CATS.forEach(function(c){var ids=inCat(c);if(!ids.length)return;var d=0,pts=0;ids.forEach(function(i){var r=rec(i);if(r&&r.d){d++;pts+=r.pts|0}});
+  h+='<button type="button" class="gk-hi" data-a="cat" data-c="'+esc(c)+'"><span class="gk-hic">'+svgI(PEOPLE[ids[0]].ic)+'</span><span class="gk-hm"><b>'+esc(c)+'</b><small>'+d+' / '+ids.length+' kişi çözüldü</small></span>'+(d===ids.length?'<span class="gk-hr win">✓</span>':'<span class="gk-hr go">AÇ</span>')+'</button>'});
+ return head('GİZLİ KİMLİK',1)+'<div class="gk-scroll"><p class="gk-sub">İpuçlarını çöz, kim olduğunu bul!</p><div class="gk-silw">'+sil()+'</div><div class="gk-lab">KATEGORİ SEÇ</div><div class="gk-list">'+h+'</div><p class="gk-foot">Gizli Kimlik puanları ayrı tutulur; İlim Puanı ve Dirhem’e eklenmez. Her kişiden puan yalnızca bir kez kazanılır.</p></div>'}
+function catV(){
+ var h='';
+ inCat(curCat).forEach(function(i,n){var p=PEOPLE[i],r=rec(i),d=r&&r.d,st,rs;
+  if(d){st=esc(p.n);rs=r.ok?'<span class="gk-hr win">+'+r.pts+'</span>':'<span class="gk-hr lose">0</span>'}
+  else{st='Gizli Kişi '+(n+1);rs='<span class="gk-hr go">'+(r?'DEVAM':'OYNA')+'</span>'}
+  h+='<button type="button" class="gk-hi" data-a="open" data-i="'+i+'"><span class="gk-hic'+(d?'':' q')+'">'+(d?svgI(p.ic):'<b>?</b>')+'</span><span class="gk-hm"><b>'+st+'</b><small>'+esc(curCat)+(r&&!d?' · İpucu '+r.c+'/5':'')+'</small></span>'+rs+'</button>'});
+ return head(esc(curCat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">GİZLİ KİŞİLER</div><div class="gk-list">'+h+'</div></div>'}
+function playV(newClue){
+ var p=PEOPLE[cur],r=ensure(cur),ord=order(cur);
+ if(!shown||shown>r.c)shown=r.c;
+ var cl='<div class="gk-clue cur'+(newClue?' new':'')+'"><b>İPUCU '+shown+'</b><p>'+esc(p.c[shown-1])+'</p></div>';
+ var guessed=r.gc===r.c,op='';
+ ord.forEach(function(oi){var w=r.w.indexOf(oi)>=0;op+='<button type="button" class="gk-opt'+(w?' x':'')+'" data-a="guess" data-o="'+oi+'"'+((w||guessed)?' disabled':'')+'>'+esc(p.o[oi])+'</button>'});
+ var last=r.c>=5,msg=guessed?'Yanlış tahmin! '+(last?'Cevap gösteriliyor…':'Yeni ipucu için üstteki puana dokun.'):(last?'Son ipucu: doğru kişiyi seç.':'Yeni ipucu için üstteki puana dokun.');
+ return head('GİZLİ KİŞİ '+(inCat(PEOPLE[cur].cat).indexOf(cur)+1))+'<div class="gk-play"><div class="gk-stepsw">'+steps(r)+'</div><div class="gk-scroll"><div class="gk-silw">'+sil('sm')+'</div><div class="gk-catw"><span class="gk-cat">'+esc(p.cat)+'</span></div><div class="gk-clues">'+cl+'</div></div><div class="gk-dock"><div class="gk-worth">Şimdi bilirsen <b>'+SC[r.c-1]+' puan</b></div><div class="gk-opts">'+op+'</div><div class="gk-msg'+(guessed?' bad':'')+'" id="gkMsg">'+msg+'</div></div></div>'}
+function resV(i,anim){
+ var p=PEOPLE[i],r=rec(i),b='';
+ if(r&&r.d){b=r.ok?'<div class="gk-badge win"><span>'+r.sc+'. ipucunda buldun</span><b>+'+r.pts+' puan</b></div>':'<div class="gk-badge lose"><span>Bu sefer bulunamadı</span><b>0 puan</b></div>'}
+ var ci=inCat(p.cat),pos=ci.indexOf(i),nx=(pos+1<ci.length)?'<button type="button" class="gk-btn2" data-a="open" data-i="'+ci[pos+1]+'">SONRAKİ KİŞİ</button>':'';
+ return head(esc(p.cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-res">'+(anim?'<div class="gk-ring"></div>':'')+'<div class="gk-port'+(anim?' rev':'')+'">'+svgI(p.ic)+'</div><div class="gk-rname">'+esc(p.n)+'</div><div class="gk-rcat"><span class="gk-cat">'+esc(p.cat)+'</span></div>'+b+'<div class="gk-bio"><h4>KISA BİYOGRAFİ</h4>'+esc(p.b)+'</div><div class="gk-row2"'+(nx?'':' style="grid-template-columns:1fr"')+'><button type="button" class="gk-btn2" data-a="cat">KİŞİLER</button>'+nx+'</div></div></div>'}
+function render(opt){
+ if(!scr)return;opt=opt||{};
+ var h;
+ if(view==='play')h=playV(opt.newClue);else if(view==='res')h=resV(cur,opt.anim);else if(view==='cat')h=catV();else h=homeV();
+ scr.innerHTML='<div class="gk-body">'+h+'</div>';
+ if(opt.anim&&opt.win)confetti();
+}
+function confetti(){var w=scr.querySelector('.gk-res');if(!w)return;var c=document.createElement('div');c.className='gk-conf';var cols=['#ffe48a','#f0c24a','#fff4d6','#7cf7b0','#9fc3ff'],s='';for(var i=0;i<34;i++)s+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;background:'+cols[i%cols.length]+';animation-delay:'+(Math.random()*.9).toFixed(2)+'s;animation-duration:'+(1.6+Math.random()*1.2).toFixed(2)+'s;transform:rotate('+Math.round(Math.random()*180)+'deg)"></i>';c.innerHTML=s;scr.appendChild(c);setTimeout(function(){if(c.parentNode)c.remove()},3600)}
+function go(v,opt){view=v;render(opt);var s=scr&&scr.querySelector('.gk-scroll');if(s)s.scrollTop=0}
+
+/* ---------- Oyun mantığı ---------- */
+function guess(o){
+ if(busy)return;var r=ensure(cur);
+ if(r.d||r.gc===r.c)return;shown=0;
+ if(o===0){r.d=1;r.ok=1;r.sc=r.c;r.pts=SC[r.c-1];save();busy=true;
+  var btn=scr.querySelector('.gk-opt[data-o="0"]');if(btn)btn.classList.add('ok');
+  setTimeout(function(){busy=false;go('res',{anim:true,win:true})},650)}
+ else{r.w.push(o);r.gc=r.c;save();
+  if(r.c>=5){r.d=1;r.ok=0;r.pts=0;r.sc=0;save();busy=true;render();setTimeout(function(){busy=false;go('res',{anim:true})},1100)}
+  else render()}
+}
+function openClue(k){
+ if(busy)return;var r=ensure(cur);if(r.d||k<1||k>r.c+1||k>5)return;
+ if(k<=r.c){shown=k;render();return}
+ r.c++;shown=r.c;save();render({newClue:true})}
+function openPerson(i){cur=i;curCat=PEOPLE[i].cat;shown=0;var r=rec(i);if(r&&r.d)go('res');else{ensure(i);go('play',{newClue:true})}}
+
+function open(){build();view='home';render();if(typeof window.show==='function')window.show('sGizli')}
+function back(){if(!scr||!scr.classList.contains('on'))return false;if(view==='play'||view==='res'){go('cat');return true}if(view==='cat'){go('home');return true}if(typeof window.show==='function')window.show('sLogin');return true}
+function build(){
+ if(scr)return;
+ scr=document.createElement('section');scr.className='screen';scr.id='sGizli';scr.setAttribute('aria-label','Gizli Kimlik');
+ scr.addEventListener('click',function(e){
+  var b=e.target.closest('[data-a]');if(!b||!scr.contains(b))return;var a=b.getAttribute('data-a');
+  if(a==='back')back();else if(a==='open')openPerson(+b.getAttribute('data-i'));else if(a==='guess')guess(+b.getAttribute('data-o'));else if(a==='clue')openClue(+b.getAttribute('data-k'));
+  else if(a==='cat'){if(b.getAttribute('data-c'))curCat=b.getAttribute('data-c');go('cat')}else if(a==='home')go('home');
+ });
+ document.body.appendChild(scr);
+}
+
+/* geri tuşu (Android + ekran) */
+var prevBack=window.__androidBack;
+window.__androidBack=function(){if(back())return true;return typeof prevBack==='function'?prevBack.apply(this,arguments):false};
+
+/* ana menü kartı */
+function addCard(){
+ var row=document.querySelector('#hcHome .hc-row');if(!row)return false;
+ if(row.querySelector('.hc-gizli'))return true;
+ var b=document.createElement('button');b.type='button';b.className='hc-card hc-gizli';b.setAttribute('aria-label','Gizli Kimlik');
+ b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 21c.8-4.4 3.4-6.6 7-6.6s6.2 2.2 7 6.6"/><path d="M10.6 7.4a1.5 1.5 0 1 1 2.2 1.3c-.5.3-.8.6-.8 1.2M12 11.1v.1" stroke-width="1.5"/></svg><span class="hc-card-copy"><b>GİZLİ KİMLİK</b><small>İpuçlarını çöz, gizli kişiyi bul</small></span>';
+ b.addEventListener('click',function(e){e.stopPropagation();open()});
+ row.appendChild(b);return true}
+if(!addCard()){var n=0,t=setInterval(function(){if(addCard()||++n>120)clearInterval(t)},250)}
+
+/* konsol/test yardımcıları */
+window.gizliKimlik={open:open,
+ sifirla:function(){DB={p:{}};save();if(scr&&scr.classList.contains('on')){view='home';render()}return 'sıfırlandı'}};
 })();
 </script>

@@ -14710,6 +14710,18 @@ html body #frm{background:#07123a!important;-webkit-backdrop-filter:none!importa
 .gk-btn2 svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .gk-btn2:active{transform:translateY(3px);box-shadow:none}
 .gk-cong{margin:0 0 12px;padding:16px 14px;border:1.5px solid #7cf7b0;border-radius:16px;background:rgba(62,224,138,.12);text-align:center;animation:gkPop .5s cubic-bezier(.3,1.6,.5,1) both}.gk-cong-t{font-size:20px;font-weight:900;color:#ffe49a}.gk-cong p{margin:6px 0 4px;font-size:14px;font-weight:700;color:#d9e4ff}.gk-cong b{font-size:15px;font-weight:900;color:#9bffc6}.gk-cong-b{width:100%;font-size:14px}
+/* Tebrikler: ekranın ortasında karartılmış arka plan + yanıp sönen DEVAM */
+.gk-cgov{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:24px;background:rgba(2,5,16,.88);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);animation:gkFadeIn .35s ease both}
+.gk-cgbox{width:min(100%,340px);display:flex;flex-direction:column;align-items:stretch;gap:14px;text-align:center}
+.gk-cgov .gk-cong{margin:0;padding:22px 16px;background:rgba(10,26,22,.9);box-shadow:0 0 30px rgba(124,247,176,.35)}
+.gk-cgov .gk-cong-t{font-size:26px}
+.gk-cgov .gk-cong p{font-size:15px}
+.gk-cgov .gk-cong b{display:block;font-size:19px}
+.gk-cgov .gk-cong-b{min-height:58px;font-size:18px;letter-spacing:.18em;color:#06121a;border-color:#fff;background:linear-gradient(180deg,#fff,#ffe49a 140%);animation:gkCgBlink 1s ease-in-out infinite}
+.gk-cghint{font-size:13px;font-weight:800;color:#ffe49a;animation:gkCgBlinkT 1s ease-in-out infinite}
+@keyframes gkCgBlink{0%,100%{opacity:1;transform:scale(1);box-shadow:0 0 26px #ffe49a,0 0 50px rgba(255,228,154,.6)}50%{opacity:.35;transform:scale(.97);box-shadow:0 0 6px rgba(255,228,154,.2)}}
+@keyframes gkCgBlinkT{0%,100%{opacity:1}50%{opacity:.25}}
+@media(prefers-reduced-motion:reduce){.gk-cgov .gk-cong-b,.gk-cghint{animation:none}}
 .gk-row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:12px}
 .gk-foot{margin:12px 6px 0;text-align:center;font-size:11px;font-weight:700;line-height:1.4;color:#8f9dc7}
 /* oyun ekranı */
@@ -15441,7 +15453,7 @@ function resV(i,anim){
  var p=PEOPLE[i],r=rec(i),b='';
  if(r&&r.d){b=r.ok?'<div class="gk-badge win"><span>'+r.sc+'. ipucunda buldun</span><b>+'+r.pts+' puan</b></div>':'<div class="gk-badge lose"><span>Bu sefer bulunamadı</span><b>0 puan</b></div>'}
  var nc=nextCat(p.cat),cg=!!(r&&r.d&&nc&&OPEN.indexOf(nc)<0&&catDone(p.cat)),ci=inCat(p.cat),pos=ci.indexOf(i),nx=(pos+1<ci.length&&unl(ci[pos+1]))?'<button type="button" class="gk-btn2 gk-go" data-a="nextp" data-i="'+ci[pos+1]+'">DEVAM <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>':'';
- return head(esc(p.cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-res">'+(anim?'<div class="gk-ring"></div>':'')+'<div class="gk-port'+(anim?' rev':'')+'">'+svgI(p.ic)+'</div><div class="gk-rname">'+esc(p.n)+'</div><div class="gk-rcat"><span class="gk-cat">'+esc(p.cat)+'</span></div>'+b+'<div class="gk-bio"><h4>KISA BİYOGRAFİ</h4>'+esc(p.b)+'</div>'+(cg?'<div class="gk-cong"><div class="gk-cong-t">🎉 Tebrikler!</div><p>Bir sonraki bölüme geçtiniz.</p><b>'+esc(nc)+'</b></div><button type="button" class="gk-btn2 gk-cong-b" data-a="next" data-c="'+esc(nc)+'">DEVAM</button>':'<div class="gk-row2"'+(nx?'':' style="grid-template-columns:1fr"')+'><button type="button" class="gk-btn2" data-a="cat">KİŞİLER</button>'+nx+'</div>')+'</div></div>'}
+ return head(esc(p.cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-res">'+(anim?'<div class="gk-ring"></div>':'')+'<div class="gk-port'+(anim?' rev':'')+'">'+svgI(p.ic)+'</div><div class="gk-rname">'+esc(p.n)+'</div><div class="gk-rcat"><span class="gk-cat">'+esc(p.cat)+'</span></div>'+b+'<div class="gk-bio"><h4>KISA BİYOGRAFİ</h4>'+esc(p.b)+'</div>'+(cg?'':'<div class="gk-row2"'+(nx?'':' style="grid-template-columns:1fr"')+'><button type="button" class="gk-btn2" data-a="cat">KİŞİLER</button>'+nx+'</div>')+'</div></div>'+(cg?'<div class="gk-cgov" role="dialog" aria-modal="true" aria-label="Tebrikler"><div class="gk-cgbox"><div class="gk-cong"><div class="gk-cong-t">🎉 Tebrikler!</div><p>Bir sonraki bölüme geçtiniz.</p><b>'+esc(nc)+'</b></div><button type="button" class="gk-btn2 gk-cong-b" data-a="next" data-c="'+esc(nc)+'">DEVAM</button><div class="gk-cghint">👆 Devam etmek için dokun</div></div></div>':'')}
 function render(opt){
  if(!scr)return;opt=opt||{};
  var h;

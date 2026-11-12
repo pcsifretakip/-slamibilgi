@@ -6604,6 +6604,7 @@ document.addEventListener('click',e=>{
 /* ===== SESLİ KONUŞMA (WebRTC, 3-4 kişilik odalar) — sinyalleşme: Firestore voiceSig ===== */
 (function(){
 const ICE={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
+const VOICE_ENABLED=false; /* sesli konuşmayı açmak için true yap */
 let on=false,muted=false,stream=null,hid='',peers={},lastT={},tm=null,box=null;
 const pid2=(a,b)=>a<b?[a,b]:[b,a];
 const docId=(u)=>{const [lo,hi]=pid2(uid,u);return hid+'__'+lo+'__'+hi};
@@ -6652,7 +6653,7 @@ function connect(u){
       if(x.t!==d.t){if(lastT[u]===d.t)return;x.t=d.t;lastT[u]=d.t;guard(async()=>{await pc.setRemoteDescription(d.offer);const a=await pc.createAnswer();await pc.setLocalDescription(a);await F.setDoc(ref,{answer:{type:a.type,sdp:a.sdp}},{merge:true});addC(d)})}
       else if(pc.remoteDescription)addC(d)},e=>console.warn('voiceSig',e))}
 }
-setInterval(()=>{const s=document.getElementById('famScene');if(s&&s.classList.contains('on')&&famG&&famG.doc&&(+famG.doc.cap||2)>=3)ui();else if(on)stop();else{const b=document.getElementById('vcBar');if(b)b.remove()}},1500);
+setInterval(()=>{if(!VOICE_ENABLED){const x=document.getElementById('vcBar');if(x)x.remove();return}const s=document.getElementById('famScene');if(s&&s.classList.contains('on')&&famG&&famG.doc&&(+famG.doc.cap||2)>=3)ui();else if(on)stop();else{const b=document.getElementById('vcBar');if(b)b.remove()}},1500);
 })();
 /* ===== ARKADAŞLIK İSTEĞİ: profilden gönder → karşıda ortada Kabul/Reddet → kabul edilince iki taraf kendi listesine ekler ===== */
 let frOn=0,frInb=[];
@@ -9274,12 +9275,12 @@ b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();
 <style id="seat-invite-css">
 #famScene:not(.playing) .fs-seat.dim{cursor:pointer;pointer-events:auto}
 #famScene:not(.playing) .fs-seat.dim .fs-svg{position:relative}
-#famScene:not(.playing) .fs-seat.dim .fs-svg::after{content:"+";position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:46px;height:46px;border-radius:50%;background:linear-gradient(#ffe48a,#d99419);color:#382100;font:900 32px/44px system-ui,sans-serif;text-align:center;box-shadow:0 0 0 0 rgba(255,217,102,.7),0 3px 0 #80500a;animation:simPulse 1.6s ease-out infinite}
+#famScene:not(.playing) .fs-seat.dim .fs-svg::after{content:"";position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='8' r='4.2' fill='%23382100'/%3E%3Cpath d='M3.8 21c.4-4.6 3.5-7 8.2-7s7.8 2.4 8.2 7z' fill='%23382100'/%3E%3C/svg%3E") center/62% no-repeat,linear-gradient(#ffe48a,#d99419);box-shadow:0 0 0 0 rgba(255,217,102,.7),0 3px 0 #80500a;animation:simPulse 1.6s ease-out infinite}
 #famScene:not(.playing) .fs-seat.dim .fs-nm::after{content:"Davet etmek için dokun";font-size:10.5px;font-weight:800;color:#ffd966;opacity:.95}
 @keyframes simPulse{0%{box-shadow:0 0 0 0 rgba(255,217,102,.7),0 3px 0 #80500a}100%{box-shadow:0 0 0 18px rgba(255,217,102,0),0 3px 0 #80500a}}
 @media(prefers-reduced-motion:reduce){#famScene:not(.playing) .fs-seat.dim .fs-svg::after{animation:none}}
-#seatInvM{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:flex-end;justify-content:center;background:rgba(4,7,30,.78);font-family:"Nunito",system-ui,sans-serif}
-#seatInvM .sim-c{position:relative;width:min(100%,480px);max-height:75vh;display:flex;flex-direction:column;padding:18px 14px 16px;border-radius:22px 22px 0 0;background:linear-gradient(#1b1450,#0d0a2e);border:2px solid #c9a24a;border-bottom:0;color:#fff4d6}
+#seatInvM{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;background:rgba(4,7,30,.78);font-family:"Nunito",system-ui,sans-serif}
+#seatInvM .sim-c{position:relative;width:min(100%,420px);max-height:70vh;display:flex;flex-direction:column;padding:18px 14px 16px;border-radius:22px;background:linear-gradient(#1b1450,#0d0a2e);border:2px solid #c9a24a;box-shadow:0 10px 40px rgba(0,0,0,.6);color:#fff4d6}
 #seatInvM h3{margin:0;text-align:center;color:#ffd966;font-size:19px}
 #seatInvM p{margin:4px 0 10px;text-align:center;font-size:13px;opacity:.85}
 #seatInvM .sim-x{position:absolute;right:10px;top:8px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px;line-height:1}

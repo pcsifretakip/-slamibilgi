@@ -9301,6 +9301,72 @@ b.addEventListener('click',function(e){e.preventDefault();e.stopPropagation();
 @keyframes vcP{0%,100%{box-shadow:0 3px 0 #80500a,0 0 0 0 rgba(255,217,102,.6)}50%{box-shadow:0 3px 0 #80500a,0 0 0 10px rgba(255,217,102,0)}}
 @media(prefers-reduced-motion:reduce){#vcBar:not(.on) #vcMain{animation:none}}
 </style>
+<style id="duel-menu-gamify">
+/* ÇEVRİM İÇİ DÜELLO: mobil oyun tarzı yeniden tasarım (yalnızca görünüm; ID ve işlevler aynı) */
+html body #frm.lbm{overflow:hidden;background:radial-gradient(120% 70% at 50% 22%,#1d3fa6 0%,#0b1d60 48%,#050b2a 100%)!important}
+html body #frm.lbm::before{display:block!important;content:""!important;position:absolute!important;left:50%;top:26%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;background:repeating-conic-gradient(from 0deg,rgba(255,212,90,.075) 0 7deg,transparent 7deg 18deg)!important;-webkit-mask-image:radial-gradient(circle,#000 0,transparent 32%)!important;mask-image:radial-gradient(circle,#000 0,transparent 32%)!important;pointer-events:none;animation:frRays 60s linear infinite!important}
+@keyframes frRays{to{transform:rotate(360deg)}}
+html body #frm.lbm .frp{position:relative;z-index:1;width:min(94vw,380px);padding:0 14px 14px!important;border:3px solid #ffd45a!important;border-radius:30px!important;
+ background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Cg fill='none' stroke='%23ffd45a' stroke-opacity='.09' stroke-width='1'%3E%3Crect x='10' y='10' width='28' height='28'/%3E%3Crect x='10' y='10' width='28' height='28' transform='rotate(45 24 24)'/%3E%3C/g%3E%3C/svg%3E"),linear-gradient(180deg,#2a52c8 0%,#16308c 34%,#0b1952 100%);
+ box-shadow:0 0 0 3px #7a4d0e,0 0 0 6px rgba(255,212,90,.22),0 0 44px rgba(255,190,50,.38),0 26px 54px rgba(0,0,0,.72),inset 0 2px 0 rgba(255,255,255,.35),inset 0 -14px 26px rgba(0,0,0,.35)}
+html body #frm.lbm.on .frp{animation:frPanelIn .5s cubic-bezier(.2,1.35,.4,1) both}
+@keyframes frPanelIn{0%{opacity:0;transform:translateY(40px) scale(.88)}100%{opacity:1;transform:none}}
+/* başlık bandı */
+html body #frm.lbm .frp .frtitle{position:relative;margin:0 -14px!important;padding:20px 58px 16px!important;border-radius:27px 27px 0 0;border-bottom:3px solid #ffd45a;background:linear-gradient(180deg,#4a78f0 0%,#2b55cf 48%,#1a3aa0 52%,#17338f 100%);box-shadow:0 6px 14px rgba(0,0,0,.35),inset 0 2px 0 rgba(255,255,255,.45)}
+html body #frm.lbm .frp .frtl,html body #frm.lbm .frp .frtl b{display:block!important;position:static!important;background:none!important;clip-path:none!important;text-align:center}
+html body #frm.lbm .frp .frtl b span{display:block!important;font:900 20px/1.1 "Nunito",system-ui,sans-serif!important;letter-spacing:.07em!important;white-space:nowrap!important;-webkit-text-fill-color:#ffe58f!important;color:#ffe58f!important;background:none!important;text-shadow:0 3px 0 #7a4d0e,2px 0 0 #3a2300,-2px 0 0 #3a2300,0 -2px 0 #3a2300,0 0 14px rgba(255,200,60,.65)!important}
+/* kapat butonu */
+html body #frm.lbm .frp .frx{top:11px!important;right:11px!important;width:38px!important;height:38px!important;border:2.5px solid #fff!important;border-radius:50%;background:linear-gradient(180deg,#ff8a8a,#e0243a 55%,#a50f26)!important;color:#fff!important;font-size:20px!important;box-shadow:0 3px 0 #6a0a18,0 0 12px rgba(255,80,80,.55)!important;text-shadow:0 1px 0 rgba(0,0,0,.4)}
+/* ana butonlar: 1 büyük + 3 küçük, 3D oyun butonları */
+html body #frm.lbm .frp .frtabs#frMainTabs{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:11px!important;max-width:none!important;margin:20px 0 0!important}
+html body #frm.lbm .frp .frtabs#frMainTabs button{--c1:#ffe08a;--c2:#ff9a1f;--c3:#d9650a;--sh:#8a3f06;--gl:255,170,40;
+ position:relative;overflow:hidden;display:flex!important;flex-direction:column!important;align-items:center;justify-content:center;gap:8px!important;aspect-ratio:auto!important;min-height:112px!important;height:auto!important;padding:12px 4px 10px!important;
+ border:3px solid rgba(255,255,255,.88)!important;border-radius:20px!important;background:linear-gradient(180deg,var(--c1) 0%,var(--c2) 48%,var(--c3) 100%)!important;color:#fff!important;font:900 12.5px/1.15 "Nunito",system-ui,sans-serif!important;text-align:center;
+ text-shadow:0 2px 0 rgba(0,0,0,.38),0 0 8px rgba(0,0,0,.25);box-shadow:0 6px 0 var(--sh),0 10px 18px rgba(0,0,0,.45),0 0 20px rgba(var(--gl),.35),inset 0 2px 0 rgba(255,255,255,.65),inset 0 -8px 12px rgba(0,0,0,.12)!important;
+ animation:frBtnIn .55s cubic-bezier(.2,1.4,.4,1) both}
+html body #frm.lbm .frp .frtabs#frMainTabs button::before{content:"";position:absolute;left:0;right:0;top:0;height:46%;border-radius:17px 17px 60% 60%/17px 17px 14px 14px;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.04));pointer-events:none}
+html body #frm.lbm .frp .frtabs#frMainTabs button svg.nv{display:block!important;position:relative;flex:none;box-sizing:border-box;width:46px!important;height:46px!important;max-width:none!important;max-height:none!important;padding:10px;border-radius:50%;background:rgba(0,0,0,.22);border:2px solid rgba(255,255,255,.75);stroke:#fff!important;stroke-width:2!important;fill:none;filter:drop-shadow(0 2px 0 rgba(0,0,0,.35))!important;box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
+html body #frm.lbm .frp .frtabs#frMainTabs button span{position:relative;display:block;max-width:100%;overflow-wrap:anywhere}
+html body #frm.lbm .frp .frtabs#frMainTabs button:active{transform:translateY(5px) scale(.98)!important;box-shadow:0 1px 0 var(--sh),0 3px 8px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.5)!important;filter:brightness(1.08)!important}
+html body #frm.lbm .frp .frtabs#frMainTabs button.on{outline:3px solid #fff;outline-offset:2px}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frMk{--c1:#ffe08a;--c2:#ff9a1f;--c3:#d9650a;--sh:#8a3f06;--gl:255,170,40;animation-delay:.18s}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frFrTab{--c1:#cdb3ff;--c2:#8a5cf0;--c3:#5a2fc2;--sh:#321478;--gl:140,90,255;animation-delay:.26s}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frAile{--c1:#8aeaff;--c2:#25aee8;--c3:#1170b4;--sh:#07406b;--gl:50,190,255;animation-delay:.34s}
+/* büyük ana buton: Oda Seç ve Oyna */
+html body #frm.lbm .frp .frtabs#frMainTabs button#frRand{--c1:#9bff9f;--c2:#2fdf69;--c3:#12a343;--sh:#0a6a2b;--gl:60,255,130;
+ order:-1;grid-column:1/-1;display:grid!important;grid-template-columns:62px 1fr;grid-template-rows:auto auto;align-content:center;column-gap:14px;row-gap:2px;min-height:100px!important;padding:12px 18px!important;text-align:left;
+ font-size:22px!important;animation:frBtnIn .55s cubic-bezier(.2,1.4,.4,1) .08s both,frPulse 1.9s ease-in-out .8s infinite}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frRand svg.nv{grid-row:1/3;width:62px!important;height:62px!important;padding:14px}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frRand span{align-self:end;font-size:22px;line-height:1.05;text-align:left}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frRand::after{content:"Hemen rakip bul";position:relative;grid-column:2;grid-row:2;align-self:start;font-size:12.5px;font-weight:800;color:#eaffd8;opacity:.95;text-shadow:0 1px 0 rgba(0,0,0,.4)}
+html body #frm.lbm .frp .frtabs#frMainTabs button#frRand::before{height:100%;border-radius:0;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.55) 50%,transparent 62%) 0 0/250% 100% no-repeat,linear-gradient(180deg,rgba(255,255,255,.34) 0,rgba(255,255,255,.03) 46%,transparent 47%);animation:frSweep 3.2s ease-in-out 1s infinite}
+@keyframes frBtnIn{0%{opacity:0;transform:translateY(26px) scale(.8)}100%{opacity:1;transform:none}}
+@keyframes frPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+@keyframes frSweep{0%{background-position:130% 0,0 0}60%,100%{background-position:-60% 0,0 0}}
+/* alt bilgi şeridi */
+html body #frm.lbm .frp .frfoot{display:flex;justify-content:center!important;margin:18px 0 0!important}
+html body #frm.lbm .frp .frfoot i{display:none!important}
+html body #frm.lbm .frp .frfoot svg{display:block!important;flex:none;width:16px!important;height:16px!important;margin:0 -2px 0 0;fill:rgba(255,212,90,.18);stroke:#ffd45a}
+html body #frm.lbm .frp .frfoot{align-items:center;gap:6px;padding:9px 12px;border-radius:999px;background:rgba(0,0,0,.32);border:1.5px solid rgba(255,212,90,.5);box-shadow:inset 0 2px 6px rgba(0,0,0,.35)}
+html body #frm.lbm .frp .frfoot span{font:800 11.5px/1.25 "Nunito",system-ui,sans-serif!important;color:#ffe08a!important;white-space:normal!important;text-align:center}
+@media(max-width:350px){html body #frm.lbm .frp .frtabs#frMainTabs button{font-size:11.5px!important}html body #frm.lbm .frp .frtl b span{font-size:17px!important}}
+@media(prefers-reduced-motion:reduce){html body #frm.lbm .frp,html body #frm.lbm .frp .frtabs#frMainTabs button,html body #frm.lbm::before,html body #frm.lbm .frp .frtabs#frMainTabs button#frRand::before{animation:none!important}}
+</style>
+<style id="gizli-kimlik-lock-css">
+#hcHome .hc-gizli.gk-lockedcard{position:relative;filter:grayscale(.75) brightness(.8);opacity:.88}
+#hcHome .hc-gizli .gkl-badge{position:absolute;right:12px;top:50%;margin-top:-16px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.45);border:1.5px solid rgba(255,224,138,.75)}
+#hcHome .hc-gizli .gkl-badge svg{width:18px;height:18px;fill:none;stroke:#ffe08a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#gkLockToast{position:fixed;left:50%;top:50%;z-index:2147483000;width:min(84vw,320px);padding:22px 20px 18px;border:3px solid #ffd45a;border-radius:24px;text-align:center;color:#fff;font-family:"Nunito",system-ui,sans-serif;background:linear-gradient(180deg,#2a52c8,#16308c 40%,#0b1952);box-shadow:0 0 0 3px #7a4d0e,0 0 36px rgba(255,190,50,.4),0 20px 50px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.3);opacity:0;visibility:hidden;transform:translate(-50%,-44%) scale(.9);pointer-events:none;transition:opacity .2s,transform .25s,visibility .2s}
+#gkLockToast.show{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1);animation:gklShake .5s ease .05s}
+#gkLockToast .gkl-ic{width:64px;height:64px;margin:-52px auto 10px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(180deg,#ffe58f,#e0a12a);border:3px solid #fff;box-shadow:0 4px 0 #7a4d0e,0 0 18px rgba(255,200,60,.6)}
+#gkLockToast .gkl-ic svg{width:34px;height:34px;fill:none;stroke:#3a2300;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#gkLockToast .gkl-ic circle{fill:#3a2300}
+#gkLockToast b{display:block;font-size:20px;font-weight:900;color:#ffe58f;text-shadow:0 2px 0 #5a3a00}
+#gkLockToast p{margin:8px 0 10px;font-size:15px;font-weight:700;line-height:1.35;color:#e6efff}
+#gkLockToast em{font-style:normal;font-weight:900;color:#9bffc6}
+#gkLockToast small{display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,212,90,.45);font-size:12.5px;font-weight:800;color:#ffe08a}
+@keyframes gklShake{0%,100%{margin-left:0}20%{margin-left:-7px}40%{margin-left:7px}60%{margin-left:-4px}80%{margin-left:4px}}
+</style>
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */
@@ -12549,6 +12615,7 @@ html body #hcHome .hc-row{grid-template-rows:repeat(7,56px)!important;gap:8px!im
 @media(min-height:780px){html body #hcHome .hc-row{grid-template-rows:repeat(7,60px)!important}}
 @media(max-height:700px){html body #hcHome .hc-row{grid-template-rows:repeat(7,50px)!important;gap:6px!important}}
 @media(max-height:620px){html body #hcHome .hc-row{grid-template-rows:repeat(7,46px)!important;gap:5px!important}}
+html body #hcHome .hc-card.hc-memleket{display:none!important}
 html body #hcHome .hc-card.hc-memleket{--rgb:61,255,160;justify-content:flex-start;text-align:left;gap:12px;padding:0 18px;height:100%;min-height:0;
 border:1px solid rgba(255,255,255,0.25)!important;border-radius:15px;
 background:rgba(255,255,255,0.08)!important;
@@ -13225,6 +13292,8 @@ function renderWrong(){
 }
 function addBtn(){
  var row=document.querySelector('#hcHome .hc-row');if(!row)return false;
+ /* GİZLENDİ: şimdilik oyuna eklenmiyor. Tekrar açmak için aşağıdaki satırı sil. */
+ if(true){var o=row.querySelector('.hc-memleket');if(o)o.remove();return true}
  if(row.querySelector('.hc-memleket'))return true;
  // Buton 1: Memleketini Tanıyor Musun?
  var b1=document.createElement('button');b1.type='button';b1.className='hc-card hc-memleket';b1.setAttribute('aria-label','MEMLEKETİNİ NE KADAR TANIYORSUN ?');
@@ -15392,7 +15461,7 @@ function rec(i){return DB.p[PEOPLE[i].n]||null}
 function ensure(i){var k=PEOPLE[i].n,r=DB.p[k];if(!r){r=DB.p[k]={c:1,w:[],gc:0,d:0,ok:0,pts:0,sc:0};save()}return r}
 function total(){var t=0;for(var k in DB.p)t+=(DB.p[k].pts|0);return t}
 function doneCnt(){var n=0;for(var k in DB.p)if(DB.p[k].d)n++;return n}
-function order(p){var s=PEOPLE[p].n,h=0;for(var q=0;q<s.length;q++)h=(h*31+s.charCodeAt(q))&0x7fffffff;var n=h+13,a=[0,1,2,3];for(var i=3;i>0;i--){n=(n*1103515245+12345)&0x7fffffff;var j=n%(i+1),t=a[i];a[i]=a[j];a[j]=t}return a}
+function order(p){var s=PEOPLE[p].n,h=2166136261;for(var q=0;q<s.length;q++){h^=s.charCodeAt(q);h=Math.imul(h,16777619)}var n=h|0,a=[0,1,2,3];function rnd(){n=(n+0x6D2B79F5)|0;var t=Math.imul(n^(n>>>15),1|n);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296}for(var i=3;i>0;i--){var j=Math.floor(rnd()*(i+1)),u=a[i];a[i]=a[j];a[j]=u}return a}
 function myName(){var n='';try{n=(localStorage.getItem('islamibilgi_name')||'').trim()}catch(e){}return n||'Misafir'}
 function myAv(){var a=$('hAv');return(a&&a.getAttribute('src'))||''}
 
@@ -15409,7 +15478,7 @@ function homeV(){
  CATS.forEach(function(c){var ids=inCat(c);if(!ids.length)return;var d=0,pts=0;ids.forEach(function(i){var r=rec(i);if(r&&r.d){d++;pts+=r.pts|0}});
   var isOpen=OPEN.indexOf(c)>=0,nu=(c===newCat),cls='gk-hi',da='cat',ic,sm,rs;
   if(!isOpen){cls+=' gk-lk';da='locked';ic='<span class="gk-lkic">'+LOCK+'</span>';sm='Kilitli';rs='<span class="gk-hr lk">'+LOCK+'</span>'}
-  else{cls+=(d===ids.length?' gk-won':' gk-op');ic=svgI(PEOPLE[ids[0]].ic)+(nu?'<span class="gk-lkout">'+LOCK+'</span>':'');sm=ids.filter(unl).length+' kişi açıldı';rs=(d===ids.length?'<span class="gk-hr win">✓</span>':'<span class="gk-hr go">AÇ</span>');if(nu)cls+=' gk-unl'}
+  else{cls+=(d===ids.length?' gk-won':' gk-op');ic=svgI(PEOPLE[ids[0]].ic)+(nu?'<span class="gk-lkout">'+LOCK+'</span>':'');sm=ids.filter(unl).length+' kişi açıldı';rs=(d===ids.length?'<span class="gk-hr win">✓</span>':'<span class="gk-hr go"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:0 auto"><path d="M9 5l7 7-7 7"/></svg></span>');if(nu)cls+=' gk-unl'}
   h+='<button type="button" class="'+cls+'" data-a="'+da+'" data-c="'+esc(c)+'"'+(isOpen?'':' aria-disabled="true"')+'><span class="gk-hic">'+ic+'</span><span class="gk-hm"><b>'+esc(c)+'</b><small>'+sm+'</small></span>'+rs+'</button>'});
  return head('GİZLİ KİMLİK',1)+'<div class="gk-scroll"><p class="gk-sub">İpuçlarını çöz, kim olduğunu bul!</p><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">KATEGORİ SEÇ</div><div class="gk-list">'+h+'</div><p class="gk-foot">Gizli Kimlik puanları ayrı tutulur; İlim Puanı ve Dirhem’e eklenmez. Her kişiden puan yalnızca bir kez kazanılır.</p></div>'}
 var SEENK='gkUnlockSeenV2';
@@ -15545,7 +15614,19 @@ function openClue(k){
  r.c++;save();render({newClue:true})}
 function openPerson(i,enter){if(!unl(i))return;cur=i;curCat=PEOPLE[i].cat;var r=rec(i);if(r&&r.d)go('res',{enter:enter});else{ensure(i);go('play',{newClue:true,enter:enter})}}
 
-function open(){build();view='home';render();if(typeof window.show==='function')window.show('sGizli')}
+/* ---- Gizli Kimlik kilidi: ilim puanı en az GK_NEED olmadan açılmaz ---- */
+var GK_NEED=100;
+function gkPts(){var v=0;try{v=Math.max(+localStorage.getItem('islamibilgi_pts')||0,+localStorage.getItem('ilimJourneyPointsV1')||0)}catch(e){}return v>0?v:0}
+function gkLocked(){return gkPts()<GK_NEED}
+var gkLt=null,gkLtT=0;
+function gkLockMsg(){
+ if(!gkLt){gkLt=document.createElement('div');gkLt.id='gkLockToast';gkLt.setAttribute('role','status');document.body.appendChild(gkLt)}
+ var p=Math.floor(gkPts());
+ gkLt.innerHTML='<div class="gkl-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="9.5" rx="2.2"/><circle cx="12" cy="15.6" r="1.2"/></svg></div><b>Gizli Kimlik kilitli</b><p>İlim Puanı bölümünde en az <em>'+GK_NEED+' puan</em> kazanmalısın.</p><small>Şu anki puanın: '+p+' / '+GK_NEED+'</small>';
+ gkLt.classList.remove('show');void gkLt.offsetWidth;gkLt.classList.add('show');
+ clearTimeout(gkLtT);gkLtT=setTimeout(function(){gkLt.classList.remove('show')},2800);
+ try{if(navigator.vibrate)navigator.vibrate([40,40,40])}catch(x){}}
+function open(){if(gkLocked()){gkLockMsg();return}build();view='home';render();if(typeof window.show==='function')window.show('sGizli')}
 function back(){if(!scr||!scr.classList.contains('on'))return false;if(scr.querySelector('.gk-ul')){finishUnlock();return true}if(view==='play'||view==='res'){go('cat');return true}if(view==='cat'){go('home');return true}if(typeof window.show==='function')window.show('sLogin');return true}
 function build(){
  if(scr)return;
@@ -15570,7 +15651,16 @@ function addCard(){
  var b=document.createElement('button');b.type='button';b.className='hc-card hc-gizli';b.setAttribute('aria-label','Gizli Kimlik');
  b.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 21c.8-4.4 3.4-6.6 7-6.6s6.2 2.2 7 6.6"/><path d="M10.6 7.4a1.5 1.5 0 1 1 2.2 1.3c-.5.3-.8.6-.8 1.2M12 11.1v.1" stroke-width="1.5"/></svg><span class="hc-card-copy"><b>GİZLİ KİMLİK</b><small>İpuçlarını çöz, gizli kişiyi bul</small></span>';
  b.addEventListener('click',function(e){e.stopPropagation();open()});
- row.appendChild(b);return true}
+ row.appendChild(b);gkRefreshCard();return true}
+function gkRefreshCard(){
+ var b=document.querySelector('#hcHome .hc-gizli');if(!b)return;
+ var lk=gkLocked(),sm=b.querySelector('small'),ic=b.querySelector('.gkl-badge');
+ b.classList.toggle('gk-lockedcard',lk);b.setAttribute('aria-disabled',lk?'true':'false');
+ if(sm)sm.textContent=lk?(GK_NEED+' ilim puanı kazanınca açılır'):'İpuçlarını çöz, gizli kişiyi bul';
+ if(lk&&!ic){ic=document.createElement('span');ic.className='gkl-badge';ic.setAttribute('aria-hidden','true');ic.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="9.5" rx="2.2"/></svg>';b.appendChild(ic)}
+ if(!lk&&ic)ic.remove()}
+setInterval(gkRefreshCard,1200);
+document.addEventListener('visibilitychange',gkRefreshCard);
 if(!addCard()){var n=0,t=setInterval(function(){if(addCard()||++n>120)clearInterval(t)},250)}
 
 /* konsol/test yardımcıları */

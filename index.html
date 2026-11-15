@@ -9356,6 +9356,21 @@ html body #frm.lbm .frp .frfoot span{font:800 11.5px/1.25 "Nunito",system-ui,san
 #hcHome .hc-gizli.gk-lockedcard{position:relative;filter:grayscale(.75) brightness(.8);opacity:.88}
 #hcHome .hc-gizli .gkl-badge{position:absolute;right:12px;top:50%;margin-top:-16px;width:32px;height:32px;display:grid;place-items:center;border-radius:50%;background:rgba(0,0,0,.45);border:1.5px solid rgba(255,224,138,.75)}
 #hcHome .hc-gizli .gkl-badge svg{width:18px;height:18px;fill:none;stroke:#ffe08a;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* Gizli Kimlik ana ekran: kaydırmasız, tüm kategoriler tek ekranda */
+#sGizli .gk-scroll.gk-nos{display:flex;flex-direction:column;overflow:hidden;padding:0 10px calc(10px + env(safe-area-inset-bottom,0px))}
+#sGizli .gk-toprow{flex:none;display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 8px}
+#sGizli .gk-toprow .gk-sil.sm{width:52px;flex:none}
+#sGizli .gk-toprow .gk-lab{margin:0;font-size:13px}
+#sGizli .gk-list.gk-grid{flex:1 1 auto;min-height:0;margin:0;display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(0,1fr);gap:6px}
+#sGizli .gk-grid .gk-hi{height:100%;min-height:0;min-width:0;padding:3px 7px;gap:6px;border-radius:12px;box-sizing:border-box}
+#sGizli .gk-grid .gk-hic{width:32px;height:32px;border-width:1.5px}
+#sGizli .gk-grid .gk-hic svg{width:18px;height:18px}
+#sGizli .gk-grid .gk-hic .gk-lkic svg,#sGizli .gk-grid .gk-hic .gk-lkout svg{width:15px;height:15px}
+#sGizli .gk-grid .gk-hm b{font-size:11.5px;line-height:1.12;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word}
+#sGizli .gk-grid .gk-hm small{font-size:9.5px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#sGizli .gk-grid .gk-hr{min-width:0;width:20px;height:20px;padding:0;display:grid;place-items:center;font-size:11px}
+#sGizli .gk-grid .gk-hr.lk{display:none}
+#sGizli .gk-grid .gk-hr svg{width:11px;height:11px}
 #gkLockToast{position:fixed;left:50%;top:50%;z-index:2147483000;width:min(84vw,320px);padding:22px 20px 18px;border:3px solid #ffd45a;border-radius:24px;text-align:center;color:#fff;font-family:"Nunito",system-ui,sans-serif;background:linear-gradient(180deg,#2a52c8,#16308c 40%,#0b1952);box-shadow:0 0 0 3px #7a4d0e,0 0 36px rgba(255,190,50,.4),0 20px 50px rgba(0,0,0,.7),inset 0 2px 0 rgba(255,255,255,.3);opacity:0;visibility:hidden;transform:translate(-50%,-44%) scale(.9);pointer-events:none;transition:opacity .2s,transform .25s,visibility .2s}
 #gkLockToast.show{opacity:1;visibility:visible;transform:translate(-50%,-50%) scale(1);animation:gklShake .5s ease .05s}
 #gkLockToast .gkl-ic{width:64px;height:64px;margin:-52px auto 10px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(180deg,#ffe58f,#e0a12a);border:3px solid #fff;box-shadow:0 4px 0 #7a4d0e,0 0 18px rgba(255,200,60,.6)}
@@ -9365,6 +9380,8 @@ html body #frm.lbm .frp .frfoot span{font:800 11.5px/1.25 "Nunito",system-ui,san
 #gkLockToast p{margin:8px 0 10px;font-size:15px;font-weight:700;line-height:1.35;color:#e6efff}
 #gkLockToast em{font-style:normal;font-weight:900;color:#9bffc6}
 #gkLockToast small{display:inline-block;padding:5px 12px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(255,212,90,.45);font-size:12.5px;font-weight:800;color:#ffe08a}
+#gkBlackout{position:fixed;inset:0;z-index:2147482999;background:#000;opacity:1;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#gkLockToast .gkl-tap{margin-top:10px;font-size:12px;font-weight:800;color:#b9c8ee;letter-spacing:.02em}
 @keyframes gklShake{0%,100%{margin-left:0}20%{margin-left:-7px}40%{margin-left:7px}60%{margin-left:-4px}80%{margin-left:4px}}
 </style>
 </body>
@@ -13137,9 +13154,10 @@ cografya:[
 {q:'Aşağıdakilerden hangisi Sakarya Nehri’nin kollarından biri değildir?',o:['Porsuk Çayı','Ankara Çayı','Mudurnu Çayı','Kızılırmak'],a:3,n:'Kızılırmak ayrı bir havzaya aittir ve Karadeniz’e kendi yatağıyla dökülür.'}
 ]}};
 window.MEMLEKET_SORULAR=SORULAR;
-var PKEY='memleketProgressV3';
-function loadProg(){try{var p=JSON.parse(localStorage.getItem(PKEY)||'{}');return p&&typeof p==='object'?p:{}}catch(e){return{}}}
-function saveProg(p){try{localStorage.setItem(PKEY,JSON.stringify(p))}catch(e){}}
+var PKEY='memleketProgressV3',MEMPROG={};
+try{localStorage.removeItem(PKEY)}catch(e){}/* çözülen cevaplar telefon hafızasına yazılmaz; eski kayıt da silinir */
+function loadProg(){return MEMPROG&&typeof MEMPROG==='object'?MEMPROG:{}}
+function saveProg(p){MEMPROG=(p&&typeof p==='object')?p:{}}
 function starsOf(k,n){n=n||10;var r=k/n;return r>=1?3:r>=.8?2:r>=.6?1:0}
 function passOf(n){return Math.ceil(n*.6)}
 function paintStars(){
@@ -15023,6 +15041,41 @@ html body #hcHome .hc-card.hc-gizli b{color:#fff0b8;letter-spacing:.06em}
 .gk-hi .gk-pts{z-index:5}
 .gk-toast{position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 72px);transform:translateX(-50%);z-index:40;padding:10px 18px;border-radius:999px;background:linear-gradient(180deg,#ffe48a,#d99419);color:#2c1d00;font-weight:900;font-size:13px;letter-spacing:.06em;white-space:nowrap;box-shadow:0 6px 24px rgba(0,0,0,.45),0 0 20px rgba(240,194,74,.6);pointer-events:none;animation:gkToast 2.6s ease both}
 @keyframes gkToast{0%{opacity:0;transform:translateX(-50%) translateY(-14px)}12%{opacity:1;transform:translateX(-50%) translateY(0)}85%{opacity:1}100%{opacity:0;transform:translateX(-50%) translateY(-8px)}}
+/* ---- Gizli Kimlik: daktilo ipucu kutusu + puan butonları ---- */
+#sGizli .gk-tw{flex:1 1 auto;min-height:0;margin:4px 16px 12px;padding:18px;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:none;border:2px solid rgba(243,215,134,.75);border-radius:22px;background:radial-gradient(120% 80% at 50% 0%,rgba(240,194,74,.16),rgba(10,18,48,.92) 62%),#0a1230;box-shadow:0 0 22px rgba(240,194,74,.22),inset 0 0 24px rgba(0,0,0,.35)}
+#sGizli .gk-tw::-webkit-scrollbar{display:none}
+#sGizli .gk-twin{font-size:clamp(19px,5.6vw,25px);line-height:1.6;font-weight:800;color:#d9e4ff;letter-spacing:.01em;word-break:break-word}
+#sGizli .gk-tx.cur{color:#fff4d6}
+#sGizli .gk-tx.typing::after{content:"";display:inline-block;width:.5em;height:1.05em;margin-left:2px;vertical-align:-.15em;background:#f3d786;border-radius:2px;animation:gkCaret .6s steps(1) infinite}
+@keyframes gkCaret{50%{opacity:0}}
+#sGizli .gk-pbsw{flex:none;padding:0 16px 10px}
+#sGizli .gk-pbsw .gk-tap{margin:0 0 8px}
+#sGizli .gk-pbs{display:flex;gap:8px}
+#sGizli .gk-pb{flex:1;min-width:0;height:52px;padding:0;border-radius:15px;border:2px solid rgba(243,215,134,.4);background:#0c1a40;color:#9fb6f0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:900;font-size:17px;line-height:1;transition:transform .1s}
+#sGizli .gk-pb svg{width:13px;height:13px}
+#sGizli .gk-pb.ok{background:#1b2f66;border-color:#f3d786;color:#f3d786}
+#sGizli .gk-pb.on{background:linear-gradient(180deg,#ffe48a,#d99419);border-color:#fff0b8;color:#2c1d00;box-shadow:0 0 16px rgba(240,194,74,.7)}
+#sGizli .gk-pb.nx{border-style:dashed;border-color:#fff0b8;color:#fff0b8;animation:gkPbN 1.4s ease-in-out infinite}
+#sGizli .gk-pb.lk{opacity:.45}
+#sGizli .gk-pb:not(.lk):active{transform:translateY(2px)}
+@keyframes gkPbN{50%{box-shadow:0 0 14px rgba(240,194,74,.65)}}
+@media(max-height:660px){#sGizli .gk-pb{height:46px}#sGizli .gk-tw{padding:14px}}
+/* ---- Gizli Kimlik: kategori ekranı (başlıksız, büyük ve ekrana yayılmış kartlar) ---- */
+#sGizli .gk-headc{padding:calc(env(safe-area-inset-top,0px) + 6px) 12px 6px}
+#sGizli .gk-headc .gk-back{width:38px;height:38px}
+#sGizli .gk-scroll.gk-nos{overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:0 12px calc(12px + env(safe-area-inset-bottom,0px))}
+#sGizli .gk-scroll.gk-nos::-webkit-scrollbar{display:none}
+#sGizli .gk-list.gk-grid{flex:1 0 auto;min-height:0;grid-auto-rows:minmax(54px,1fr);gap:9px}
+#sGizli .gk-grid .gk-hi{padding:5px 10px;gap:9px;border-radius:15px;overflow:visible}
+#sGizli .gk-grid .gk-hic{width:clamp(38px,5.6vh,48px);height:clamp(38px,5.6vh,48px);border-width:2px}
+#sGizli .gk-grid .gk-hic svg{width:22px;height:22px}
+#sGizli .gk-grid .gk-hic .gk-lkic svg,#sGizli .gk-grid .gk-hic .gk-lkout svg{width:18px;height:18px}
+#sGizli .gk-grid .gk-hm{min-height:0;max-height:100%;overflow:hidden}
+#sGizli .gk-grid .gk-hm b{font-size:clamp(13px,1.95vh,15px);line-height:1.15;-webkit-line-clamp:2}
+#sGizli .gk-grid .gk-hm b.gk-lg{font-size:clamp(11px,1.6vh,12.5px)}
+#sGizli .gk-grid .gk-hm small{font-size:clamp(10.5px,1.5vh,11.5px);margin-top:2px}
+#sGizli .gk-grid .gk-hr{width:26px;height:26px;font-size:12px}
+#sGizli .gk-grid .gk-hr svg{width:13px;height:13px}
 </style>
 <script id="gizli-kimlik-js">
 /* ===== GİZLİ KİMLİK modu =====
@@ -15089,6 +15142,42 @@ var PEOPLE=[
  o:['Selahaddin Eyyubî','Baybars','Nureddin Zengî','Harun Reşid'],
  c:['1137–1138 yıllarında Tikrit’te doğdum.','Mısır’da vezir oldum ve 1171’de Fatımî hilafetine son verdim.','1187’de Hıttin Savaşı’nda Haçlı ordusunu yendim.','Aynı yıl Kudüs’ü Haçlılardan geri aldım.','Üçüncü Haçlı Seferi’nde Aslan Yürekli Richard ile karşılaştım; Eyyubî Devleti’nin kurucusuyum.'],
  b:'Selahaddin Eyyubî (1137/38–1193), Eyyubîler Devleti’nin kurucusudur. Nureddin Zengî’nin komutanlarındandı; Mısır’da vezir olup 1171’de Fatımî hilafetine son verdi. 1187’de Hıttin Savaşı’nda Haçlıları yenerek Kudüs’ü geri aldı. Üçüncü Haçlı Seferi’nde Aslan Yürekli Richard ile mücadele etti; 1192 tarihli Remle Antlaşması ile Kudüs Müslümanlarda kaldı, Hıristiyan hacıların ziyareti serbest bırakıldı. 1193’te Şam’da vefat etti; adaleti ve cömertliğiyle anılır.'},
+{n:'Târık bin Ziyâd',cat:'İslam Komutanları',ic:'sword',
+ o:['Târık bin Ziyâd','Musa bin Nusayr','Ukbe bin Nâfi','Abdurrahman ed-Dâhil'],
+ c:['Kuzey Afrika’daki fetihlerde görev aldım.','711 yılında ordumla birlikte denizi geçtim.','İber Yarımadası’nda önemli bir fetih hareketi başlattım.','Geçtiğim boğaz daha sonra adımla anıldı.','Cebelitarık isminin kökeninde adım bulunur.'],
+ b:'Târık bin Ziyâd, 711 yılında İber Yarımadası’na geçerek Endülüs’ün fethini başlatan komutandır. Cebelitarık adı, onun adından türemiştir.'},
+{n:'Ukbe bin Nâfi',cat:'İslam Komutanları',ic:'flag',
+ o:['Ukbe bin Nâfi','Târık bin Ziyâd','Musa bin Nusayr','Ziyad bin Ebih'],
+ c:['Kuzey Afrika’daki fetih hareketlerinde önemli rol oynadım.','İslam ordularının batıya doğru ilerlemesine katkı sağladım.','Kayrevan şehrinin kuruluşuyla tanınırım.','Berberî topluluklarıyla yaşanan mücadelelerde görev aldım.','Kuzey Afrika’da önemli bir askerî merkez kuran komutanım.'],
+ b:'Ukbe bin Nâfi, Kuzey Afrika’nın İslamlaşma sürecinde önemli rol oynadı. 670 yılında Kayrevan şehrinin kurulmasına öncülük etti.'},
+{n:'Musa bin Nusayr',cat:'İslam Komutanları',ic:'shield',
+ o:['Musa bin Nusayr','Târık bin Ziyâd','Ukbe bin Nâfi','Hasan bin Nu’mân'],
+ c:['Emevî döneminde Kuzey Afrika’da görev yaptım.','Bölgede İslam yönetiminin güçlenmesine katkıda bulundum.','Târık bin Ziyâd’ın askerî faaliyetlerini destekledim.','Endülüs’ün fethinden sonra İber Yarımadası’na geçtim.','Kuzey Afrika valisi olarak tanınan komutanım.'],
+ b:'Musa bin Nusayr, Emevîler döneminde Kuzey Afrika’nın yönetiminde görev aldı. Târık bin Ziyâd’ın Endülüs seferini destekledi ve fetih sonrasında bölgeye geçti.'},
+{n:'Kuteybe bin Müslim',cat:'İslam Komutanları',ic:'swords',
+ o:['Kuteybe bin Müslim','Muhammed bin Kasım','Târık bin Ziyâd','Ukbe bin Nâfi'],
+ c:['Emevî Devleti döneminde doğu seferlerinde görev aldım.','Mâverâünnehir bölgesinde fetihler gerçekleştirdim.','Buhara ve Semerkant çevresinde etkili oldum.','Orta Asya’da İslam’ın yayılmasına katkı sağladım.','Emevîlerin doğudaki en önemli komutanlarından biriyim.'],
+ b:'Kuteybe bin Müslim, Emevîler döneminde Mâverâünnehir bölgesinde seferler düzenledi. Buhara ve Semerkant gibi önemli şehirlerin İslam hâkimiyetine girmesinde rol oynadı.'},
+{n:'Muhammed bin Kasım',cat:'İslam Komutanları',ic:'ship',
+ o:['Muhammed bin Kasım','Kuteybe bin Müslim','Târık bin Ziyâd','Mesleme bin Abdülmelik'],
+ c:['Genç yaşta askerî görevler üstlendim.','Emevîler döneminde doğuya doğru sefer düzenledim.','Sind bölgesine yönelik fetih hareketini yönettim.','Hindistan alt kıtasının kuzeybatısında önemli başarılar elde ettim.','Sind’in fethiyle tanınan Emevî komutanıyım.'],
+ b:'Muhammed bin Kasım, 8. yüzyılın başlarında Sind bölgesine sefer düzenledi. Bu seferler, İslam tarihinin Hindistan alt kıtasındaki erken dönem gelişmeleri açısından önemlidir.'},
+{n:'Mesleme bin Abdülmelik',cat:'İslam Komutanları',ic:'castle',
+ o:['Mesleme bin Abdülmelik','Kuteybe bin Müslim','Muhammed bin Kasım','Târık bin Ziyâd'],
+ c:['Emevî hanedanına mensuptum.','Bizans’a karşı düzenlenen seferlerde görev aldım.','İstanbul’u kuşatan Emevî ordusunun komutanlığını yaptım.','Anadolu’daki askerî hareketlerde önemli rol oynadım.','Abdülmelik bin Mervan’ın oğullarından biriyim.'],
+ b:'Mesleme bin Abdülmelik, Emevî döneminin önemli askerî liderlerindendir. Bizans’a karşı seferler düzenlemiş ve İstanbul kuşatmasında görev almıştır.'},
+{n:'Baybars',cat:'İslam Komutanları',ic:'sword',
+ o:['Baybars','Selahaddin Eyyubî','Kalavun','Nureddin Mahmud Zengî'],
+ c:['Memlük Devleti’nin güçlenmesinde önemli rol oynadım.','Moğol ordularına karşı mücadele ettim.','Ayn Câlût Savaşı’nda kazanılan zaferde görev aldım.','Daha sonra Memlük sultanı oldum.','Sultan Baybars adıyla tanınırım.'],
+ b:'Baybars, Memlük Devleti’nin en önemli hükümdarlarından biridir. Moğollara ve Haçlılara karşı mücadele ederek devletin gücünü artırdı.'},
+{n:'İmadeddin Zengî',cat:'İslam Komutanları',ic:'castle',
+ o:['İmadeddin Zengî','Nureddin Mahmud Zengî','Selahaddin Eyyubî','Baybars'],
+ c:['Musul ve Halep çevresinde güçlü bir yönetim kurdum.','Haçlı devletlerine karşı mücadele ettim.','Urfa Haçlı Kontluğu’nu ele geçirdim.','1144 yılında gerçekleşen fetih, Haçlılar açısından büyük bir darbe oldu.','Zengîler hanedanının kurucusuyum.'],
+ b:'İmadeddin Zengî, 1144 yılında Urfa’yı Haçlılardan geri aldı. Bu gelişme, Haçlı dünyasında büyük yankı uyandırdı ve İkinci Haçlı Seferi’nin sebeplerinden biri oldu.'},
+{n:'Nureddin Mahmud Zengî',cat:'İslam Komutanları',ic:'flag',
+ o:['Nureddin Mahmud Zengî','İmadeddin Zengî','Selahaddin Eyyubî','Baybars'],
+ c:['Babamın kurduğu siyasi mirası devam ettirdim.','Haçlılara karşı mücadeleyi sürdürdüm.','Şam’ı yönetimim altına aldım.','Selahaddin Eyyubî’nin yükselişinde etkili oldum.','İmadeddin Zengî’nin oğluyum.'],
+ b:'Nureddin Mahmud Zengî, Haçlılara karşı mücadeleyi sürdürdü. Şam’ı hâkimiyeti altına aldı ve Selahaddin Eyyubî’nin siyasi yükselişinde önemli rol oynadı.'},
 {n:'İbn-i Sina',cat:'İslam Bilim İnsanları',ic:'book',
  o:['İbn-i Sina','El-Harezmî','Biruni','Farabi'],
  c:['980 yılında Buhara yakınlarındaki Afşana köyünde doğdum.','Gençken Buhara emirini tedavi ettim.','Eş-Şifâ adlı ansiklopedik felsefe eserini yazdım.','El-Kânûn fi’t-Tıb adlı eserim yüzyıllarca tıp okullarında okutuldu.','Batı dünyasında ‘Avicenna’ adıyla tanındım.'],
@@ -15201,6 +15290,30 @@ var PEOPLE=[
  o:['Uluğ Bey','Ali Kuşçu','Ömer Hayyam','El-Battânî'],
  c:['Timur’un torunu, Şahruh’un oğluyum.','Semerkant’ta hükümdarlık yaptım.','Semerkant’ta medrese ve büyük bir rasathane kurdurdum.','Rasathanemde yıldızların konumlarını gösteren bir zic hazırladım.','Hazırladığım yıldız cetveli “Zîc-i Cedîd-i Sultânî” Avrupa’da da kullanıldı; adım bir ay kraterine verildi.'],
  b:'Uluğ Bey (1394–1449), Timur’un torunu ve Şahruh’un oğludur. Semerkant’ta hükümdarlık yaptı; burada medrese ve büyük bir rasathane kurdu. Ali Kuşçu gibi bilginleri çevresinde topladı. “Zîc-i Cedîd-i Sultânî” adlı yıldız cetveli, yaklaşık bin yıldızın konumunu içerir ve uzun süre kullanıldı. Ay’daki bir krater onun adını taşır. 1449’da oğlu Abdüllatif’in düzeniyle öldürüldü.'},
+{n:'İbnü’l-Heysem',cat:'İslam Bilim İnsanları',ic:'book',
+ o:['İbnü’l-Heysem','Biruni','El-Battânî','El-Kindî'],
+ c:['Yaklaşık 965 yılında Basra’da doğdum.','Mısır’a gidip Nil’in taşkınlarını düzenleme projesi üzerinde çalıştım.','Işığın nasıl yayıldığını ve gözün nasıl gördüğünü deneylerle inceledim.','Karanlık oda deneylerimle ışığın doğru çizgiler halinde yayıldığını gösterdim.','Kitâbü’l-Menâzır adlı eserimle optik biliminin temelini attım; Batı’da Alhazen adıyla bilinirim.'],
+ b:'İbnü’l-Heysem (yaklaşık 965–1040), Basra’da doğmuş, Mısır’da çalışmış büyük bir fizikçi ve matematikçidir. Kitâbü’l-Menâzır (Optik) adlı eserinde görmenin gözün dışarıya ışın göndermesiyle değil, cisimlerden gelen ışığın göze ulaşmasıyla olduğunu deneylerle savundu. Karanlık oda deneyleri ve deneye dayalı yöntemi nedeniyle modern optiğin ve deneysel bilimin öncülerinden sayılır. Batı’da Alhazen adıyla tanınır.'},
+{n:'Ebû Bekir er-Râzî',cat:'İslam Bilim İnsanları',ic:'castle',
+ o:['Ebû Bekir er-Râzî','İbn-i Sina','Ez-Zehravî','Fahreddin er-Râzî'],
+ c:['Rey şehrinde doğdum; önce kimya ile uğraştım.','Sonra hekimliğe yöneldim ve Rey ile Bağdat’ta hastanelerin başhekimliğini yaptım.','Çiçek ve kızamık hastalıklarını birbirinden ayıran bir eser yazdım.','Tıp bilgisini bir araya getiren ansiklopedik eserim Kitâbü’l-Hâvî Latinceye çevrildi.','Batı’da Rhazes adıyla tanınırım.'],
+ b:'Ebû Bekir er-Râzî (yaklaşık 865–925), İslam dünyasının en büyük hekim ve kimyagerlerindendir. Rey ve Bağdat’taki hastanelerde başhekimlik yaptı. Çiçek ve kızamığı birbirinden ayıran eseri ile ünlüdür. Tıp bilgilerini topladığı Kitâbü’l-Hâvî Latinceye çevrilerek Avrupa’da uzun süre okundu. Batı’da Rhazes adıyla bilinir.'},
+{n:'Cabir bin Hayyân',cat:'İslam Bilim İnsanları',ic:'bow',
+ o:['Cabir bin Hayyân','El-Kindî','İbn-i Sina','Ez-Zehravî'],
+ c:['VIII. yüzyılda, Harun Reşid döneminde yaşadım.','Maddeleri gözlemleyip deneylerle incelemeyi esas aldım.','Damıtma, kristalleştirme ve buharlaştırma gibi yöntemleri kullanıp geliştirdim.','İmbik gibi laboratuvar araçlarıyla çalıştım.','Kimyanın kurucularından sayılırım; Batı’da Geber adıyla bilinirim.'],
+ b:'Cabir bin Hayyân (yaklaşık 721–815), kimyanın kurucularından sayılan İslam bilginidir. Harun Reşid döneminde yaşadı. Maddeleri deneyle incelemeyi esas aldı; damıtma, kristalleştirme ve buharlaştırma gibi yöntemleri geliştirdi. İmbik gibi laboratuvar araçlarıyla çalıştı. Eserleri Latinceye çevrildi ve Batı’da Geber adıyla tanındı.'},
+{n:'Ez-Zehravî',cat:'İslam Bilim İnsanları',ic:'sword',
+ o:['Ez-Zehravî','El-Cezerî','Ebû Bekir er-Râzî','İbn Rüşd'],
+ c:['Endülüs’te, Kurtuba yakınındaki Medînetüzzehrâ’da yaşadım.','Endülüs Emevî halifelerinin sarayında hekimlik yaptım.','Ömrümü tıp ve ameliyat üzerine çalışarak geçirdim.','Et-Tasrîf adlı otuz ciltlik tıp ansiklopedimin cerrahi bölümü çok ünlüdür.','Cerrahi aletleri çizimleriyle anlattım; cerrahinin babası sayılırım ve Batı’da Abulcasis adıyla bilinirim.'],
+ b:'Ez-Zehravî (936–1013), Endülüs’te Kurtuba yakınındaki Medînetüzzehrâ’da yaşamış büyük bir hekim ve cerrahtır. Emevî halifelerinin sarayında hekimlik yaptı. Otuz ciltlik et-Tasrîf adlı eserinin cerrahi bölümünde ameliyat aletlerini çizimleriyle anlattı. Bu bölüm Latinceye çevrilerek Avrupa’da yüzyıllarca cerrahi eğitiminde kullanıldı. Batı’da Abulcasis adıyla bilinir.'},
+{n:'Ali Kuşçu',cat:'İslam Bilim İnsanları',ic:'helmet',
+ o:['Ali Kuşçu','Takiyyüddin','Ömer Hayyam','El-Battânî'],
+ c:['Semerkant’ta doğdum; babam Uluğ Bey’in doğancıbaşısıydı.','Uluğ Bey’in rasathanesinde çalıştım.','Uzun Hasan’ın elçisi olarak İstanbul’a geldim.','Fatih Sultan Mehmed beni İstanbul’a yerleştirdi; Ayasofya Medresesi’nde ders verdim.','Astronomi eserim Fethiyye ve matematik eserim Muhammediyye ile tanınırım; adım “doğancı” anlamına gelir.'],
+ b:'Ali Kuşçu (ö. 1474), Semerkant’ta doğdu. Babası Uluğ Bey’in doğancıbaşısıydı; “Kuşçu” lakabı buradan gelir. Uluğ Bey’in rasathanesinde çalıştı. Uzun Hasan’ın elçisi olarak İstanbul’a geldi, Fatih Sultan Mehmed’in isteğiyle burada kaldı ve Ayasofya Medresesi’nde ders verdi. Astronomi ve matematik alanındaki eserleri Osmanlı ilim hayatını etkiledi.'},
+{n:'Ömer Hayyam',cat:'İslam Bilim İnsanları',ic:'book',
+ o:['Ömer Hayyam','Ali Kuşçu','El-Harezmî','El-Battânî'],
+ c:['Nişabur’da doğdum; “Hayyam” lakabı “çadırcı” anlamına gelir.','Selçuklu Sultanı Melikşah döneminde Isfahan’daki rasathanede çalıştım.','Üçüncü dereceden denklemleri geometrik yöntemlerle çözmeye çalıştım.','Güneş yılını çok hassas hesaplayan Celâlî Takvimi’nin hazırlanmasında görev aldım.','Bilimin yanında yazdığım rubailerle de ünlüyüm.'],
+ b:'Ömer Hayyam (1048–1131), Nişaburlu matematikçi, astronom ve şairdir. Selçuklu Sultanı Melikşah döneminde Isfahan’daki rasathanede çalıştı ve güneş yılını çok hassas hesaplayan Celâlî Takvimi’nin hazırlanmasında yer aldı. Cebir alanında üçüncü dereceden denklemleri geometrik yöntemlerle ele aldı. Rubaileriyle dünya çapında ün kazandı.'},
 {n:"Hz. Ebubekir",cat:"İslam Tarihi",ic:"book",
  o:["Hz. Ebubekir", "Hz. Ömer bin Hattâb", "Hz. Ali", "Ebû Ubeyde bin Cerrâh"],
  c:["Hayatım boyunca doğruluktan ayrılmamaya gayret ettim.", "İslam’ın ilk yıllarında en zor zamanlarda Peygamberimizin yanında yer aldım.", "Hicret yolculuğunda ona eşlik ettim.", "Peygamberimizin vefatından sonra Müslümanların ilk halifesi oldum.", "Sıddık lakabıyla tanınırım."],
@@ -15329,10 +15442,46 @@ var PEOPLE=[
  o:["Hz. Hatice", "Hz. Âişe", "Hz. Hafsa", "Hz. Zeyneb"],
  c:["Mekke’de Kureyş’in itibarlı ve zengin bir tüccarıydım.", "Dürüstlüğüyle tanınan genç bir adama ticaret işi emanet ettim.", "İlk vahiyden sonra Peygamberimizi teselli ettim.", "İslam’a ilk iman eden kişiyim.", "Peygamberimizin ilk eşiyim; kızımız Hz. Fâtıma’dır."],
  b:"Hz. Hatice (yaklaşık 555–619), Peygamberimizin ilk eşi ve İslam’a ilk iman eden kişidir. Mekke’nin saygın ve zengin tüccarlarındandı. Vahyin başlangıcında Peygamberimize destek oldu, servetini İslam davası için harcadı. Kızları arasında Hz. Fâtıma vardır. 619’da vefat etti; bu yıl “hüzün yılı” olarak anılır."},
-{n:"Sümeyye bint Hayyât",cat:"Kadın Sahabeler",ic:"bow",
- o:["Sümeyye bint Hayyât", "Ümmü Seleme", "Nesîbe bint Kâ’b", "Hansâ"],
- c:["Yâsir’in eşi, Ammâr’ın annesiyim.", "Mekke’de köle olarak yaşadım.", "İslam’ı ilk kabul edenlerdenim.", "İşkencelere rağmen imanımdan dönmedim.", "İslam’ın ilk şehidi sayılırım."],
- b:"Sümeyye bint Hayyât (öl. 615 civarı), Yâsir’in eşi ve Ammâr bin Yâsir’in annesidir. Mekke’de İslam’ı ilk kabul edenlerdendir. Müşrik Mekkelilerin işkencelerine rağmen imanından dönmedi ve bu yüzden şehit edildi; İslam’ın ilk şehidi sayılır."},
+{n:"Hz. Sümeyye bint Hayyat",cat:"Kadın Sahabeler",ic:"star",
+ o:["Hz. Sümeyye", "Hz. Esma", "Hz. Ümmü Seleme", "Hz. Safiyye"],
+ c:["İslam'ın ilk yıllarında Mekke'de Müslüman oldum.", "Ailemle birlikte ağır işkencelere maruz kaldım.", "İnancımdan vazgeçmem için bana baskı yapıldı.", "Ebû Cehil tarafından şehit edildiğim rivayet edilir.", "İslam'ın ilk kadın şehidi olarak tanınırım."],
+ b:"Hz. Sümeyye, İslam'ın ilk döneminde inancı uğruna büyük eziyetlere katlandı. İslam tarihinin ilk şehidi olarak anılır."},
+{n:"Hz. Esma bint Ebû Bekir",cat:"Kadın Sahabeler",ic:"palm-tree",
+ o:["Hz. Esma", "Hz. Sümeyye", "Hz. Hafsa", "Hz. Ümmü Habibe"],
+ c:["Hicret sırasında önemli bir görev üstlendim.", "Peygamberimiz ve babası için yolculuk hazırlıklarına yardım ettim.", "Yiyecek torbasını hazırlarken kuşağımı ikiye böldüm.", "Zâtünnitâkayn lakabıyla tanındım.", "Hz. Ebû Bekir'in kızı, Hz. Âişe'nin kız kardeşiyim."],
+ b:"Hz. Esma bint Ebû Bekir, hicret sırasında Peygamberimize ve babası Hz. Ebû Bekir'e yardım etti. Kuşağını ikiye bölerek yiyecek torbasını bağlaması nedeniyle Zâtünnitâkayn lakabını aldı."},
+{n:"Hz. Ümmü Seleme",cat:"Kadın Sahabeler",ic:"book",
+ o:["Hz. Ümmü Seleme", "Hz. Hafsa", "Hz. Zeynep bint Cahş", "Hz. Cüveyriye"],
+ c:["Eşimle birlikte Habeşistan'a hicret ettim.", "Daha sonra Medine'ye göç ederken ailemle ayrılık yaşadım.", "Peygamberimizin eşlerinden biri oldum.", "Hudeybiye Antlaşması sonrasında verdiğim fikir önemli bir rol oynadı.", "Peygamberimizin hanımlarından ve hadis rivayet eden sahabelerdenim."],
+ b:"Hz. Ümmü Seleme, hicretlerde yaşadığı zorluklarla ve ilmî birikimiyle tanınır. Hudeybiye Antlaşması sonrasında Peygamberimize verdiği tavsiye önemli bir örnektir."},
+{n:"Hz. Hafsa bint Ömer",cat:"Kadın Sahabeler",ic:"book",
+ o:["Hz. Hafsa", "Hz. Esma", "Hz. Ümmü Seleme", "Hz. Zeynep bint Cahş"],
+ c:["Babam İslam tarihinde önemli bir yere sahipti.", "İlk eşim Huneys bin Huzâfe idi.", "Peygamberimizle evlendim.", "Kur'an ayetlerinin bir araya getirildiği sahifeler bir dönem benim yanımda muhafaza edildi.", "Hz. Ömer'in kızıyım."],
+ b:"Hz. Hafsa, Hz. Ömer'in kızıdır ve Peygamberimizin eşlerinden biridir. Hz. Ebû Bekir döneminde toplanan Kur'an sahifeleri, Hz. Osman dönemindeki çoğaltma çalışmalarına kadar onun yanında muhafaza edilmiştir."},
+{n:"Hz. Zeynep bint Cahş",cat:"Kadın Sahabeler",ic:"heart",
+ o:["Hz. Zeynep bint Cahş", "Hz. Ümmü Seleme", "Hz. Safiyye", "Hz. Meymune"],
+ c:["Peygamberimizin akrabalarından biriydim.", "İlk evliliğim Zeyd bin Hârise ile oldu.", "Evliliğimle ilgili olay Kur'an'da Ahzâb suresinde anlatılır.", "Peygamberimizle evliliğim Allah'ın emriyle gerçekleşti.", "Peygamberimizin hanımlarından biriyim."],
+ b:"Hz. Zeynep bint Cahş, Peygamberimizin halası Ümeyme'nin kızıdır. Zeyd bin Hârise ile evliliğinin sona ermesinden sonra Peygamberimizle evlenmiştir. Bu konu Ahzâb suresinde yer alır."},
+{n:"Hz. Safiyye bint Huyey",cat:"Kadın Sahabeler",ic:"moon-star",
+ o:["Hz. Safiyye", "Hz. Cüveyriye", "Hz. Reyhâne", "Hz. Ümmü Habibe"],
+ c:["Benî Nadîr kabilesine mensuptum.", "Hayber'in fethinden sonra Müslüman oldum.", "Peygamberimizle evlendim.", "Aslen Yahudi bir aileden geliyordum.", "Peygamberimizin hanımlarından biriyim."],
+ b:"Hz. Safiyye bint Huyey, Hayber'in fethinden sonra Müslüman oldu ve Peygamberimizle evlendi. Peygamberimizin hanımları arasında yer aldı."},
+{n:"Hz. Cüveyriye bint Hâris",cat:"Kadın Sahabeler",ic:"heart",
+ o:["Hz. Cüveyriye", "Hz. Safiyye", "Hz. Meymune", "Hz. Ümmü Habibe"],
+ c:["Benî Mustalik kabilesinin ileri gelenlerinden birinin kızıydım.", "Bir savaş sonrasında esir düştüm.", "Peygamberimizle evlendikten sonra kabilemden birçok kişi serbest bırakıldı.", "Evliliğim kabilemle Müslümanlar arasındaki ilişkileri etkiledi.", "Peygamberimizin hanımlarından biriyim."],
+ b:"Hz. Cüveyriye bint Hâris, Benî Mustalik kabilesinin liderinin kızıdır. Peygamberimizle evliliğinin ardından sahabeler kabilesinden birçok esiri serbest bırakmıştır."},
+{n:"Hz. Ümmü Habibe",cat:"Kadın Sahabeler",ic:"globe",
+ o:["Hz. Ümmü Habibe", "Hz. Ümmü Seleme", "Hz. Esma", "Hz. Hafsa"],
+ c:["Babam Mekke'nin önde gelen isimlerinden biriydi.", "İlk eşimle birlikte Habeşistan'a hicret ettim.", "Eşim dininden dönünce onunla yollarımız ayrıldı.", "Peygamberimizle evliliğim Habeşistan'da gerçekleşti.", "Ebû Süfyân'ın kızı ve Peygamberimizin eşlerindenim."],
+ b:"Hz. Ümmü Habibe'nin asıl adı Remle bint Ebû Süfyân'dır. Habeşistan'a hicret etmiş ve Peygamberimizle orada evlenmiştir."},
+{n:"Hz. Nüseybe bint Kâ'b",cat:"Kadın Sahabeler",ic:"shield",
+ o:["Hz. Nüseybe bint Kâ'b", "Hz. Esma bint Yezid", "Hz. Sümeyra", "Hz. Şifâ bint Abdullah"],
+ c:["İslam'ın ilk dönemlerinde Medine'de Müslüman oldum.", "Akabe Biatları'na katıldım.", "Uhud Savaşı'nda yaralıları tedavi etmekle kalmadım, savaşın içinde de yer aldım.", "Peygamberimizi korumak için mücadele ettim.", "Ümmü Umâre adıyla tanınırım."],
+ b:"Hz. Nüseybe bint Kâ'b, Uhud Savaşı'nda Peygamberimizi korumak için mücadele eden kadın sahabelerdendir. Ümmü Umâre adıyla da bilinir."},
+{n:"Hz. Esma bint Yezid",cat:"Kadın Sahabeler",ic:"message-circle",
+ o:["Hz. Esma bint Yezid", "Hz. Nüseybe bint Kâ'b", "Hz. Şifâ bint Abdullah", "Hz. Ümmü Atıyye"],
+ c:["Kadınların dinî konulardaki sorularını Peygamberimize ilettim.", "Açık sözlülüğümle tanındım.", "Kadınların hakları ve ibadetleri hakkında sorular sordum.", "Peygamberimizin huzurunda kadınları temsil ederek konuştuğum rivayet edilir.", "Hatîbetü'n-nisâ, yani kadınların sözcüsü lakabıyla tanınırım."],
+ b:"Hz. Esma bint Yezid, sahabî hanımlardandır. Kadınların sorularını Peygamberimize iletmesi ve hitabetiyle tanınır."},
 {n:"Hz. Osman",cat:"İslam Halifeleri",ic:"castle",
  o:["Hz. Osman", "Hz. Ali", "Muaviye bin Ebî Süfyân", "Ömer bin Abdülaziz"],
  c:["Peygamberimizin iki kızıyla evlendim; “Zinnûreyn” diye anıldım.", "Önce Habeşistan’a, sonra Medine’ye hicret ettim.", "Rûme kuyusunu satın alıp Müslümanlara vakfettim.", "644’te üçüncü halife olarak seçildim.", "Kur’an’ın Mushaf olarak çoğaltılıp şehirlere gönderilmesini sağladım."],
@@ -15341,6 +15490,46 @@ var PEOPLE=[
  o:["Sedefkâr Mehmed Ağa", "Mimar Kemaleddin", "Davut Ağa", "Vedat Tek"],
  c:["Sedef işçiliğinde usta olduğum için bu lakabı aldım.", "Mimar Sinan’ın yetiştirdiği ustalardan biriyim.", "I. Ahmed döneminde Hassa Başmimarı oldum.", "1609’da temelini attığım cami İstanbul’da Sultanahmet Meydanı’ndadır.", "Altı minareli, mavi çinileriyle ünlü Sultanahmet Camii’nin mimarıyım."],
  b:"Sedefkâr Mehmed Ağa (öl. 1617), Osmanlı klasik dönem mimarlarındandır. Sedef kakma ustalığıyla tanındığı için bu lakabı aldı; Mimar Sinan’ın yanında yetişti. 1606’da Hassa Başmimarlığına getirildi. I. Ahmed adına yapılan Sultanahmet (Mavi) Camii’nin mimarıdır; cami 1609–1616 arasında inşa edildi. 1617’de vefat etti."},
+{n:"Mimar Kemaleddin",cat:"İslam Mimarları",ic:"castle",
+ o:["Mimar Kemaleddin","Vedat Tek","Mimar Sinan","Hasan Fethi"],
+ c:["1870’te İstanbul’da doğdum.","Almanya’da mimarlık eğitimi gördüm.","Vakıflar İdaresi’nin mimarlığını yaptım.","Osmanlı’nın son dönemlerinde Birinci Ulusal Mimarlık Akımı’nın öncülerinden oldum.","Bebek Camii ve Bostancı Camii gibi yapıları tasarladım; ünlü Vakıf Hanları da benim eserimdir."],
+ b:"Mimar Kemaleddin (1870–1927), İstanbul’da doğmuş, Almanya’da eğitim görmüş büyük bir Türk mimarıdır. Osmanlı’nın son döneminde Birinci Ulusal Mimarlık Akımı’nın öncülerinden sayılır. Vakıflar İdaresi’nin mimarlığını yaptı. Bebek ve Bostancı camileri ile Vakıf Hanları en bilinen eserleridir."},
+{n:"Mimar Vedat Tek",cat:"İslam Mimarları",ic:"bow",
+ o:["Mimar Vedat Tek","Mimar Kemaleddin","Sedad Hakkı Eldem","Mimar Sinan"],
+ c:["1873’te İstanbul’da doğdum.","Paris’te mimarlık eğitimi aldım.","Osmanlı ve Cumhuriyet döneminin ilk ulusal mimarlık akımının öncüsüyüm.","Sirkeci’deki Büyük Postane binasını tasarladım.","Ankara Palas’ın mimarıyım."],
+ b:"Mimar Vedat Tek (1873–1942), Paris’te eğitim görmüş büyük bir Türk mimarıdır. Birinci Ulusal Mimarlık Akımı’nın önde gelen isimlerindendir. İstanbul Sirkeci’deki Büyük Postane binasını ve Ankara Palas’ı tasarladı."},
+{n:"Mimar Hayreddin",cat:"İslam Mimarları",ic:"sword",
+ o:["Mimar Hayreddin","Davud Ağa","Atik Sinan","Mimar Sinan"],
+ c:["XVI. yüzyılda yaşadım.","Mimar Sinan’ın öğrencisiyim.","Kanuni Sultan Süleyman döneminde çalıştım.","Neretva Nehri üzerinde dev bir taş köprü inşa ettim.","Mostar Köprüsü’nün mimarıyım."],
+ b:"Mimar Hayreddin, XVI. yüzyılda yaşamış, Mimar Sinan’ın öğrencisi olan Osmanlı mimarıdır. Neretva Nehri üzerindeki Mostar Köprüsü’nü yaptı. Köprü 1566’da tamamlandı ve kemerinin genişliğiyle ünlüdür."},
+{n:"Davud Ağa",cat:"İslam Mimarları",ic:"book",
+ o:["Davud Ağa","Sedefkâr Mehmed Ağa","Mimar Hayreddin","Atik Sinan"],
+ c:["Mimar Sinan’ın yakın talebelerindendim.","Sinan’ın ölümünden sonra başmimar oldum.","Osmanlı Sarayı’nda mimarlık yaptım.","Eminönü’ndeki büyük bir külliyenin temelini attım.","Yeni Valide Camii’nin temelini ben attım."],
+ b:"Davud Ağa (ö. 1599), Mimar Sinan’ın talebelerindendir. Sinan’ın ölümünden sonra başmimar oldu. Eminönü’ndeki Yeni Valide Camii’nin temelini attı. Yapı sonradan Sedefkâr Mehmed Ağa ve başkaları tarafından tamamlandı."},
+{n:"Ustad Ahmad Lahori",cat:"İslam Mimarları",ic:"helmet",
+ o:["Ustad Ahmad Lahori","Mimar Sinan","Ahlatlı Hürremşah","Hasan Fethi"],
+ c:["Hindistan’da, Babür İmparatorluğu döneminde yaşadım.","Şah Cihan’ın baş mimarlarındandım.","Delhi’deki Kızıl Kale’nin yapımında görev aldım.","Lahor’da büyük yapılarda çalıştım.","Taç Mahal’in baş mimarı olarak bilinirim."],
+ b:"Ustad Ahmad Lahori (yaklaşık 1580–1649), Babür İmparatoru Şah Cihan’ın baş mimarlarındandır. Taç Mahal’in baş mimarı olarak bilinir. Delhi’deki Kızıl Kale’nin yapımında da görev aldı."},
+{n:"Ahlatlı Hürremşah",cat:"İslam Mimarları",ic:"castle",
+ o:["Ahlatlı Hürremşah","Kelük bin Abdullah","Atik Sinan","Mimar Sinan"],
+ c:["Ahlat’ta doğdum.","Mengücekliler döneminde çalıştım.","XIII. yüzyılın başında çalıştım.","Taş işçiliğindeki çarpıcı kapılarla tanınan bir cami ve şifahane yaptım.","Divriği Ulu Camii ve Darüşşifası’nın mimarıyım."],
+ b:"Ahlatlı Hürremşah, 1228–1229’da yapılan Divriği Ulu Camii ve Darüşşifası’nın mimarıdır. Mengücekliler döneminde çalıştı. Yapı, taş işçiliğindeki zengin kapılarıyla ünlüdür ve UNESCO Dünya Mirası Listesi’ndedir."},
+{n:"Kelük bin Abdullah",cat:"İslam Mimarları",ic:"bow",
+ o:["Kelük bin Abdullah","Ahlatlı Hürremşah","Atik Sinan","Davud Ağa"],
+ c:["Selçuklu döneminde yaşadım.","XIII. yüzyılda Anadolu’da çalıştım.","Taç kapısı ve çini işçiliğiyle tanınan bir medrese yaptım.","Medresemin avlusunda iki katlı bir düzenleme vardır.","Sivas’taki Gök Medrese’nin mimarıyım."],
+ b:"Kelük bin Abdullah, XIII. yüzyılda Anadolu Selçuklu döneminde yaşamış mimardır. Sivas’taki Gök Medrese’yi 1271’de inşa etti. Medrese, taç kapısı ve çini işçiliğiyle ünlüdür."},
+{n:"Hasan Fethi",cat:"İslam Mimarları",ic:"sword",
+ o:["Hasan Fethi","Sedad Hakkı Eldem","Mimar Kemaleddin","Vedat Tek"],
+ c:["Mısır’da doğdum.","Yirminci yüzyılda yaşadım.","Fakir halk için ucuz ve yerel malzemeden evler tasarladım.","Kerpiç ve yerel malzemeyi modern mimaride yeniden kullandım.","Yeni Gurne köyü projesiyle tanınırım."],
+ b:"Hasan Fethi (1900–1989), Mısırlı büyük bir mimardır. Yoksul halk için kerpiç gibi yerel malzemeyle ucuz yapılar tasarladı. Yeni Gurne (New Gourna) köyü projesiyle tanınır."},
+{n:"Sedad Hakkı Eldem",cat:"İslam Mimarları",ic:"book",
+ o:["Sedad Hakkı Eldem","Mimar Kemaleddin","Hasan Fethi","Vedat Tek"],
+ c:["1908’de İstanbul’da doğdum.","Paris ve İstanbul’da eğitim gördüm.","Türk evi üzerine araştırmalar yaptım.","Milli Mimari Rönesansı olarak anılan akımın önde gelen isimlerindenim.","Türk evinin planını modern mimaride yeniden yorumladım."],
+ b:"Sedad Hakkı Eldem (1908–1988), İstanbul’da doğmuş büyük bir Türk mimarıdır. Türk evi üzerine yaptığı araştırmalarla tanınır. Milli Mimari Rönesansı akımının önde gelen isimlerindendir ve Türk evinin planını modern mimaride yeniden yorumladı."},
+{n:"Atik Sinan",cat:"İslam Mimarları",ic:"castle",
+ o:["Atik Sinan","Mimar Hayreddin","Davud Ağa","Mimar Sinan"],
+ c:["Fatih Sultan Mehmed döneminde çalıştım.","İstanbul’un fethinden sonra yapılan büyük eserlerde görev aldım.","Mimar Sinan değilim; ondan yaklaşık bir asır önce yaşadım.","Fatih Sultan Mehmed adına İstanbul’da büyük bir cami ve külliye yaptım.","Fatih Camii ve Külliyesi’nin mimarıyım."],
+ b:"Atik Sinan (ö. 1471), Fatih Sultan Mehmed döneminde yaşamış Osmanlı mimarıdır. İstanbul’un fethinden sonra yapılan Fatih Camii ve Külliyesi’nin mimarıdır. Mimar Sinan’dan yaklaşık bir asır önce yaşamıştır."},
 {n:"Mevlânâ Celâleddîn-i Rûmî",cat:"Mutasavvıflar",ic:"book",
  o:["Mevlânâ Celâleddîn-i Rûmî", "Yunus Emre", "Hacı Bektaş-ı Velî", "Ahmed Yesevî"],
  c:["1207’de Belh’te doğdum; babam Bahâeddin Veled’dir.", "Ailemle birlikte Anadolu’ya gelip Konya’ya yerleştim.", "Şems-i Tebrizî ile tanışmam hayatımın dönüm noktası oldu.", "Mesnevî adlı büyük eserimi yazdım.", "Vefat günüm “Şeb-i Arûs” (düğün gecesi) olarak anılır; adıma Mevlevîlik denir."],
@@ -15365,6 +15554,46 @@ var PEOPLE=[
  o:["İmam Müslim", "İmam Buhârî", "Nesâî", "İbn Mâce"],
  c:["Yaklaşık 821’de Nişabur’da doğdum.", "Hocam İmam Buhârî’ye büyük saygı duydum.", "Hadis tahsili için Hicaz, Irak, Şam ve Mısır’a gittim.", "Hadisleri senedleriyle birlikte konularına göre düzenledim.", "Eserim “Sahîh-i Müslim”dir; Buhârî ile birlikte “Sahîhayn” diye anılırız."],
  b:"İmam Müslim (yaklaşık 821–875), Nişabur’da doğan büyük muhaddistir. Hadis tahsili için Hicaz, Irak, Şam ve Mısır’ı dolaştı. “el-Câmiu’s-Sahîh” adlı eserini hadisleri konularına göre ve senedleriyle düzenleyerek yazdı; Buhârî’nin eseriyle birlikte “Sahîhayn” diye anılır. 875’te Nişabur’da vefat etti."},
+{n:"Tirmizî",cat:"Muhaddisler",ic:"book",
+ o:["Tirmizî","Ebû Dâvûd","Nesâî","İbn Mâce"],
+ c:["Ceyhun Nehri kıyısındaki Tirmiz’de doğdum.","Hadis öğrenmek için Horasan, Irak ve Hicaz’ı dolaştım.","İmam Buhârî’nin öğrencisiyim.","Eserimde hadislerin derecesini belirttim ve “hasen” terimini yaygınlaştırdım.","Câmi‘ (Sünen) adlı eserim Kütüb-i Sitte’dendir; Peygamberimizin güzel ahlakını anlatan Şemâil adlı eserim de meşhurdur."],
+ b:"Tirmizî (yaklaşık 824–892), Tirmiz’de doğmuş büyük bir muhaddistir. İmam Buhârî’nin öğrencisidir. Câmi‘ (Sünen) adlı eseri Kütüb-i Sitte’den biridir ve hadislerin derecesini belirtmesiyle tanınır. Peygamberimizin görünüşünü ve ahlakını anlatan Şemâil adlı eseri de çok okunmuştur."},
+{n:"Ebû Dâvûd",cat:"Muhaddisler",ic:"castle",
+ o:["Ebû Dâvûd","Tirmizî","Nesâî","Dârimî"],
+ c:["Sicistan’da doğdum.","Hadis toplamak için İslam dünyasının pek çok şehrini gezdim.","İmam Ahmed bin Hanbel’in öğrencisiyim.","Yarım milyona yakın hadis arasından yaklaşık dört bin sekiz yüzünü eserime aldım.","Fıkıh konularına ağırlık veren Sünen adlı eserim Kütüb-i Sitte’dendir."],
+ b:"Ebû Dâvûd (817–889), Sicistan’da doğmuş büyük bir muhaddistir. Hadis toplamak için birçok şehri gezdi ve İmam Ahmed bin Hanbel’den ders aldı. Fıkıh konularına ağırlık veren Sünen adlı eseri Kütüb-i Sitte’den biridir. Hayatının son yıllarını Basra’da geçirdi."},
+{n:"Nesâî",cat:"Muhaddisler",ic:"bow",
+ o:["Nesâî","Ebû Dâvûd","İbn Mâce","Tirmizî"],
+ c:["Horasan’daki Nesâ şehrinde doğdum.","Hadis öğrenmek için Hicaz, Irak, Şam ve Mısır’a kadar seyahat ettim.","Râvilerin güvenilirliği konusunda çok titiz davrandım.","Eserimin kısaltılmış hâli “el-Müctebâ” diye anılır.","Sünen adlı eserim Kütüb-i Sitte’dendir; adım doğduğum şehre nispetle anılır."],
+ b:"Nesâî (829–915), Horasan’daki Nesâ şehrinde doğmuş büyük bir muhaddistir. Hadis öğrenmek için birçok ülke gezdi, rivayetleri seçerken çok titiz davrandı. Sünen adlı eseri ve onun kısaltılmış hâli olan el-Müctebâ, Kütüb-i Sitte içinde yer alır."},
+{n:"İbn Mâce",cat:"Muhaddisler",ic:"helmet",
+ o:["İbn Mâce","Nesâî","Tirmizî","Ebû Dâvûd"],
+ c:["Kazvin’de doğdum.","Hadis öğrenmek için Irak, Şam, Mısır ve Hicaz’a seyahat ettim.","Aynı zamanda Kazvin tarihi ve bir tefsir yazmışım.","Sünen adlı eserimle tanınırım.","Eserim Kütüb-i Sitte’nin altıncı kitabı olarak kabul edilir."],
+ b:"İbn Mâce (824–887), Kazvin’de doğmuş büyük bir muhaddistir. Hadis öğrenmek için birçok bölgeyi gezdi. Sünen adlı eseri, Kütüb-i Sitte’nin altıncı kitabı olarak kabul edilir."},
+{n:"Ahmed bin Hanbel",cat:"Muhaddisler",ic:"sword",
+ o:["Ahmed bin Hanbel","İmam Şâfiî","Ebû Hanîfe","İmam Buhârî"],
+ c:["Bağdat’ta doğdum.","İmam Şâfiî’nin öğrencisi oldum.","“Halku’l-Kur’ân” meselesinde Abbâsî yönetiminin baskısına rağmen görüşümden dönmedim.","Yaklaşık otuz bin hadis içeren büyük bir Müsned yazdım.","Hanbelî mezhebinin imamıyım."],
+ b:"Ahmed bin Hanbel (780–855), Bağdat’ta doğmuş büyük bir muhaddis ve fakihtir. Hadis ilmi için birçok şehri gezdi, İmam Şâfiî’den de ders aldı. Halku’l-Kur’ân meselesinde zulme uğramasına rağmen görüşünden dönmedi. Müsned adlı eseri en büyük hadis derlemelerindendir. Hanbelî mezhebi onun adıyla anılır."},
+{n:"Dârimî",cat:"Muhaddisler",ic:"book",
+ o:["Dârimî","Tirmizî","Ebû Dâvûd","Taberânî"],
+ c:["Semerkant’ta doğdum.","Hadis öğrenmek için Horasan, Irak, Şam ve Mısır’a kadar gittim.","Yüksek bir ilim ve zühd ehli olarak tanındım; hadis ilminde güvenilir kabul edildim.","Sünen adlı eserim hadisleri konularına göre sıralar.","Bazı âlimler, eserimi Kütüb-i Sitte’ye altıncı kitap olarak eklerler."],
+ b:"Dârimî (797–869), Semerkant’ta doğmuş büyük bir muhaddistir. Hadis öğrenmek için birçok ülkeyi gezdi. Sünen (Müsned) adlı eseri hadisleri konularına göre sıralar. Bazı âlimler bu eseri Kütüb-i Sitte’nin altıncı kitabı olarak sayar."},
+{n:"Beyhakî",cat:"Muhaddisler",ic:"castle",
+ o:["Beyhakî","Hâkim en-Nîsâbûrî","Taberânî","İbn Hacer el-Askalânî"],
+ c:["Nişabur yakınlarındaki Beyhak köyünde doğdum.","Hâkim en-Nîsâbûrî gibi âlimlerden hadis okudum.","Şâfiî mezhebinin görüşlerini hadislerle destekledim.","es-Sünenü’l-Kübrâ adlı büyük bir hadis ve fıkıh eseri yazdım.","Peygamberimizin hayatını anlatan Delâilü’n-Nübüvve adlı eserim de meşhurdur."],
+ b:"Beyhakî (994–1066), Nişabur yakınlarındaki Beyhak’ta doğmuş büyük bir muhaddis ve fakihtir. Şâfiî mezhebinin görüşlerini hadislerle destekledi. es-Sünenü’l-Kübrâ adlı eseri hadis ve fıkıh alanında temel kaynaklardandır. Delâilü’n-Nübüvve adlı eseri de çok bilinir."},
+{n:"Hâkim en-Nîsâbûrî",cat:"Muhaddisler",ic:"bow",
+ o:["Hâkim en-Nîsâbûrî","Beyhakî","Taberânî","Dârimî"],
+ c:["Nişabur’da doğdum.","Hadis öğrenmek için Irak, Hicaz ve Mâverâünnehir’e gittim.","Kadılık yaptığım için adımın başında “Hâkim” lakabı vardır.","Hadis usulü üzerine Ma‘rifetü ‘Ulûmi’l-Hadîs adlı eseri yazdım.","el-Müstedrek ale’s-Sahîhayn adlı eserimle Buhârî ve Müslim’de bulunmayan sahih hadisleri toplamaya çalıştım."],
+ b:"Hâkim en-Nîsâbûrî (933–1014), Nişabur’da doğmuş büyük bir muhaddistir. Kadılık yaptığı için “Hâkim” lakabıyla anılır. el-Müstedrek ale’s-Sahîhayn adlı eserinde, Buhârî ve Müslim’in şartlarına uygun olduğunu düşündüğü ama sahihlerine almadıkları hadisleri topladı. Hadis usulü üzerine de eser yazdı. Talebelerinden biri Beyhakî’dir."},
+{n:"İbn Hacer el-Askalânî",cat:"Muhaddisler",ic:"helmet",
+ o:["İbn Hacer el-Askalânî","İmam Nevevî","İbn Kesîr","Beyhakî"],
+ c:["Kahire’de doğdum; ailem Askalan’dan gelmedir.","Küçük yaşta yetim kaldım ve Kur’an’ı erken ezberledim.","Hadis ilimleri ve râvilerin hayatı üzerine çok sayıda eser yazdım.","Hadis konularını kısaca toplayan Bulûğu’l-Merâm benim eserimdir.","Fethu’l-Bârî adlı Sahîh-i Buhârî şerhimle tanınırım."],
+ b:"İbn Hacer el-Askalânî (1372–1449), Kahire’de doğmuş büyük bir muhaddistir. Küçük yaşta yetim kaldı, hadis ilminde derinleşti. Sahîh-i Buhârî’nin en meşhur şerhi olan Fethu’l-Bârî ile tanınır. Bulûğu’l-Merâm ve râvilerin hayatını anlatan eserleri de çok kullanılır."},
+{n:"Taberânî",cat:"Muhaddisler",ic:"book",
+ o:["Taberânî","Beyhakî","Dârimî","İbn Cerîr et-Taberî"],
+ c:["Taberiye şehrinde doğdum.","Hadis öğrenmek için Şam, Hicaz, Yemen, Mısır ve Irak’ı dolaştım.","Hayatımın son yıllarında İsfahan’a yerleştim.","Yüzlerce hocadan hadis dinlemiş bir hâfız olarak tanınırım.","el-Mu‘cemü’l-Kebîr, el-Evsat ve es-Sagîr adlı üç Mu‘cem’in sahibiyim."],
+ b:"Taberânî (873–971), Taberiye’de doğmuş büyük bir muhaddistir. Hadis toplamak için birçok bölgeyi gezdi, son yıllarını İsfahan’da geçirdi. el-Mu‘cemü’l-Kebîr, el-Evsat ve es-Sagîr adlı üç Mu‘cem’i hadis edebiyatının önemli kaynaklarındandır."},
 {n:"Ebû Hanîfe",cat:"Fakihler",ic:"castle",
  o:["Ebû Hanîfe", "İmam Mâlik", "İmam Şâfiî", "Ahmed bin Hanbel"],
  c:["699’da Kûfe’de doğdum.", "Kumaş ticaretiyle uğraşırken ilme yöneldim.", "Hocam Hammâd bin Ebî Süleyman’dır.", "Kıyas ve istihsan gibi yöntemleri sıkça kullanan bir fıkıh ekolü oluşturdum.", "Adıma bağlı mezhep Hanefîliktir; “İmam-ı Âzam” diye anılırım."],
@@ -15373,6 +15602,46 @@ var PEOPLE=[
  o:["İmam Şâfiî", "Ebû Hanîfe", "İmam Mâlik", "Ahmed bin Hanbel"],
  c:["767’de Gazze’de doğdum; küçükken babamı kaybettim.", "Mekke’de büyüdüm ve Medine’de İmam Mâlik’ten ders aldım.", "Bağdat’ta ve Mısır’da ders verdim.", "Fıkıh usulünü sistemli yazan ilk âlimlerdenim; er-Risâle adlı kitabım vardır.", "Adıma bağlı mezhep Şâfiîliktir."],
  b:"İmam Şâfiî (767–820), Şâfiî mezhebinin imamıdır. Gazze’de doğdu, Mekke’de yetişti, Medine’de İmam Mâlik’ten ders aldı. Bağdat ve Mısır’da ders verdi. “er-Risâle” adlı eseriyle fıkıh usulünün temellerini attı. 820’de Mısır’da vefat etti."},
+{n:"İmam Mâlik",cat:"Fakihler",ic:"book",
+ o:["İmam Mâlik","İmam Şâfiî","Ebû Hanîfe","Ahmed bin Hanbel"],
+ c:["Medine’de doğdum ve ömrümün büyük kısmını orada geçirdim.","Hocalarım arasında Nâfi‘ gibi büyük âlimler vardır.","Medine halkının ameli fıkhımda önemli bir delildir.","İmam Şâfiî benim öğrencimdir.","Muvatta adlı eserim hadis ve fıkhı birlikte ele alır; Mâlikî mezhebinin imamıyım."],
+ b:"İmam Mâlik (yaklaşık 711–795), Medine’de yaşamış büyük bir fakih ve muhaddistir. Medine halkının amelini fıkhında önemli bir delil kabul etti. Muvatta adlı eseri, hadis ve fıkhı birlikte ele alan ilk büyük eserlerdendir. İmam Şâfiî onun öğrencisidir. Mâlikî mezhebi onun adıyla anılır."},
+{n:"Ebû Yûsuf",cat:"Fakihler",ic:"castle",
+ o:["Ebû Yûsuf","İmam Muhammed","Ebû Hanîfe","İmam Evzâî"],
+ c:["Kûfe’de fakir bir ailede doğdum.","İlim öğrenmeye küçük yaşta başladım.","Ebû Hanîfe’nin en önde gelen öğrencisiyim.","Harun Reşid döneminde başkadılık görevinde bulundum.","Kitâbü’l-Harâc adlı eserimde devletin vergi ve mali işlerini anlattım."],
+ b:"Ebû Yûsuf (731–798), Kûfe’de doğmuş büyük bir Hanefî fakihidir. Ebû Hanîfe’nin en önde gelen öğrencisidir. Harun Reşid döneminde başkadılık yaptı. Kitâbü’l-Harâc adlı eseri, İslam devletinin vergi ve mali düzenini anlatır."},
+{n:"İmam Muhammed",cat:"Fakihler",ic:"bow",
+ o:["İmam Muhammed","Ebû Yûsuf","İmam Şâfiî","Süfyân es-Sevrî"],
+ c:["Irak’ta doğdum ve Kûfe’de yetiştim.","Ebû Hanîfe’den ve Ebû Yûsuf’tan ders aldım.","Medine’de İmam Mâlik’ten de Muvatta’yı dinledim.","Hanefî mezhebinin temel kitaplarını yazdım; el-Mebsût eserlerimdendir.","Es-Siyerü’l-Kebîr adlı eserimle devletler hukukunun öncülerinden sayılırım."],
+ b:"İmam Muhammed eş-Şeybânî (749–805), Hanefî mezhebinin kurucu isimlerindendir. Ebû Hanîfe ve Ebû Yûsuf’tan ders aldı, Medine’de İmam Mâlik’ten hadis dinledi. Mezhebin temel kitaplarını yazdı. Es-Siyerü’l-Kebîr adlı eseri savaş ve barış hukukunu anlatır; bu yönüyle devletler hukukunun öncülerinden sayılır."},
+{n:"İmam Evzâî",cat:"Fakihler",ic:"sword",
+ o:["İmam Evzâî","Leys bin Sa‘d","İmam Mâlik","Süfyân es-Sevrî"],
+ c:["Baalbek’te doğdum, ömrümün büyük kısmını Beyrut’ta geçirdim.","Şam bölgesinin en büyük fakihi olarak tanındım.","Yöneticilere adaleti hatırlatmaktan çekinmedim.","Savaş ve barış hukuku konusundaki görüşlerim İslam devletler hukukunun ilk örnekleridir.","Bir dönem Şam’da ve Endülüs’te benim adımı taşıyan bir mezhep uygulandı."],
+ b:"İmam Evzâî (707–774), Baalbek’te doğmuş, Beyrut’ta yaşamış büyük bir fakih ve muhaddistir. Şam bölgesinin önde gelen fıkıh âlimiydi. Yöneticilere adaleti hatırlatmaktan çekinmedi. Savaş ve barış hukuku konusundaki görüşleri çok önemlidir. Mezhebi bir süre Şam ve Endülüs’te uygulandı, sonra yerini diğer mezheplere bıraktı."},
+{n:"Leys bin Sa‘d",cat:"Fakihler",ic:"helmet",
+ o:["Leys bin Sa‘d","İmam Evzâî","İmam Mâlik","Süfyân es-Sevrî"],
+ c:["Mısır’da doğdum ve orada yaşadım.","Medine’deki hocalarımdan ders aldım.","Mısır’ın en büyük fakihi olarak tanındım.","Cömertliğimle ve fakirlere yardımımla meşhurdum.","İmam Mâlik’le yazıştım; görüşlerim Mısır’da bir dönem mezhep gibi uygulandı."],
+ b:"Leys bin Sa‘d (713–791), Mısır’da yaşamış büyük bir fakih ve muhaddistir. Mısır’ın en büyük âlimi kabul edilirdi. Cömertliğiyle de tanınırdı. İmam Mâlik’le çağdaştı ve onunla fıkhî konularda mektuplaştı. Mezhebi sonradan yaşatılamadı."},
+{n:"Süfyân es-Sevrî",cat:"Fakihler",ic:"book",
+ o:["Süfyân es-Sevrî","İmam Evzâî","Leys bin Sa‘d","İmam Muhammed"],
+ c:["Kûfe’de doğdum.","Hadis ilminde zamanımın en büyük hâfızlarından biri sayıldım.","Fıkıhta bağımsız bir müctehid olarak tanındım.","Abbâsî halifesinin kadılık teklifini kabul etmedim.","Hayatımın son yıllarını Basra’da geçirdim; bir zamanlar “hadiste mü’minlerin emiri” diye anıldım."],
+ b:"Süfyân es-Sevrî (716–778), Kûfe’de doğmuş büyük bir muhaddis ve fakihtir. Hadis hafızası ve zühdüyle tanınır. Abbâsî yönetiminin kadılık teklifini kabul etmedi. Bağımsız bir müctehid olarak fıkıh görüşleri bir süre izlendi. Son yıllarını Basra’da geçirdi."},
+{n:"İbn Kudâme",cat:"Fakihler",ic:"castle",
+ o:["İbn Kudâme","Ahmed bin Hanbel","İbn Teymiyye","İmam Nevevî"],
+ c:["Filistin’in Cemmâîl köyünde doğdum.","Küçük yaşta ailemle Şam’a göç ettim.","Selahaddin Eyyubî çağında yaşadım.","Hanbelî fıkhının en büyük kitaplarından birini yazdım.","El-Muğnî adlı geniş fıkıh eserim, mezhepler arası karşılaştırmalarıyla meşhurdur."],
+ b:"İbn Kudâme (1147–1223), Filistin’in Cemmâîl köyünde doğmuş büyük bir Hanbelî fakihidir. Ailesiyle Şam’a göç etti, Kâsiyûn Dağı eteğinde ders verdi. El-Muğnî adlı eseri, mezhepler arası karşılaştırmalı fıkhın en önemli örneklerindendir."},
+{n:"Serahsî",cat:"Fakihler",ic:"bow",
+ o:["Serahsî","Merginânî","İmam Muhammed","İbn Âbidîn"],
+ c:["Serahs şehrinden yetiştim.","Hanefî fıkhında çok büyük bir şöhret kazandım.","Bir yönetici hakkında söylediğim sözler yüzünden hapse atıldım.","Hapiste, kuyunun içinden öğrencilerime fıkıh dikte ettim.","El-Mebsût adlı otuz ciltlik Hanefî fıkıh ansiklopedim hapiste yazdırdığım eserdir."],
+ b:"Serahsî (ö. yaklaşık 1090), Serahs’ta yetişmiş büyük bir Hanefî fakihidir. Yöneticiye karşı söylediği sözler yüzünden uzun süre hapis yattı. Hapiste, kuyunun başına gelen öğrencilerine el-Mebsût adlı otuz ciltlik fıkıh ansiklopedisini yazdırdı. Eser Hanefî fıkhının temel kaynaklarındandır."},
+{n:"Merginânî",cat:"Fakihler",ic:"book",
+ o:["Merginânî","Serahsî","İbn Âbidîn","İmam Muhammed"],
+ c:["Fergana’daki Merginân şehrinde doğdum.","Hanefî fıkhının büyük âlimlerindenim.","Fıkıh ilmi için Semerkant ve Buhara’da bulundum.","Fetvalarımı öğrencilerim titizlikle kayda geçirdi.","El-Hidâye adlı eserim yüzyıllar boyunca medreselerde okutulmuştur."],
+ b:"Merginânî (1135–1197), Fergana’daki Merginân şehrinde doğmuş büyük bir Hanefî fakihidir. Fıkıh tahsili için Semerkant ve Buhara gibi merkezlere gitti. El-Hidâye adlı eseri, Hanefî fıkhının en çok okutulan ve şerh edilen kitaplarından biri oldu."},
+{n:"İbn Âbidîn",cat:"Fakihler",ic:"helmet",
+ o:["İbn Âbidîn","Serahsî","Merginânî","İmam Muhammed"],
+ c:["Şam’da doğdum ve orada yaşadım.","Osmanlı döneminde yaşadım.","Hanefî mezhebinin son dönem büyük fakihlerindenim.","Eserim, geçmişteki Hanefî görüşlerini toplayıp değerlendirir.","Reddü’l-Muhtâr adlı hâşiyem Hanefî fıkhının en çok başvurulan kitaplarındandır."],
+ b:"İbn Âbidîn (1784–1836), Şam’da doğmuş son dönemin büyük Hanefî fakihidir. Osmanlı döneminde yaşadı. Reddü’l-Muhtâr adlı hâşiyesi, Hanefî fıkhının en çok başvurulan kaynaklarındandır."},
 {n:"Ebû Mansûr el-Mâtürîdî",cat:"Mütekellimler",ic:"book",
  o:["Ebû Mansûr el-Mâtürîdî", "Ebü’l-Hasan el-Eş‘arî", "Gazzâlî", "Cüveynî"],
  c:["Semerkant yakınlarındaki Mâtürîd köyünde doğdum.", "9.–10. yüzyıllarda Mâverâünnehir’de yaşadım.", "Ebû Hanîfe’nin itikadî görüşlerini sistemleştirdim.", "Te’vîlâtü’l-Kur’ân adlı tefsirimi yazdım.", "Adıma bağlı kelâm ekolü, Türklerin büyük çoğunluğunun benimsediği itikadî yoldur; 944’te vefat ettim."],
@@ -15381,6 +15650,46 @@ var PEOPLE=[
  o:["Ebü’l-Hasan el-Eş‘arî", "Ebû Mansûr el-Mâtürîdî", "Bâkıllânî", "Gazzâlî"],
  c:["873’te Basra’da doğdum.", "Uzun yıllar Mu‘tezile âlimi Cübbâî’nin öğrencisiydim.", "Mu‘tezile’den ayrılıp Ehl-i Sünnet çizgisini savundum.", "Makâlâtü’l-İslâmiyyîn adlı mezhepler kitabını yazdım.", "Adıma bağlı kelâm ekolü Eş‘arîlik olarak bilinir."],
  b:"Ebü’l-Hasan el-Eş‘arî (873–936), Eş‘arîlik kelâm ekolünün kurucusudur. Basra’da doğdu; uzun süre Mu‘tezile’nin önde gelen âlimi Cübbâî’nin öğrencisiydi. Sonra Mu‘tezile’den ayrılıp Ehl-i Sünnet itikadını savundu. “Makâlâtü’l-İslâmiyyîn” adlı eseri mezhepler tarihinin ilk kaynaklarındandır. 936 civarında Bağdat’ta vefat etti."},
+{n:"Bâkıllânî",cat:"Mütekellimler",ic:"book",
+ o:["Bâkıllânî","Cüveynî","Âmidî","Ebü’l-Hasan el-Eş‘arî"],
+ c:["Basra’da doğdum, hayatımın büyük kısmını Bağdat’ta geçirdim.","Kadılık yaptığım için “Kâdî” lakabıyla anıldım.","Bizans İmparatoru’nun yanına elçi olarak gönderildim.","Eş‘arî kelamını sistemli hâle getiren âlimlerdenim.","İ‘câzü’l-Kur’ân adlı eserimle Kur’an’ın mucizeliğini açıkladım."],
+ b:"Bâkıllânî (ö. 1013), Basra’da doğup Bağdat’ta yaşamış büyük bir kelam âlimidir. Eş‘arî mezhebinin sistemleşmesinde önemli rol oynadı. Kadılık yaptı ve Bizans’a elçi olarak gönderildi. İ‘câzü’l-Kur’ân adlı eserinde Kur’an’ın mucizeliğini ele aldı."},
+{n:"Cüveynî",cat:"Mütekellimler",ic:"castle",
+ o:["Cüveynî","Bâkıllânî","Âmidî","İbn Teymiyye"],
+ c:["Nişabur yakınlarında doğdum.","Babam da büyük bir âlimdi.","Bir süre Mekke ve Medine’de ders verdim.","Nişabur’daki Nizâmiyye Medresesi’nde uzun yıllar hocalık yaptım.","Lakabım “İmâmü’l-Haremeyn”dir; öğrencim İmam Gazzâlî’dir."],
+ b:"Cüveynî (1028–1085), Nişabur yakınlarında doğmuş büyük bir kelam ve fıkıh âlimidir. Mekke ve Medine’de ders verdiği için “İmâmü’l-Haremeyn” diye anıldı. Nişabur’daki Nizâmiyye Medresesi’nde hocalık yaptı. İmam Gazzâlî onun öğrencisidir. el-İrşâd adlı kelam eseri çok tanınmıştır."},
+{n:"Âmidî",cat:"Mütekellimler",ic:"bow",
+ o:["Âmidî","Cüveynî","Îcî","Teftâzânî"],
+ c:["Diyarbakır’ın eski adı Âmid’de doğdum.","İlk önce Hanbelî mezhebine bağlıydım, sonra Şâfiî mezhebine geçtim.","Bağdat, Şam ve Kahire’de ders verdim.","Ebkârü’l-Efkâr adlı kelam eserimle tanınırım.","Fıkıh usulünde el-İhkâm adlı eserim de çok meşhurdur."],
+ b:"Seyfeddin el-Âmidî (1156–1233), Diyarbakır’ın eski adı Âmid’de doğmuş büyük bir kelam ve fıkıh usulü âlimidir. Bağdat, Şam ve Kahire’de ders verdi. Ebkârü’l-Efkâr adlı eseri kelam alanında, el-İhkâm fî Usûli’l-Ahkâm adlı eseri fıkıh usulünde çok tanınmıştır."},
+{n:"Îcî",cat:"Mütekellimler",ic:"helmet",
+ o:["Îcî","Teftâzânî","Cürcânî","Âmidî"],
+ c:["Fars bölgesindeki Îc kasabasında doğdum.","Şiraz’da kadılık yaptım.","Kelam ilminin temel kitaplarından birini yazdım.","Eserimi yüzyıllar boyunca medreselerde okuttular ve üzerine şerhler yazıldı.","El-Mevâkıf adlı eserim, kelamın son dönem klasiklerindendir."],
+ b:"Adudüddin el-Îcî (ö. 1355), Fars bölgesindeki Îc’de doğmuş büyük bir kelam âlimidir. Şiraz’da kadılık yaptı. el-Mevâkıf adlı eseri medreselerde yüzyıllarca okutuldu ve üzerine çok sayıda şerh yazıldı."},
+{n:"Teftâzânî",cat:"Mütekellimler",ic:"sword",
+ o:["Teftâzânî","Cürcânî","Îcî","İmam Gazzâlî"],
+ c:["Horasan’daki Teftâzân köyünde doğdum.","Semerkant’ta ders verdim ve orada vefat ettim.","Çok sayıda ilim dalında eser verdim.","Şerhu’l-Akâid adlı eserim Osmanlı medreselerinde uzun yıllar okutuldu.","Belagat alanında el-Mutavvel adlı eserim de meşhurdur."],
+ b:"Teftâzânî (1312–1390), Horasan’daki Teftâzân’da doğmuş büyük bir kelam ve belagat âlimidir. Semerkant’ta ders verdi ve orada vefat etti. Şerhu’l-Akâid adlı eseri Osmanlı medreselerinde de uzun süre okutuldu. Belagat alanındaki el-Mutavvel adlı eseri de çok tanınmıştır."},
+{n:"Cürcânî",cat:"Mütekellimler",ic:"book",
+ o:["Cürcânî","Teftâzânî","Îcî","Âmidî"],
+ c:["Cürcân yakınlarında doğdum.","Şiraz’da ve Semerkant’ta ders verdim.","Teftâzânî ile ilmî tartışmalarım meşhurdur.","Îcî’nin el-Mevâkıf adlı eserine şerh yazdım.","et-Ta‘rîfât adlı terimler sözlüğümle tanınırım."],
+ b:"Seyyid Şerîf el-Cürcânî (1340–1413), Cürcân yakınlarında doğmuş büyük bir kelam ve dil âlimidir. Şiraz’da ve Semerkant’ta ders verdi. Îcî’nin el-Mevâkıf adlı eserine şerh yazdı. et-Ta‘rîfât adlı ilim terimleri sözlüğü çok kullanılmıştır."},
+{n:"Ebü’l-Muîn en-Nesefî",cat:"Mütekellimler",ic:"castle",
+ o:["Ebü’l-Muîn en-Nesefî","Ebü’l-Yüsr el-Pezdevî","Ebû Mansûr el-Mâtürîdî","Bâkıllânî"],
+ c:["Nesef şehrinde yetiştim.","Mâtürîdî’nin yolundan giden büyük âlimlerdenim.","Mâtürîdî kelamının sistemleşmesine katkı yaptım.","Tebsıratü’l-Edille adlı eserimde itikad konularını ayrıntılı ele aldım.","Beni, müfessir Nesefî ile karıştırmayın; benim adım Ebü’l-Muîn’dir."],
+ b:"Ebü’l-Muîn en-Nesefî (ö. 1115), Nesef’te yetişmiş büyük bir Mâtürîdî kelam âlimidir. Mâtürîdî kelamının sistemleşmesine büyük katkı yaptı. Tebsıratü’l-Edille adlı eseri bu alandaki en önemli kitaplardandır."},
+{n:"Ebü’l-Yüsr el-Pezdevî",cat:"Mütekellimler",ic:"bow",
+ o:["Ebü’l-Yüsr el-Pezdevî","Ebü’l-Muîn en-Nesefî","Ebû Mansûr el-Mâtürîdî","Âmidî"],
+ c:["Semerkant yakınlarındaki Pezde’de doğdum.","Hanefî fıkhının büyük âlimlerinden biri olan Fahrülislâm el-Pezdevî benim kardeşimdir.","Semerkant’ta ders verdim.","Mâtürîdî kelamının önde gelen isimlerinden biriyim.","Usûlü’d-Dîn adlı itikad kitabım Mâtürîdî kelamının temel eserlerindendir."],
+ b:"Ebü’l-Yüsr el-Pezdevî (yaklaşık 1030–1100), Semerkant yakınındaki Pezde’de doğmuş Mâtürîdî kelam âlimidir. Hanefî fakihi Fahrülislâm el-Pezdevî’nin kardeşidir. Usûlü’d-Dîn adlı eseri Mâtürîdî kelamının temel kitaplarındandır."},
+{n:"Vâsıl bin Atâ",cat:"Mütekellimler",ic:"sword",
+ o:["Vâsıl bin Atâ","Ebü’l-Hasan el-Eş‘arî","Ebû Mansûr el-Mâtürîdî","Bâkıllânî"],
+ c:["Medine’de doğdum, Basra’da yaşadım.","Hasan-ı Basrî’nin ders halkasında bulundum.","Büyük günah işleyenin durumu konusunda hocamdan farklı düşündüm.","“El-menzile beyne’l-menzileteyn” görüşünü savundum.","Mu‘tezile mezhebinin kurucusu sayılırım."],
+ b:"Vâsıl bin Atâ (699–748), Medine’de doğmuş, Basra’da yaşamış kelam âlimidir. Hasan-ı Basrî’nin derslerine katıldı; büyük günah işleyenin durumu konusunda hocasından ayrıldı. “El-menzile beyne’l-menzileteyn” görüşüyle Mu‘tezile mezhebinin kurucusu sayılır."},
+{n:"Şehristânî",cat:"Mütekellimler",ic:"helmet",
+ o:["Şehristânî","Cüveynî","Âmidî","Bâkıllânî"],
+ c:["Horasan’daki Şehristân’da doğdum.","Nişabur’da ve Bağdat’ta ders verdim.","Selçuklu Sultanı Sencer’in sarayıyla ilişkim vardı.","Nihâyetü’l-Ikdâm adlı kelam kitabını yazdım.","el-Milel ve’n-Nihal adlı eserimle dinleri ve mezhepleri tanıttım."],
+ b:"Şehristânî (1076–1153), Horasan’daki Şehristân’da doğmuş büyük bir kelam âlimi ve mezhepler tarihçisidir. Nişabur ve Bağdat’ta bulundu. el-Milel ve’n-Nihal adlı eseri, dinleri ve mezhepleri tanıtan en önemli kaynaklardandır."},
 {n:"Fuzûlî",cat:"İslam Şairleri ve Edebiyatçıları",ic:"book",
  o:["Fuzûlî", "Bâkî", "Nâbî", "Nefî"],
  c:["Irak’ta, Kerbelâ ve Hille çevresinde yaşadım.", "16. yüzyılda Türkçe, Arapça ve Farsça şiirler yazdım.", "Leylâ ile Mecnûn adlı mesnevîmle ünlüyüm.", "Su Kasidesi ve Beng ü Bâde adlı eserlerim de vardır.", "Divan edebiyatının büyük şairiyim; mahlasım “Fuzûlî”dir."],
@@ -15389,6 +15698,46 @@ var PEOPLE=[
  o:["Mehmed Âkif Ersoy", "Necip Fazıl Kısakürek", "Yahya Kemal Beyatlı", "Ziya Gökalp"],
  c:["1873’te İstanbul’da doğdum; babam Tahir Efendi’dir.", "Halkalı Ziraat ve Baytar Mektebi’ni bitirdim.", "Sırât-ı Müstakîm ve Sebîlürreşâd dergilerinde yazılar yazdım.", "Şiirlerimi “Safahat” adlı kitapta topladım.", "İstiklâl Marşı’nın şairiyim."],
  b:"Mehmed Âkif Ersoy (1873–1936), şair, düşünür ve fikir adamıdır. İstanbul’da doğdu; Halkalı Ziraat ve Baytar Mektebi’ni bitirdi. Sırât-ı Müstakîm ve Sebîlürreşâd dergilerinde yazılar yazdı. Şiirlerini “Safahat”ta topladı. İstiklâl Marşı’nın sözlerini yazdı; marş 1921’de TBMM’de kabul edildi. 1936’da İstanbul’da vefat etti."},
+{n:"Hassân bin Sâbit",cat:"İslam Şairleri ve Edebiyatçıları",ic:"book",
+ o:["Hassân bin Sâbit","Kâ‘b bin Züheyr","Fuzûlî","Mehmed Âkif Ersoy"],
+ c:["Medine’de Hazrec kabilesinden doğdum.","Câhiliye döneminde de şiirle ün yapmış bir şairdim.","Müslüman olduktan sonra şiirlerimi İslam’ı savunmaya adadım.","Peygamberimize yönelen hicivlere şiirle cevap verdim.","Peygamberimizin şairi olarak tanınırım."],
+ b:"Hassân bin Sâbit (ö. yaklaşık 674), Medine’de Hazrec kabilesinden gelen büyük bir sahabî ve şairdir. Câhiliye döneminde de tanınmış bir şairdi. Müslüman olduktan sonra şiirleriyle İslam’ı savundu ve Peygamberimize yöneltilen hicivlere cevap verdi. “Resûlullah’ın şairi” olarak anılır."},
+{n:"Kâ‘b bin Züheyr",cat:"İslam Şairleri ve Edebiyatçıları",ic:"castle",
+ o:["Kâ‘b bin Züheyr","Hassân bin Sâbit","Sa‘dî-i Şîrâzî","Fuzûlî"],
+ c:["Babam Câhiliye döneminin büyük şairlerinden Züheyr’dir.","Önceleri şiirlerimle Peygamberimizi incittim.","Sonra Medine’ye gelip Peygamberimizden af diledim.","Okuduğum kasideyi dinleyen Peygamberimiz, üzerindeki hırkayı omzuma attı.","Kasîde-i Bürde olarak anılan şiirimle tanınırım."],
+ b:"Kâ‘b bin Züheyr, şair Züheyr’in oğludur. Önceleri Peygamberimiz aleyhinde şiirler söyledi. Sonra Medine’ye gelip Müslüman oldu ve affedildi. Kasîde-i Bürde diye anılan kasidesini okuduğunda Peygamberimizin üzerindeki hırkayı omzuna attığı rivayet edilir."},
+{n:"Sa‘dî-i Şîrâzî",cat:"İslam Şairleri ve Edebiyatçıları",ic:"bow",
+ o:["Sa‘dî-i Şîrâzî","Hâfız-ı Şîrâzî","Câmî","Feridüddin Attâr"],
+ c:["Şiraz’da doğdum.","Moğol istilaları sırasında yurdumdan ayrıldım ve uzun yıllar seyahat ettim.","Seyahatlerimde gördüklerimi hikâyelere ve öğütlere dönüştürdüm.","Âdem oğullarının tek bir bedenin organları gibi olduğunu anlatan ünlü dizeler bana aittir.","Gülistân ve Bostân adlı eserlerimle tanınırım."],
+ b:"Sa‘dî-i Şîrâzî (yaklaşık 1210–1292), Şiraz’da doğmuş büyük bir Fars şairi ve edibidir. Uzun yıllar seyahat etti, gördüklerini hikâye ve öğütlerle anlattı. Gülistân ve Bostân adlı eserleri çok okunmuştur. Âdem oğullarının tek bir bedenin organları gibi olduğunu anlatan dizeleri meşhurdur."},
+{n:"Hâfız-ı Şîrâzî",cat:"İslam Şairleri ve Edebiyatçıları",ic:"helmet",
+ o:["Hâfız-ı Şîrâzî","Sa‘dî-i Şîrâzî","Câmî","Fuzûlî"],
+ c:["Şiraz’da yaşadım.","Kur’an’ı ezberlediğim için adımın başında “Hâfız” vardır.","Şiirlerimde gazel türünün en büyük ustalarından biri sayılırım.","Dîvânım, İran edebiyatının en çok okunan eserlerinden biridir.","Mezarım Şiraz’da bugün de ziyaret edilir."],
+ b:"Hâfız-ı Şîrâzî (yaklaşık 1315–1390), Şiraz’da yaşamış büyük bir Fars şairidir. Kur’an’ı ezberlediği için “Hâfız” lakabıyla anılır. Gazel türünün en büyük ustalarından sayılır. Dîvânı İran edebiyatının en çok okunan eserlerindendir. Mezarı Şiraz’da ziyaret edilir."},
+{n:"Feridüddin Attâr",cat:"İslam Şairleri ve Edebiyatçıları",ic:"sword",
+ o:["Feridüddin Attâr","Câmî","Sa‘dî-i Şîrâzî","Mevlânâ Celâleddîn-i Rûmî"],
+ c:["Nişabur’da doğdum.","Adım, babamdan kalan eczacılık mesleğinden gelir.","Tasavvuf büyüklerinin hayatını anlatan bir tezkire yazdım.","Mevlânâ’nın çocukluğunda babasına bir eserimi hediye ettiğim anlatılır.","Mantıku’t-Tayr (Kuş Dili) adlı mesnevimle tanınırım."],
+ b:"Feridüddin Attâr (yaklaşık 1145–1221), Nişabur’da doğmuş büyük bir mutasavvıf şairdir. Eczacılık yaptığı için “Attâr” diye anılır. Tasavvuf büyüklerinin hayatını anlatan Tezkiretü’l-Evliyâ’yı yazdı. Mantıku’t-Tayr (Kuş Dili) adlı mesnevisi çok meşhurdur. Mevlânâ’ya etkisi olduğu söylenir."},
+{n:"Abdurrahman-ı Câmî",cat:"İslam Şairleri ve Edebiyatçıları",ic:"book",
+ o:["Abdurrahman-ı Câmî","Feridüddin Attâr","Hâfız-ı Şîrâzî","Sa‘dî-i Şîrâzî"],
+ c:["Horasan’daki Câm kasabasında doğdum.","Herat’ta yaşadım.","Nakşibendî tarikatına bağlı bir mutasavvıftım.","Ali Şîr Nevâî ile dosttum.","Baharistan ve Yûsuf u Züleyhâ adlı eserlerim meşhurdur."],
+ b:"Abdurrahman-ı Câmî (1414–1492), Horasan’da doğmuş, Herat’ta yaşamış büyük bir Fars şairi ve mutasavvıftır. Nakşibendî tarikatına bağlıydı ve Ali Şîr Nevâî ile dostluk kurdu. Baharistan ve Yûsuf u Züleyhâ gibi eserleri çok okunmuştur."},
+{n:"Bâkî",cat:"İslam Şairleri ve Edebiyatçıları",ic:"castle",
+ o:["Bâkî","Fuzûlî","Nef‘î","Şeyh Gâlib"],
+ c:["İstanbul’da doğdum; küçük yaşta ilim yoluna girdim.","Kanuni Sultan Süleyman’ın sarayında şiirimle ün yaptım.","Divan şiirinin en büyük ustalarından biri sayılırım.","Kanuni’nin vefatı üzerine yazdığım mersiye çok tanınmıştır.","Sultânü’ş-Şuarâ (şairlerin sultanı) lakabıyla anılırım."],
+ b:"Bâkî (1526–1600), İstanbul’da doğmuş, Kanuni Sultan Süleyman devrinde ün kazanmış büyük bir divan şairidir. Aynı zamanda ilmiye mesleğinde yükseldi. Kanuni için yazdığı mersiye çok meşhurdur. “Sultânü’ş-Şuarâ” diye anılır."},
+{n:"Şeyh Gâlib",cat:"İslam Şairleri ve Edebiyatçıları",ic:"bow",
+ o:["Şeyh Gâlib","Bâkî","Nef‘î","Fuzûlî"],
+ c:["İstanbul’da doğdum.","Mevlevî tarikatına girdim.","Galata Mevlevîhânesi’nde şeyhlik yaptım.","Divan şiirinin son büyük ustalarından sayılırım.","Hüsn ü Aşk adlı mesnevimle tanınırım."],
+ b:"Şeyh Gâlib (1757–1799), İstanbul’da doğmuş, Mevlevî tarikatına girmiş büyük bir divan şairidir. Galata Mevlevîhânesi’nde şeyhlik yaptı. Hüsn ü Aşk adlı mesnevisi divan edebiyatının en değerli eserlerindendir."},
+{n:"Nef‘î",cat:"İslam Şairleri ve Edebiyatçıları",ic:"helmet",
+ o:["Nef‘î","Bâkî","Şeyh Gâlib","Fuzûlî"],
+ c:["Erzurum’da doğdum.","IV. Murad döneminde İstanbul’da şiirimle ün yaptım.","Kaside türünde çok güçlüydüm.","Hicivlerim yüzünden başım derde girdi.","Siham-ı Kazâ adlı hiciv kitabımla tanınırım; hicivlerim yüzünden idam edildim."],
+ b:"Nef‘î (ö. 1635), Erzurum’da doğmuş büyük bir divan şairidir. IV. Murad döneminde kaside yazmada ün kazandı. Hicivleri yüzünden birçok kişiyi kendine düşman etti. Siham-ı Kazâ adlı hiciv kitabı çok bilinir. 1635’te idam edildi."},
+{n:"Necip Fazıl Kısakürek",cat:"İslam Şairleri ve Edebiyatçıları",ic:"book",
+ o:["Necip Fazıl Kısakürek","Mehmed Âkif Ersoy","Fuzûlî","Şeyh Gâlib"],
+ c:["1904’te İstanbul’da doğdum.","Şiirimle Türk edebiyatında yeni bir yol açtım.","Tiyatro ve fikir yazılarıyla da tanındım.","Büyük Doğu adlı dergiyi çıkardım.","Kaldırımlar ve Sakarya Türküsü şiirlerimle tanınırım."],
+ b:"Necip Fazıl Kısakürek (1904–1983), İstanbul’da doğmuş büyük bir şair, yazar ve fikir adamıdır. Şiirleriyle, tiyatro eserleriyle ve çıkardığı Büyük Doğu dergisiyle tanınır. Kaldırımlar ve Sakarya Türküsü en bilinen şiirlerindendir."},
 {n:"Mus‘ab bin Umeyr",cat:"İslam Davetçileri",ic:"bow",
  o:["Mus‘ab bin Umeyr", "Zeyd bin Hârise", "Câfer bin Ebî Tâlib", "Ebû Zer el-Gıfârî"],
  c:["Mekke’de zengin ve şık giyinen bir gençtim.", "Müslüman olunca rahat hayatımı geride bıraktım.", "Peygamberimiz beni Medine’ye İslam’ı öğretmek için gönderdi.", "Medine’de birçok kişinin Müslüman olmasına vesile oldum.", "Uhud Savaşı’nda sancaktarken şehit oldum."],
@@ -15397,6 +15746,46 @@ var PEOPLE=[
  o:["Muaz bin Cebel", "Mus‘ab bin Umeyr", "Ubâde bin Sâmit", "Übeyy bin Kâ‘b"],
  c:["Medineli Hazrec kabilesindenim; genç yaşta Müslüman oldum.", "Akabe biatında bulundum.", "Peygamberimiz beni Yemen’e vali ve öğretmen olarak gönderdi.", "Helal ve haram konusundaki bilgimle tanındım.", "Yemen’e giderken verdiğim cevaplar, içtihat konusunda örnek gösterilir."],
  b:"Muaz bin Cebel (yaklaşık 605–639), Medineli sahabedir. Akabe biatlarında bulundu. Peygamberimiz onu Yemen’e vali, kadı ve öğretmen olarak gönderdi. Helal ve harama dair bilgisiyle tanındı; Kur’an ve fıkıh öğretti. Suriye’de çıkan bir salgında 639 civarında vefat etti."},
+{n:"Cafer bin Ebû Tâlib",cat:"İslam Davetçileri",ic:"sword",
+ o:["Cafer bin Ebû Tâlib","Mus‘ab bin Umeyr","Muaz bin Cebel","Ebû Mûsâ el-Eş‘arî"],
+ c:["Peygamberimizin amcası Ebû Tâlib’in oğluyum.","Müslümanların Habeşistan’a hicretinde başkanlık yaptım.","Habeş Kralı Necâşî’nin huzurunda İslam’ı anlattım.","Necâşî’ye Meryem Sûresi’nden âyetler okudum.","Mûte Savaşı’nda şehit oldum; “Tayyâr” (Cennette uçan) lakabıyla anılırım."],
+ b:"Cafer bin Ebû Tâlib, Peygamberimizin amcası Ebû Tâlib’in oğlu ve Hz. Ali’nin kardeşidir. Habeşistan’a hicret eden Müslümanların başkanlığını yaptı. Kral Necâşî’nin huzurunda İslam’ı anlattı ve Meryem Sûresi’nden âyetler okudu. 629’daki Mûte Savaşı’nda şehit oldu. “Tayyâr” lakabıyla anılır."},
+{n:"Ebû Mûsâ el-Eş‘arî",cat:"İslam Davetçileri",ic:"book",
+ o:["Ebû Mûsâ el-Eş‘arî","Muaz bin Cebel","Cafer bin Ebû Tâlib","Ebû Zer el-Gıfârî"],
+ c:["Yemen’den gelip Müslüman oldum.","Peygamberimiz beni, Muaz bin Cebel ile birlikte Yemen’e gönderdi.","Halifelik dönemlerinde Basra ve Kûfe’nin valiliğini yaptım.","Güzel sesle Kur’an okumamla tanınırdım.","Basra’da halka Kur’an’ı öğrettim."],
+ b:"Ebû Mûsâ el-Eş‘arî, Yemen’den gelip Müslüman olmuş büyük bir sahabîdir. Peygamberimiz tarafından Muaz bin Cebel ile birlikte Yemen’e gönderildi. Hz. Ömer döneminde Basra ve Kûfe valiliği yaptı. Güzel sesle Kur’an okumasıyla meşhurdur."},
+{n:"Tufeyl bin Amr ed-Devsî",cat:"İslam Davetçileri",ic:"castle",
+ o:["Tufeyl bin Amr ed-Devsî","Ebû Zer el-Gıfârî","Es‘ad bin Zürâre","Mus‘ab bin Umeyr"],
+ c:["Devs kabilesinin reislerindendim.","Aynı zamanda şairdim.","Mekke’de Peygamberimizi dinleyip Müslüman oldum.","Kabilemin yurduna dönüp insanları İslam’a çağırdım.","Devs kabilesinin Müslüman olmasında rol oynadım."],
+ b:"Tufeyl bin Amr ed-Devsî, Devs kabilesinin reislerinden ve şairlerindendir. Mekke’de Müslüman olduktan sonra kabilesine dönüp onları İslam’a çağırdı. Devs kabilesinin Müslüman olmasında önemli rol oynadı."},
+{n:"Ebû Zer el-Gıfârî",cat:"İslam Davetçileri",ic:"bow",
+ o:["Ebû Zer el-Gıfârî","Tufeyl bin Amr ed-Devsî","Muaz bin Cebel","Ebû Mûsâ el-Eş‘arî"],
+ c:["Gıfâr kabilesindendim.","İslam’ı ilk kabul edenler arasında yer aldım.","Mekke’de Müslüman olduğumu açıkça söylemekten çekinmedim.","Kabileme dönüp onları İslam’a davet ettim.","Dünyaya fazla bağlanmama ve sadelikle yaşamamla tanınırım."],
+ b:"Ebû Zer el-Gıfârî, Gıfâr kabilesinden gelen ve İslam’ı ilk kabul edenler arasında yer alan büyük bir sahabîdir. Mekke’de Müslüman olduğunu açıkça söyledi. Kabilesine dönerek İslam’ı anlattı. Sade yaşamı ve dünyaya bağlanmayışıyla tanınır."},
+{n:"Es‘ad bin Zürâre",cat:"İslam Davetçileri",ic:"helmet",
+ o:["Es‘ad bin Zürâre","Mus‘ab bin Umeyr","Tufeyl bin Amr ed-Devsî","Muaz bin Cebel"],
+ c:["Medine’de Hazrec kabilesindendim.","Akabe’de Peygamberimize biat eden ilk Medineliler arasındaydım.","Mus‘ab bin Umeyr’i Medine’de evimde misafir ettim.","Mus‘ab ile birlikte Medine’de İslam’ı anlattım.","Medine’de ilk cuma namazını kıldırdığım rivayet edilir."],
+ b:"Es‘ad bin Zürâre, Medine’de Hazrec kabilesinden gelen büyük bir ensar sahabîsidir. Akabe biatlarında bulundu. Mus‘ab bin Umeyr’i evinde misafir etti ve onunla birlikte Medine’de İslam’ı yaydı. Medine’de ilk cuma namazını kıldırdığı rivayet edilir."},
+{n:"Abdullah bin Yâsîn",cat:"İslam Davetçileri",ic:"sword",
+ o:["Abdullah bin Yâsîn","Muînüddîn Çeştî","Satuk Buğra Han","İmâm-ı Rabbânî"],
+ c:["Kuzey Afrika’da yaşadım.","Berberî kabilelerine İslam’ı doğru biçimde öğretmeye çalıştım.","Sahra’da bir ribât (ilim ve ibadet merkezi) kurdum.","Ribâtımda yetişen insanlar bölgede yeni bir devletin temelini attı.","Murâbıtlar hareketinin kurucusuyum."],
+ b:"Abdullah bin Yâsîn (ö. 1059), Kuzey Afrika’da Berberî kabilelerine İslam’ı öğretmek için çalışan bir âlimdir. Sahra’da kurduğu ribâtta yetişen müritleriyle Murâbıtlar hareketini başlattı. Bu hareket sonradan büyük bir devlete dönüştü."},
+{n:"Muînüddîn Çeştî",cat:"İslam Davetçileri",ic:"book",
+ o:["Muînüddîn Çeştî","İmâm-ı Rabbânî","Seyyid Ali Hemedânî","Ahmed Yesevî"],
+ c:["Horasan bölgesinde yetiştim.","Tasavvuf eğitimimi aldıktan sonra Hindistan’a gittim.","Ecmer şehrine yerleştim.","Sevgi ve hoşgörü dolu davetimle Hindistan’da çok kişinin gönlünü kazandım.","Çeştiyye tarikatının Hindistan’daki en büyük şahsiyetiyim."],
+ b:"Muînüddîn Çeştî (1141–1236), Horasan bölgesinde yetişmiş büyük bir mutasavvıf ve davetçidir. Hindistan’a giderek Ecmer şehrine yerleşti. Sevgi ve hoşgörüye dayalı davetiyle Hindistan’da İslam’ın yayılmasına katkıda bulundu. Çeştiyye tarikatının Hindistan’daki en büyük şahsiyetidir."},
+{n:"Satuk Buğra Han",cat:"İslam Davetçileri",ic:"castle",
+ o:["Satuk Buğra Han","Abdullah bin Yâsîn","İmâm-ı Rabbânî","Muînüddîn Çeştî"],
+ c:["Karahanlı hanedanındanım.","Genç yaşta bir Müslüman tüccarın etkisiyle İslam’a girdim.","Müslüman olunca Abdülkerim adını aldım.","Kaşgar’da hükümdar olduktan sonra Müslümanlığı devlet içinde yaydım.","Türklerin toplu olarak Müslüman olmasının öncüsü sayılırım."],
+ b:"Satuk Buğra Han (ö. 955), Karahanlı hanedanından bir Türk hükümdarıdır. Müslüman olunca Abdülkerim adını aldı. Kaşgar’da hükümdar olduktan sonra İslam’ın devlet içinde yayılmasını sağladı. Türklerin toplu olarak Müslüman olmasının öncülerinden sayılır."},
+{n:"İmâm-ı Rabbânî",cat:"İslam Davetçileri",ic:"bow",
+ o:["İmâm-ı Rabbânî","Muînüddîn Çeştî","Seyyid Ali Hemedânî","Abdullah bin Yâsîn"],
+ c:["Hindistan’da Serhend şehrinde doğdum.","Nakşibendî tarikatının büyük şeyhlerindenim.","Hükümdar Ekber Şah döneminde yayılan din karışımı fikirlerine karşı çıktım.","Müridlerime ve devlet adamlarına yazdığım mektuplar toplanıp kitaplaştırıldı.","İkinci bin yılın müceddidi (yenileyicisi) olarak tanınırım."],
+ b:"İmâm-ı Rabbânî Ahmed Fârûkî Serhendî (1564–1624), Hindistan’da Serhend’de doğmuş büyük bir Nakşibendî şeyhidir. Ekber Şah döneminde yayılan din karışımı fikirlere karşı İslam’ı savundu. Mektûbât adlı eseri mektuplarından oluşur. İkinci bin yılın müceddidi diye anılır."},
+{n:"Seyyid Ali Hemedânî",cat:"İslam Davetçileri",ic:"helmet",
+ o:["Seyyid Ali Hemedânî","Muînüddîn Çeştî","İmâm-ı Rabbânî","Satuk Buğra Han"],
+ c:["Hemedan’da doğdum.","Kübreviyye tarikatına bağlı bir mutasavvıftım.","Uzun yıllar İslam dünyasını dolaştım.","Keşmir’e gelip halkı İslam’a davet ettim.","Keşmir’de “Şâh-ı Hemedân” diye anılırım."],
+ b:"Seyyid Ali Hemedânî (1314–1385), Hemedan’da doğmuş büyük bir mutasavvıf ve davetçidir. Kübreviyye tarikatına bağlıydı. İslam dünyasını dolaştı ve Keşmir’e gelerek halkı İslam’a davet etti. Keşmir’de “Şâh-ı Hemedân” diye anılır."},
 {n:"I. Abdurrahman ed-Dâhil",cat:"İslam Devletleri ve Hükümdarları",ic:"castle",
  o:["I. Abdurrahman ed-Dâhil", "III. Abdurrahman", "Tarık bin Ziyad", "Mûsâ bin Nusayr"],
  c:["Emevî hanedanındanım; Şam’da doğdum.", "Abbasîler Emevîleri devirince canımı kurtarmak için kaçtım.", "Kuzey Afrika üzerinden İspanya’ya geçtim.", "756’da Kurtuba’yı alarak Endülüs Emevî Devleti’ni kurdum.", "Lakabım “Sakru Kureyş”tir; “ed-Dâhil” (içeri giren) olarak bilinirim."],
@@ -15405,6 +15794,46 @@ var PEOPLE=[
  o:["Sultan Baybars", "Kutuz", "Selahaddin Eyyubî", "Kalavun"],
  c:["Kıpçak Türklerindenim; köle olarak Mısır’a getirildim.", "Memlûk ordusunda yükselip komutan oldum.", "1260’da Aynicâlût Savaşı’nda Moğolları yenen ordunun komutanlarındandım.", "Sultan olunca Haçlı kalelerini birer birer aldım.", "Abbasî halifeliğini Kahire’de yeniden canlandırdım."],
  b:"Sultan Baybars (1223–1277), Memlûk Devleti’nin en büyük sultanlarındandır. Kıpçak Türkü olarak doğdu, köle olarak Mısır’a getirildi. 1260’da Aynicâlût Savaşı’nda Moğolları yenen ordunun komutanlarındandı. 1260–1277 arasında sultanlık yaptı; Antakya’yı ve birçok Haçlı kalesini aldı. Abbasî halifeliğini Kahire’de yeniden canlandırdı. 1277’de Şam’da vefat etti."},
+{n:"III. Abdurrahman",cat:"İslam Devletleri ve Hükümdarları",ic:"castle",
+ o:["III. Abdurrahman","I. Abdurrahman ed-Dâhil","Yusuf bin Taşfin","Sultan Baybars"],
+ c:["Endülüs Emevî hanedanına mensubum.","Yaklaşık elli yıl boyunca hüküm sürdüm.","929’da halifelik unvanını aldım.","Kurtuba yakınında Medînetüzzehrâ şehrini kurdum.","Endülüs’ü en parlak dönemine ulaştıran halifeyim."],
+ b:"III. Abdurrahman (889–961), Endülüs Emevî hükümdarıdır. 929’da halifelik unvanını aldı. Kurtuba yakınında Medînetüzzehrâ şehrini kurdurdu. Hükümdarlığı sırasında Endülüs siyasi, ilmî ve ekonomik bakımdan en parlak dönemini yaşadı."},
+{n:"Yusuf bin Taşfin",cat:"İslam Devletleri ve Hükümdarları",ic:"sword",
+ o:["Yusuf bin Taşfin","III. Abdurrahman","Sultan Baybars","Melikşah"],
+ c:["Kuzey Afrika’da Murâbıtlar Devleti’nin hükümdarıyım.","Marakeş şehrini başkent yaptım.","Endülüs’teki Müslüman beylikler benden yardım istedi.","1086’da Zallâka Savaşı’nda Kastilya Kralı VI. Alfonso’yu yendim.","Murâbıtların en büyük hükümdarı olarak bilinirim."],
+ b:"Yusuf bin Taşfin (ö. 1106), Kuzey Afrika’daki Murâbıtlar Devleti’nin en büyük hükümdarıdır. Marakeş’i başkent yaptı. Endülüs beylerinin yardım çağrısı üzerine Endülüs’e geçti ve 1086’da Zallâka Savaşı’nda Kastilya Kralı VI. Alfonso’yu yendi."},
+{n:"Melikşah",cat:"İslam Devletleri ve Hükümdarları",ic:"castle",
+ o:["Melikşah","Alparslan","Tuğrul Bey","Sultan Sencer"],
+ c:["Büyük Selçuklu Devleti’nin üçüncü sultanıyım.","Babam Alparslan’dır.","Nizâmülmülk benim vezirimdi.","Isfahan’ı başkent yaptım ve rasathane kurdurdum.","Celâlî Takvimi’nin hazırlandığı dönemin sultanıyım."],
+ b:"Melikşah (1055–1092), Büyük Selçuklu Devleti’nin en parlak dönemini yaşatan sultanıdır. Alparslan’ın oğludur. Vezir Nizâmülmülk’ün yardımıyla devleti geniş topraklarda yönetti. Isfahan’da rasathane kurdurdu ve Celâlî Takvimi’nin hazırlanması bu dönemde gerçekleşti."},
+{n:"I. Alaeddin Keykubad",cat:"İslam Devletleri ve Hükümdarları",ic:"castle",
+ o:["I. Alaeddin Keykubad","II. Kılıçarslan","Melikşah","Uzun Hasan"],
+ c:["Anadolu Selçuklu Devleti’nin hükümdarıyım.","Selçukluları en parlak dönemlerine ben ulaştırdım.","Alanya’da büyük bir kale ve tersane yaptırdım.","1230’da Yassıçemen Savaşı’nda Celâleddin Harzemşah’ı yendim.","Kubâdâbâd Sarayı da benim zamanımda yapıldı."],
+ b:"I. Alaeddin Keykubad (ö. 1237), Anadolu Selçuklu Devleti’nin en parlak dönemini yaşatan sultanıdır. Alanya Kalesi’ni ve tersanesini yaptırdı. 1230’daki Yassıçemen Savaşı’nda Celâleddin Harzemşah’ı yendi. Kubâdâbâd Sarayı da onun zamanında inşa edildi."},
+{n:"Ahmed bin Tolun",cat:"İslam Devletleri ve Hükümdarları",ic:"book",
+ o:["Ahmed bin Tolun","Mansa Musa","III. Abdurrahman","Sultan Baybars"],
+ c:["Türk asıllıyım.","Abbâsî hilafeti zamanında Mısır’a vali olarak gönderildim.","Mısır’da fiilen bağımsız bir yönetim kurdum.","Tolunoğulları Devleti’nin kurucusuyum.","Kahire’de adımla anılan bir cami yaptırdım."],
+ b:"Ahmed bin Tolun (835–884), Türk asıllı Mısır valisidir. Abbâsîler adına Mısır’a vali olarak gelip fiilen bağımsız Tolunoğulları Devleti’ni kurdu. Kahire’de kendi adıyla anılan İbn Tolun Camii’ni yaptırdı."},
+{n:"Mansa Musa",cat:"İslam Devletleri ve Hükümdarları",ic:"book",
+ o:["Mansa Musa","Ahmed bin Tolun","Yusuf bin Taşfin","III. Abdurrahman"],
+ c:["Batı Afrika’daki Mali İmparatorluğu’nun hükümdarıyım.","Ülkem altın bakımından çok zengindi.","1324’te büyük bir kafileyle Hac’ca gittim.","Hac yolculuğumda kafilemin altın harcamaları Kahire’de ve Mekke’de konuşuldu.","Timbuktu’yu önemli bir ilim ve ticaret merkezi hâline getirdim."],
+ b:"Mansa Musa (ö. yaklaşık 1337), Batı Afrika’daki Mali İmparatorluğu’nun en ünlü hükümdarıdır. 1324’te büyük bir kafileyle Hac’ca gitti. Hac yolculuğunda harcadığı altınlar Kahire ve Mekke’de uzun süre konuşuldu. Timbuktu’nun ilim ve ticaret merkezi olmasına katkıda bulundu."},
+{n:"Babür Şah",cat:"İslam Devletleri ve Hükümdarları",ic:"sword",
+ o:["Babür Şah","Uzun Hasan","Mansa Musa","II. Abdülhamid"],
+ c:["Timur soyundan gelen bir hükümdarım.","Fergana’da doğdum.","1526’da Panipat Savaşı’nı kazandım.","Hindistan’da yeni bir imparatorluk kurdum.","Babür İmparatorluğu’nun kurucusuyum; hatıralarım Babürnâme adıyla bilinir."],
+ b:"Babür Şah (1483–1530), Timur soyundan gelen, Fergana’da doğmuş bir hükümdardır. 1526’da Panipat Savaşı’nı kazanarak Hindistan’da Babür İmparatorluğu’nu kurdu. Hatıralarını anlattığı eseri Babürnâme’dir."},
+{n:"II. Abdülhamid",cat:"İslam Devletleri ve Hükümdarları",ic:"castle",
+ o:["II. Abdülhamid","Kanuni Sultan Süleyman","Babür Şah","Uzun Hasan"],
+ c:["Osmanlı padişahı olarak 33 yıl tahtta kaldım.","Yıldız Sarayı’nı yönetim merkezi yaptım.","Rusya ile yapılan 93 Harbi benim döneminde yaşandı.","Hicaz Demiryolu’nun yapılmasına öncülük ettim.","Osmanlı’nın otuz dördüncü padişahıyım ve İslam birliği fikrine önem verdim."],
+ b:"II. Abdülhamid (1842–1918), 1876–1909 arasında hüküm süren Osmanlı padişahıdır. Döneminde 93 Harbi yaşandı, Hicaz Demiryolu yapıldı ve eğitim ile ulaşım alanlarında yatırımlar arttı. İslam birliği fikrine önem verdi. 1909’da tahttan indirildi."},
+{n:"II. Kılıçarslan",cat:"İslam Devletleri ve Hükümdarları",ic:"helmet",
+ o:["II. Kılıçarslan","I. Alaeddin Keykubad","Melikşah","Uzun Hasan"],
+ c:["Anadolu Selçuklu Devleti’nin hükümdarıyım.","Konya’yı merkez yaparak devleti güçlendirdim.","Bizans İmparatorluğu ile uzun yıllar mücadele ettim.","1176’da Bizans ordusunu ağır bir yenilgiye uğrattım.","Miryokefalon Savaşı’nın galibiyim."],
+ b:"II. Kılıçarslan (1156–1192), Anadolu Selçuklu Devleti’nin güçlü sultanlarındandır. Konya’yı merkez edip devleti güçlendirdi. 1176’daki Miryokefalon Savaşı’nda Bizans ordusunu ağır bir yenilgiye uğratarak Anadolu’nun Türk yurdu olmasını kesinleştirdi."},
+{n:"Uzun Hasan",cat:"İslam Devletleri ve Hükümdarları",ic:"bow",
+ o:["Uzun Hasan","II. Kılıçarslan","Babür Şah","Fatih Sultan Mehmet"],
+ c:["Akkoyunlu Devleti’nin en büyük hükümdarıyım.","Karakoyunlulara karşı mücadeleyi kazandım.","Tebriz’i başkent yaptım.","Venedik ile Osmanlılara karşı ittifak yaptım.","1473’te Otlukbeli Savaşı’nda Fatih Sultan Mehmed’e yenildim."],
+ b:"Uzun Hasan (1423–1478), Akkoyunlu Devleti’nin en büyük hükümdarıdır. Karakoyunlu Devleti’ni ortadan kaldırdı ve Tebriz’i başkent yaptı. Osmanlılara karşı Venedik ile ittifak kurdu. 1473’teki Otlukbeli Savaşı’nda Fatih Sultan Mehmed’e yenildi."},
 {n:"Fâtıma el-Fihrî",cat:"İslam Tarihinin Önemli Kadınları",ic:"castle",
  o:["Fâtıma el-Fihrî", "Râbia el-Adeviyye", "Zübeyde Hatun", "Şeceretüddür"],
  c:["Kayrevan’dan Fas’ın Fes şehrine göç eden bir ailenin kızıyım.", "Babam ticaretle büyük bir servet kazandı.", "Babamdan ve kardeşimden kalan serveti hayır işlerine ayırdım.", "859’da Fes’te bir cami yaptırdım.", "Bu caminin medresesi, dünyanın en eski üniversitelerinden Karaviyyîn’dir."],
@@ -15413,6 +15842,46 @@ var PEOPLE=[
  o:["Râbia el-Adeviyye", "Fâtıma el-Fihrî", "Şeceretüddür", "Zübeyde Hatun"],
  c:["Basra’da yoksul bir ailede doğdum.", "Bir dönem köle olarak yaşadım, sonra azat edildim.", "Hayatımı ibadete ve tefekküre adadım.", "Allah’a cennet ya da cehennem için değil, sevgi için ibadet etmeyi anlattım.", "İlâhî aşk anlayışıyla tanınan ilk kadın mutasavvıflardan biriyim."],
  b:"Râbia el-Adeviyye (yaklaşık 717–801), Basra’da yaşamış büyük kadın mutasavvıftır. Yoksul bir ailede doğdu, bir dönem köle olarak yaşadı; sonra azat edildi. Hayatını ibadete ve Allah sevgisine adadı. İlâhî aşk (muhabbet) anlayışının ilk temsilcilerindendir. 801 civarında Basra’da vefat etti."},
+{n:"Zübeyde Hatun",cat:"İslam Tarihinin Önemli Kadınları",ic:"castle",
+ o:["Zübeyde Hatun","Şecerüddür","Fâtıma el-Fihrî","Hürrem Sultan"],
+ c:["Abbâsî hanedanından bir hanımefendiyim.","Halife Harun Reşid’in eşiyim.","Halife Emin’in annesiyim.","Hacıların yaşadığı su sıkıntısını giderdim.","Mekke’ye su getirten Zübeyde Hatun’um; Ayn-ı Zübeyde adlı su kanalı benimle anılır."],
+ b:"Zübeyde Hatun (ö. 831), Halife Harun Reşid’in eşi ve Halife Emin’in annesidir. Hacıların su ihtiyacını gidermek için Mekke’ye su getirten Ayn-ı Zübeyde projesiyle tanınır. Kûfe ile Mekke arasındaki hac yolunun düzenlenmesine de katkıda bulundu."},
+{n:"Şecerüddür",cat:"İslam Tarihinin Önemli Kadınları",ic:"sword",
+ o:["Şecerüddür","Zübeyde Hatun","Hürrem Sultan","Gevher Nesibe"],
+ c:["Eyyubî Sultanı Salih Eyyub’un eşiyim.","Kocamın Mansûra’da hasta olduğu sırada devleti yönettim.","Yedinci Haçlı Seferi sırasında Mısır’ı korudum.","Mansûra’da Fransa Kralı IX. Louis’in esir alındığı dönemde yönetimdeydim.","Memlük Devleti’nin ilk sultanı olarak tanınırım."],
+ b:"Şecerüddür (ö. 1257), Eyyubî Sultanı Salih Eyyub’un eşidir. Kocasının ölümünden sonra Mısır’ı yönetti ve Yedinci Haçlı Seferi’nde devleti korudu. Daha sonra sultan ilan edilerek Memlük Devleti’nin ilk hükümdarı oldu."},
+{n:"Mahperi Hatun",cat:"İslam Tarihinin Önemli Kadınları",ic:"book",
+ o:["Mahperi Hatun","Gevher Nesibe","Hafsa Sultan","Mihrimah Sultan"],
+ c:["Anadolu Selçuklu Devleti’nde yaşadım.","Sultan I. Alaeddin Keykubad’ın eşiyim.","Sultan II. Gıyaseddin Keyhüsrev’in annesiyim.","Kayseri’de cami, medrese, hamam ve türbeden oluşan bir külliye yaptırdım.","Hunat Hatun adıyla tanınan Kayseri’deki külliyenin banisiyim."],
+ b:"Mahperi Hatun (ö. 1268), Anadolu Selçuklu Sultanı I. Alaeddin Keykubad’ın eşi ve II. Gıyaseddin Keyhüsrev’in annesidir. Kayseri’de cami, medrese, hamam ve türbe içeren Hunat Hatun Külliyesi’ni yaptırdı."},
+{n:"Gevher Nesibe",cat:"İslam Tarihinin Önemli Kadınları",ic:"bow",
+ o:["Gevher Nesibe","Mahperi Hatun","Hürrem Sultan","Şecerüddür"],
+ c:["Selçuklu hanedanındanım.","Kardeşim Sultan I. Gıyaseddin Keyhüsrev’dir.","Genç yaşta bir hastalık yüzünden vefat ettim.","Vasiyetim üzerine kardeşim, Kayseri’de bir sağlık kuruluşu yaptırdı.","Gevher Nesibe Şifahanesi ve Tıp Medresesi benim adımla anılır."],
+ b:"Gevher Nesibe (ö. 1204), Anadolu Selçuklu hanedanından bir hanım sultandır. Vasiyeti üzerine kardeşi Sultan I. Gıyaseddin Keyhüsrev, Kayseri’de Gevher Nesibe Şifahanesi ve Tıp Medresesi’ni yaptırdı. Bu yapı Anadolu’daki ilk tıp medreselerindendir."},
+{n:"Hürrem Sultan",cat:"İslam Tarihinin Önemli Kadınları",ic:"castle",
+ o:["Hürrem Sultan","Mihrimah Sultan","Hafsa Sultan","Kösem Sultan"],
+ c:["Osmanlı Sarayı’na cariye olarak girdim.","Kanuni Sultan Süleyman’ın eşi oldum.","Haseki unvanını taşıdım.","İstanbul’da, Kudüs’te ve Mekke’de hayır eserleri yaptırdım.","İstanbul’daki Haseki Külliyesi’ni Mimar Sinan’a yaptırdım."],
+ b:"Hürrem Sultan (ö. 1558), Kanuni Sultan Süleyman’ın eşidir. Saraya cariye olarak girdi ve Haseki unvanını aldı. İstanbul’da Haseki Külliyesi başta olmak üzere İstanbul, Kudüs ve Mekke’de birçok hayır eseri yaptırdı."},
+{n:"Mihrimah Sultan",cat:"İslam Tarihinin Önemli Kadınları",ic:"helmet",
+ o:["Mihrimah Sultan","Hürrem Sultan","Hafsa Sultan","Turhan Sultan"],
+ c:["Osmanlı hanedanındanım.","Annem Hürrem Sultan, babam Kanuni Sultan Süleyman’dır.","Rüstem Paşa’nın eşiyim.","Mimar Sinan, adıma iki büyük cami yaptı.","Üsküdar’daki ve Edirnekapı’daki camiler adımı taşır."],
+ b:"Mihrimah Sultan (1522–1578), Kanuni Sultan Süleyman ile Hürrem Sultan’ın kızı ve Rüstem Paşa’nın eşidir. Mimar Sinan tarafından Üsküdar’da ve Edirnekapı’da adına iki büyük cami yapıldı."},
+{n:"Hafsa Sultan",cat:"İslam Tarihinin Önemli Kadınları",ic:"book",
+ o:["Hafsa Sultan","Hürrem Sultan","Mihrimah Sultan","Turhan Sultan"],
+ c:["Osmanlı Sarayı’nda Valide Sultan unvanını taşıdım.","Yavuz Sultan Selim’in eşiyim.","Kanuni Sultan Süleyman’ın annesiyim.","Şehzade Süleyman’ın Manisa’da bulunduğu dönemde onunla birlikte yaşadım.","Manisa’da bir külliye yaptırdım; Mesir Macunu geleneği de benimle anılır."],
+ b:"Hafsa Sultan (ö. 1534), Yavuz Sultan Selim’in eşi ve Kanuni Sultan Süleyman’ın annesidir. Manisa’da Sultan Camii ve Külliyesi’ni yaptırdı. Manisa’daki Mesir Macunu geleneği onun adıyla anılır."},
+{n:"Nene Hatun",cat:"İslam Tarihinin Önemli Kadınları",ic:"sword",
+ o:["Nene Hatun","Mihrimah Sultan","Hafsa Sultan","Şecerüddür"],
+ c:["Erzurum’da doğdum.","93 Harbi sırasında Erzurum’da yaşıyordum.","Rus saldırısı sırasında şehri savunanlara destek verdim.","Aziziye Tabyası’nda yaralı askerlere ve savunmaya yardım ettim.","Aziziye Tabyası’nın kahramanı Nene Hatun’um."],
+ b:"Nene Hatun (1857–1955), Erzurum’da doğmuş, 1877–1878 Osmanlı-Rus Savaşı’nda (93 Harbi) Aziziye Tabyası’nın savunmasında yer alan hanımdır. Cesareti ve fedakârlığıyla Türk tarihine geçmiştir."},
+{n:"Turhan Sultan",cat:"İslam Tarihinin Önemli Kadınları",ic:"castle",
+ o:["Turhan Sultan","Kösem Sultan","Hafsa Sultan","Mihrimah Sultan"],
+ c:["Osmanlı Sarayı’na cariye olarak girdim.","Sultan İbrahim’in eşiyim.","Oğlum IV. Mehmed çocuk yaşta tahta çıktığında Valide Sultan ve naibe oldum.","Eminönü’ndeki Yeni Cami’nin yapımını tamamlattım.","Mısır Çarşısı, Yeni Cami külliyesinin bir parçası olarak yapıldı."],
+ b:"Turhan Sultan (1627–1683), Sultan İbrahim’in eşi ve IV. Mehmed’in annesidir. Oğlu çocuk yaşta tahta çıkınca Valide Sultan ve naibe olarak devleti yönetti. Eminönü’ndeki Yeni Cami’nin yapımını tamamlattı; Mısır Çarşısı da bu külliyenin bir parçasıdır."},
+{n:"Kösem Sultan",cat:"İslam Tarihinin Önemli Kadınları",ic:"helmet",
+ o:["Kösem Sultan","Turhan Sultan","Hürrem Sultan","Hafsa Sultan"],
+ c:["Osmanlı Sarayı’na cariye olarak girdim.","Sultan I. Ahmed’in eşiyim.","IV. Murad ve İbrahim’in annesiyim.","Uzun yıllar Valide Sultan olarak devlet işlerinde etkili oldum.","Üsküdar’da Çinili Cami’yi yaptırdım."],
+ b:"Kösem Sultan (yaklaşık 1589–1651), Sultan I. Ahmed’in eşi, IV. Murad ve İbrahim’in annesidir. Uzun yıllar Valide Sultan olarak devlet yönetiminde etkili oldu. Üsküdar’daki Çinili Cami’yi yaptırdı."},
 {n:"Âsım bin Behdele",cat:"Kıraat Âlimleri",ic:"book",
  o:["Âsım bin Behdele", "Nâfi‘ el-Medenî", "Hamza ez-Zeyyât", "Kisâî"],
  c:["Kûfe’de yaşadım ve Kur’an okuttum.", "Hocalarım arasında Ebû Abdurrahman es-Sülemî vardır.", "Yedi meşhur kıraat imamından biriyim.", "Öğrencim Hafs bin Süleyman’ın rivayeti benim adıma yayıldı.", "Bugün en yaygın okunan kıraat, “Hafs an Âsım” kıraatidir."],
@@ -15421,6 +15890,46 @@ var PEOPLE=[
  o:["Nâfi‘ el-Medenî", "Âsım bin Behdele", "Ebû Amr el-Basrî", "İbn Kesîr el-Mekkî"],
  c:["Medine’de yaşadım; aslen İsfahanlı bir ailedenim.", "Pek çok tâbiîden Kur’an okuyuşunu öğrendim.", "Mescid-i Nebevî’de uzun yıllar Kur’an okuttum.", "Yedi kıraat imamından biriyim.", "Kıraatim Kuzey ve Batı Afrika’da yaygın okunur; öğrencilerim Verş ve Kâlûn’dur."],
  b:"Nâfi‘ el-Medenî (yaklaşık 689–785), Medine’de yaşamış yedi kıraat imamından biridir. Uzun yıllar Mescid-i Nebevî’de Kur’an okuttu. Kıraati, öğrencileri Verş ve Kâlûn’un rivayetleriyle Kuzey ve Batı Afrika’da yaygın olarak okunur. 785 civarında Medine’de vefat etti."},
+{n:"İbn Kesîr el-Mekkî",cat:"Kıraat Âlimleri",ic:"castle",
+ o:["İbn Kesîr el-Mekkî","Nâfi‘ el-Medenî","Ebû Amr el-Basrî","İbn Âmir eş-Şâmî"],
+ c:["Mekke’de yaşadım.","Tâbiîn neslinden bir kıraat âlimiyim.","Mekke’deki ders halkamda Kur’an okutuyordum.","Yedi kıraat imamından biri olarak tanınırım.","Râvîlerim Bezzî ve Kunbül’dür."],
+ b:"İbn Kesîr el-Mekkî (665–738), Mekke’de yaşamış yedi kıraat imamından biridir. Tâbiîn neslindendir. Mekke kıraatinin imamı olarak tanınır. Râvîleri Bezzî ve Kunbül’dür."},
+{n:"Ebû Amr el-Basrî",cat:"Kıraat Âlimleri",ic:"book",
+ o:["Ebû Amr el-Basrî","Hamza ez-Zeyyât","Kisâî","İbn Kesîr el-Mekkî"],
+ c:["Mekke’de doğdum, Basra’da yaşadım.","Arap diline ve şiirine çok hâkimdim.","Kur’an’ı Mekke, Medine, Kûfe ve Basra âlimlerinden okudum.","Basra kıraat ekolünün imamıyım.","Râvîlerim Dûrî ve Sûsî’dir."],
+ b:"Ebû Amr el-Basrî (689–770), Mekke’de doğmuş, Basra’da yaşamış yedi kıraat imamından biridir. Arap diline ve şiirine çok hâkimdi. Basra kıraat ekolünün imamıdır. Râvîleri Dûrî ve Sûsî’dir."},
+{n:"İbn Âmir eş-Şâmî",cat:"Kıraat Âlimleri",ic:"bow",
+ o:["İbn Âmir eş-Şâmî","Ebû Amr el-Basrî","Kisâî","Hamza ez-Zeyyât"],
+ c:["Yemen kökenli bir âlimim.","Şam’da yaşadım.","Dımaşk Emevî Camii’nde imamlık yaptım.","Şam kıraat ekolünün imamıyım.","Râvîlerim Hişâm ve İbn Zekvân’dır."],
+ b:"İbn Âmir eş-Şâmî (ö. 736), Şam’da yaşamış yedi kıraat imamından biridir. Dımaşk Emevî Camii’nde imamlık yaptı. Şam kıraat ekolünün imamıdır. Râvîleri Hişâm ve İbn Zekvân’dır."},
+{n:"Hamza ez-Zeyyât",cat:"Kıraat Âlimleri",ic:"helmet",
+ o:["Hamza ez-Zeyyât","Kisâî","Ebû Amr el-Basrî","İbn Âmir eş-Şâmî"],
+ c:["Kûfe’de yaşadım.","Mesleğim zeytinyağı ticaretiydi.","“Zeyyât” lakabını bu yüzden aldım.","Kûfe kıraat ekolünün imamlarındanım.","Râvîlerim Halef ve Hallâd’dır."],
+ b:"Hamza ez-Zeyyât (699–773), Kûfe’de yaşamış yedi kıraat imamından biridir. Zeytinyağı ticareti yaptığı için “Zeyyât” lakabıyla anıldı. Kûfe kıraat ekolünün imamlarındandır. Râvîleri Halef ve Hallâd’dır."},
+{n:"Kisâî",cat:"Kıraat Âlimleri",ic:"sword",
+ o:["Kisâî","Hamza ez-Zeyyât","Âsım bin Behdele","Ebû Amr el-Basrî"],
+ c:["Kûfe’de yetiştim.","Nahiv ilminde çok söz sahibi bir âlimdim.","Abbâsî halifesi Harun Reşid’in oğullarının hocası oldum.","Hamza ez-Zeyyât’tan Kur’an okudum.","Kûfe kıraat ekolünün imamlarındanım; adım “kisâ” (hırka) sözcüğünden gelir."],
+ b:"Kisâî (ö. 805), Kûfe’de yetişmiş yedi kıraat imamından biridir. Nahiv ilminde de ünlüdür. Harun Reşid’in oğullarına hocalık yaptı. Hamza ez-Zeyyât’tan kıraat okudu."},
+{n:"Ebû Ca‘fer el-Medenî",cat:"Kıraat Âlimleri",ic:"book",
+ o:["Ebû Ca‘fer el-Medenî","Nâfi‘ el-Medenî","Yâkub el-Hadramî","Halef bin Hişâm"],
+ c:["Medine’de yaşadım.","Tâbiîn neslindenim.","Sahabeden Abdullah bin Abbas ve Ebû Hureyre gibi âlimlerden ders aldım.","Medine halkına Kur’an okuttum.","Onuncu kıraat imamlarından biri sayılırım."],
+ b:"Ebû Ca‘fer el-Medenî (ö. yaklaşık 747), Medine’de yaşamış, tâbiîn neslinden bir kıraat âlimidir. Sahabeden Abdullah bin Abbas ve Ebû Hureyre gibi isimlerden ders aldı. Yedi kıraat imamına eklenen üç imamdan biri sayılır."},
+{n:"Yâkub el-Hadramî",cat:"Kıraat Âlimleri",ic:"castle",
+ o:["Yâkub el-Hadramî","Halef bin Hişâm","Ebû Ca‘fer el-Medenî","Ebû Amr el-Basrî"],
+ c:["Basra’da yaşadım.","Basra Camii’nde imamlık yaptım.","Hem kıraat hem de Arap dili alanında yetiştim.","Onuncu kıraat imamlarından biri sayılırım.","Râvîlerim Ruveys ve Revh’dir."],
+ b:"Yâkub el-Hadramî (ö. 820), Basra’da yaşamış bir kıraat âlimidir. Basra Camii’nde imamlık yaptı. Yedi kıraat imamına eklenen üç imamdan biri sayılır. Râvîleri Ruveys ve Revh’dir."},
+{n:"Halef bin Hişâm",cat:"Kıraat Âlimleri",ic:"bow",
+ o:["Halef bin Hişâm","Yâkub el-Hadramî","Ebû Ca‘fer el-Medenî","Hamza ez-Zeyyât"],
+ c:["Bağdat’ta yaşadım.","Hamza ez-Zeyyât’ın talebelerindendim.","Hem Hamza’nın râvîsi hem de ayrı bir kıraat imamıyım.","Onuncu kıraat imamlarından biri sayılırım.","Yedi imama eklenen üç imamdan biriyim."],
+ b:"Halef bin Hişâm (ö. 844), Bağdat’ta yaşamış bir kıraat âlimidir. Hamza ez-Zeyyât’ın talebesi ve râvîsiydi. Yedi kıraat imamına eklenen üç imamdan biri sayılır."},
+{n:"Hafs bin Süleyman",cat:"Kıraat Âlimleri",ic:"helmet",
+ o:["Hafs bin Süleyman","Âsım bin Behdele","Nâfi‘ el-Medenî","Kisâî"],
+ c:["Kûfe’de doğdum.","Kıraat imamı Âsım’ın talebesiyim.","Âsım’ın üvey oğlu olduğum da söylenir.","Âsım’dan duyduğum kıraati nakleden râvîyim.","Bugün İslam dünyasında en yaygın okunan Hafs kıraati benim adımla anılır."],
+ b:"Hafs bin Süleyman (ö. 796), Kûfe’de yaşamış kıraat âlimidir. Kıraat imamı Âsım bin Behdele’nin talebesi ve râvîsidir. Onun rivayet ettiği Hafs kıraati bugün İslam dünyasında en yaygın okunan kıraattir."},
+{n:"İbnü’l-Cezerî",cat:"Kıraat Âlimleri",ic:"book",
+ o:["İbnü’l-Cezerî","Hafs bin Süleyman","Nâfi‘ el-Medenî","Âsım bin Behdele"],
+ c:["Dımaşk’ta doğdum.","Kıraat ilminin en büyük âlimlerinden biri sayılırım.","Timur’un Anadolu seferi sonrasında Semerkant’a götürüldüm.","Bursa’da ve Şiraz’da kıraat dersleri verdim.","en-Neşr fi’l-Kırââti’l-‘Aşr adlı eserim kıraat ilminin başvuru kaynağıdır."],
+ b:"İbnü’l-Cezerî (1350–1429), Dımaşk’ta doğmuş büyük bir kıraat âlimidir. Timur’un Anadolu seferi sonrasında Semerkant’a gitti; Bursa ve Şiraz’da da ders verdi. en-Neşr fi’l-Kırââti’l-‘Aşr adlı eseri kıraat ilminin en önemli kaynağıdır."},
 {n:"Abdülkadir Geylânî",cat:"Tarikat Büyükleri",ic:"book",
  o:["Abdülkadir Geylânî", "Bahâeddin Nakşibend", "Ahmed er-Rufâî", "Hacı Bektaş-ı Velî"],
  c:["1077’de Geylan’da doğdum.", "Gençken ilim için Bağdat’a gittim.", "Bağdat’ta ders verip vaazlar ettim.", "Futûhu’l-Gayb adlı eserimi yazdım.", "Adıma bağlı tarikat Kâdirîliktir; “Gavs-ı Âzam” lakabıyla anılırım."],
@@ -15429,6 +15938,46 @@ var PEOPLE=[
  o:["Bahâeddin Nakşibend", "Abdülkadir Geylânî", "Mevlânâ Celâleddîn-i Rûmî", "Ahmed Yesevî"],
  c:["1318’de Buhara yakınlarındaki Kasr-ı Ârifân’da doğdum.", "Seyyid Emir Külâl’in terbiyesinde yetiştim.", "Hac yolculuklarım ve Buhara’daki hizmetlerimle tanındım.", "Çalışmayı ve toplum içinde yaşamayı öğütledim; “kalabalık içinde yalnızlık” anlayışıyla bilinirim.", "Adıma bağlı tarikat Nakşibendîliktir."],
  b:"Bahâeddin Nakşibend (1318–1389), Nakşibendîlik tarikatının adını aldığı büyük sûfîdir. Buhara yakınlarında doğdu; Seyyid Emir Külâl’in terbiyesinde yetişti. İbadetle birlikte çalışmayı ve toplum içinde yaşamayı öğütledi; “halvet der encümen” (kalabalık içinde yalnızlık) anlayışıyla bilinir. 1389’da Buhara yakınlarında vefat etti. Nakşibendîlik Orta Asya’dan Anadolu ve Hindistan’a yayıldı."},
+{n:"Ahmed er-Rufâî",cat:"Tarikat Büyükleri",ic:"castle",
+ o:["Ahmed er-Rufâî","Abdülkadir Geylânî","Ebü’l-Hasan eş-Şâzelî","Seyyid Ahmed el-Bedevî"],
+ c:["Irak’ın Vâsıt bölgesindeki bataklıklar çevresinde yetiştim.","Dayımın yanında ilim ve tasavvuf eğitimi aldım.","Tevazu ve kulluk anlayışıyla tanınırım.","Müridlerime halka hizmeti ve alçak gönüllülüğü öğrettim.","Rufâîlik tarikatının kurucusuyum."],
+ b:"Ahmed er-Rufâî (1118–1182), Irak’ın Vâsıt bölgesinde yetişmiş büyük bir mutasavvıftır. Tevazu ve halka hizmet anlayışıyla tanınır. Rufâîlik tarikatı onun adıyla anılır."},
+{n:"Ebü’l-Hasan eş-Şâzelî",cat:"Tarikat Büyükleri",ic:"book",
+ o:["Ebü’l-Hasan eş-Şâzelî","Seyyid Ahmed el-Bedevî","Ahmed er-Rufâî","Necmeddin Kübrâ"],
+ c:["Kuzey Afrika’da doğdum.","Önce Tunus’a, sonra İskenderiye’ye yerleştim.","Dünyayı terk etmeden Allah’a kulluk etmeyi öğrettim.","Hizbü’l-Bahr adlı duamla tanınırım.","Şâzelîlik tarikatının kurucusuyum."],
+ b:"Ebü’l-Hasan eş-Şâzelî (1196–1258), Kuzey Afrika’da doğmuş, İskenderiye’de yaşamış büyük bir mutasavvıftır. Hizbü’l-Bahr adlı duasıyla tanınır. Şâzelîlik tarikatının kurucusudur."},
+{n:"Necmeddin Kübrâ",cat:"Tarikat Büyükleri",ic:"bow",
+ o:["Necmeddin Kübrâ","Ahmed er-Rufâî","Hâlid-i Bağdâdî","Ubeydullah-ı Ahrâr"],
+ c:["Hârezm bölgesinde yaşadım.","Mısır’da ve diğer ilim merkezlerinde hadis okudum.","Çok sayıda müride tasavvuf eğitimi verdim.","Moğolların Hârezm’i istila ettiği sırada şehit düştüm.","Kübreviyye tarikatının kurucusuyum."],
+ b:"Necmeddin Kübrâ (1145–1221), Hârezm bölgesinde yaşamış büyük bir mutasavvıftır. Moğol istilası sırasında şehit düştü. Kübreviyye tarikatının kurucusudur."},
+{n:"Hâlid-i Bağdâdî",cat:"Tarikat Büyükleri",ic:"helmet",
+ o:["Hâlid-i Bağdâdî","Ubeydullah-ı Ahrâr","Bahâeddin Nakşibend","Aziz Mahmud Hüdâyî"],
+ c:["Süleymaniye yakınlarında doğdum.","Hindistan’da bir Nakşibendî şeyhinden seyr ü sülûk eğitimi aldım.","Şam’da yaşadım ve orada vefat ettim.","Nakşibendî yolunu Osmanlı topraklarında yaydım.","Nakşibendiyye-Hâlidiyye kolunun kurucusuyum."],
+ b:"Hâlid-i Bağdâdî (1779–1827), Süleymaniye yakınlarında doğmuş, Hindistan’da Nakşibendî yolunun şeyhinden eğitim almış büyük bir mutasavvıftır. Şam’da vefat etti. Nakşibendiyye-Hâlidiyye kolunun kurucusudur."},
+{n:"Aziz Mahmud Hüdâyî",cat:"Tarikat Büyükleri",ic:"book",
+ o:["Aziz Mahmud Hüdâyî","Somuncu Baba","Şâbân-ı Velî","Hâlid-i Bağdâdî"],
+ c:["Şereflikoçhisar’da doğdum.","Önce medrese eğitimi aldım, kadılık ve müderrislik yaptım.","Bursa’da Üftâde Hazretleri’ne mürid oldum.","Üsküdar’da bir külliye yaptırdım.","Celvetiyye tarikatını Osmanlı’da yaydım."],
+ b:"Aziz Mahmud Hüdâyî (1541–1628), Şereflikoçhisar’da doğmuş büyük bir Osmanlı mutasavvıfıdır. Medrese eğitimi alıp müderrislik ve kadılık yaptı. Bursa’da Üftâde’ye mürid oldu. Üsküdar’da külliyesi vardır. Celvetiyye tarikatının Osmanlı’da yayılmasını sağladı."},
+{n:"Şâbân-ı Velî",cat:"Tarikat Büyükleri",ic:"castle",
+ o:["Şâbân-ı Velî","Aziz Mahmud Hüdâyî","Somuncu Baba","Ahi Evran"],
+ c:["Kastamonu’nun Taşköprü ilçesinde doğdum.","İstanbul’da ilim tahsili gördüm.","Halvetî şeyhlerinden birine mürid oldum.","Kastamonu’da müridlerime tasavvuf eğitimi verdim.","Halvetiyye tarikatının Şabâniyye kolunun kurucusuyum."],
+ b:"Şâbân-ı Velî (ö. 1569), Kastamonu’nun Taşköprü ilçesinde doğmuş büyük bir Osmanlı mutasavvıfıdır. Halvetiyye tarikatının Şabâniyye kolunu kurdu. Kastamonu’da müridlerine tasavvuf eğitimi verdi."},
+{n:"Ubeydullah-ı Ahrâr",cat:"Tarikat Büyükleri",ic:"sword",
+ o:["Ubeydullah-ı Ahrâr","Hâlid-i Bağdâdî","Necmeddin Kübrâ","Bahâeddin Nakşibend"],
+ c:["Taşkent yakınlarında doğdum.","Semerkant ve Buhara’da yaşadım.","Timurlu yöneticileri üzerinde manevi etkim vardı.","Ticaretle uğraşıp çok zengin oldum ve halka yardım ettim.","Nakşibendî yolunun büyük şeyhlerindenim."],
+ b:"Ubeydullah-ı Ahrâr (1404–1490), Taşkent yakınlarında doğmuş büyük bir Nakşibendî şeyhidir. Semerkant ve Buhara’da yaşadı. Timurlu yöneticiler üzerinde manevi etkisi vardı. Zenginliğini halkın yararına kullandı."},
+{n:"Seyyid Ahmed el-Bedevî",cat:"Tarikat Büyükleri",ic:"helmet",
+ o:["Seyyid Ahmed el-Bedevî","Ebü’l-Hasan eş-Şâzelî","Ahmed er-Rufâî","Abdülkadir Geylânî"],
+ c:["Fas’ta doğdum.","Mekke’ye ve Irak’a gittim.","Mısır’daki Tanta şehrine yerleştim.","Tanta’da müridlerime tasavvuf eğitimi verdim.","Bedeviyye tarikatının kurucusuyum."],
+ b:"Seyyid Ahmed el-Bedevî (1200–1276), Fas’ta doğmuş, Mısır’ın Tanta şehrine yerleşmiş büyük bir mutasavvıftır. Bedeviyye tarikatının kurucusudur."},
+{n:"Somuncu Baba",cat:"Tarikat Büyükleri",ic:"book",
+ o:["Somuncu Baba","Şâbân-ı Velî","Aziz Mahmud Hüdâyî","Ahi Evran"],
+ c:["Kayseri’de doğdum.","Hamîdüddîn-i Velî diye de anılırım.","Bursa Ulu Camii’nde ilk hutbeyi okudum.","Şehirde ekmek yapıp satmamdan dolayı bu adla anıldım.","Hacı Bayram-ı Velî’nin hocasıyım."],
+ b:"Somuncu Baba (ö. 1412), Kayseri’de doğmuş büyük bir Osmanlı mutasavvıfıdır. Asıl adı Hamîdüddîn-i Velî’dir. Bursa Ulu Camii’nde ilk hutbeyi okudu. Ekmek yapıp sattığı için Somuncu Baba diye anıldı. Hacı Bayram-ı Velî’nin hocasıdır."},
+{n:"Ahi Evran",cat:"Tarikat Büyükleri",ic:"castle",
+ o:["Ahi Evran","Somuncu Baba","Şâbân-ı Velî","Aziz Mahmud Hüdâyî"],
+ c:["Hoy şehrinde doğdum.","Anadolu’ya gelip Kırşehir’e yerleştim.","Mevlânâ ile aynı çağda yaşadım.","Esnaf ve sanatkârlar için ahlak ve dayanışma esaslarını belirledim.","Ahîlik teşkilatının önderiyim."],
+ b:"Ahi Evran (1169–1262), Hoy şehrinde doğmuş, Anadolu’ya gelerek Kırşehir’e yerleşmiş büyük bir mutasavvıf ve ahi şeyhidir. Esnaf ve sanatkâr teşkilatı olan Ahîliğin Anadolu’da yayılmasında önemli rol oynadı."},
 {n:"İbn Haldûn",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"book",
  o:["İbn Haldûn", "İbn Battûta", "Biruni", "İbn Rüşd"],
  c:["1332’de Tunus’ta doğdum.", "Kuzey Afrika ve Endülüs’te devlet hizmetlerinde bulundum.", "Memlûk Mısır’ında kadılık yaptım.", "1401’de Şam önlerinde Timur ile görüştüm.", "“Mukaddime” adlı eserimle sosyolojinin ve tarih felsefesinin öncüsü sayılırım."],
@@ -15437,6 +15986,46 @@ var PEOPLE=[
  o:["İbn Battûta", "Marco Polo", "Evliya Çelebi", "İbn Cübeyr"],
  c:["1304’te Tanca’da doğdum.", "21 yaşında hacca gitmek için yola çıktım.", "Yaklaşık otuz yıl boyunca Afrika, Asya ve Avrupa’yı gezdim.", "Anadolu’da Ahîlerin misafirperverliğini anlattım.", "Gezilerimi “Rihle” adlı kitapta topladım."],
  b:"İbn Battûta (1304–1368/69), Faslı seyyahtır. 1325’te hacca gitmek için Tanca’dan ayrıldı ve yaklaşık otuz yıl boyunca Kuzey Afrika’dan Hindistan ve Çin’e, Anadolu’dan Doğu Afrika’ya kadar uzanan geniş bir coğrafyayı gezdi. Anadolu’da Ahîlerin misafirperverliğini anlattı. Seyahatlerini “Rihle” adlı eserinde topladı. 1368/69’da Fas’ta vefat etti."},
+{n:"Evliya Çelebi",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"book",
+ o:["Evliya Çelebi","Kâtip Çelebi","İbn Battûta","İdrîsî"],
+ c:["1611’de İstanbul’da doğdum.","Saray eğitimi gördüm ve Enderun’da yetiştim.","Yaklaşık kırk yıl boyunca Osmanlı topraklarını ve çevre ülkeleri gezdim.","Gördüklerimi, duyduklarımı ve yaşadıklarımı bir eserde topladım.","On ciltlik Seyahatnâme’nin yazarıyım."],
+ b:"Evliya Çelebi (1611–yaklaşık 1685), İstanbul’da doğmuş Osmanlı gezginidir. Yaklaşık kırk yıl boyunca Osmanlı topraklarını ve komşu ülkeleri gezdi. Gördüklerini on ciltlik Seyahatnâme’sinde anlattı."},
+{n:"Kâtip Çelebi",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"castle",
+ o:["Kâtip Çelebi","Evliya Çelebi","Ahmed Cevdet Paşa","İbn Haldûn"],
+ c:["1609’da İstanbul’da doğdum.","Divan-ı Hümayun’da kâtiplik yaptım.","Kâtip Çelebi ve Hacı Halife adlarıyla anılırım.","Coğrafya, tarih ve bibliyografya alanlarında eser verdim.","Cihannümâ ve Keşfü’z-Zünûn adlı eserlerin yazarıyım."],
+ b:"Kâtip Çelebi (1609–1657), İstanbul’da doğmuş Osmanlı bilginidir. Divan-ı Hümayun’da kâtiplik yaptı. Coğrafya, tarih ve bibliyografya alanında eser verdi. Cihannümâ ve Keşfü’z-Zünûn en bilinen eserleridir."},
+{n:"İdrîsî",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"bow",
+ o:["İdrîsî","İbn Battûta","Yâkût el-Hamevî","Mes‘ûdî"],
+ c:["Septe (Ceuta) şehrinde doğdum.","Kurtuba’da eğitim aldım.","Sicilya Kralı II. Roger’ın sarayında çalıştım.","Kral için gümüşten büyük bir dünya haritası çizdim.","Nüzhetü’l-Müştâk adlı coğrafya eserimle tanınırım."],
+ b:"İdrîsî (1100–1165), Septe’de doğmuş büyük bir İslam coğrafyacısıdır. Sicilya Kralı II. Roger’ın sarayında çalıştı. Kral için gümüş bir dünya haritası hazırladı. Nüzhetü’l-Müştâk adlı eseri coğrafya literatürünün klasiklerindendir."},
+{n:"Mes‘ûdî",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"helmet",
+ o:["Mes‘ûdî","İdrîsî","İbn Haldûn","Yâkût el-Hamevî"],
+ c:["Bağdat’ta doğdum.","Hindistan’dan Doğu Afrika’ya kadar birçok yeri gezdim.","Tarih ve coğrafyayı bir arada ele aldım.","Müslüman dünyada “Arapların Herodotu” diye anılırım.","Mürûcü’z-Zeheb adlı eserimle tanınırım."],
+ b:"Mes‘ûdî (ö. 956), Bağdat’ta doğmuş büyük bir tarihçi ve coğrafyacıdır. Hindistan’dan Doğu Afrika’ya kadar birçok bölgeyi gezdi. Tarih ve coğrafyayı birlikte ele aldığı Mürûcü’z-Zeheb adlı eseriyle tanınır."},
+{n:"Yâkût el-Hamevî",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"book",
+ o:["Yâkût el-Hamevî","Mes‘ûdî","İdrîsî","İbn Battûta"],
+ c:["Rum asıllıyım; küçük yaşta esir düşüp Bağdat’a getirildim.","Efendim bana okuma yazma ve ticaret öğretti.","Hama şehriyle anılan lakabımı efendimden aldım.","Gezdiğim yerlerde kütüphanelerde araştırma yaptım.","Mu‘cemü’l-Büldân adlı coğrafya sözlüğünü yazdım."],
+ b:"Yâkût el-Hamevî (1179–1229), Rum asıllı olup küçük yaşta Bağdat’a getirilmiş büyük bir coğrafyacıdır. Gezdiği yerlerdeki kütüphanelerden yararlandı. Mu‘cemü’l-Büldân adlı coğrafya sözlüğü kaynak eserlerdendir."},
+{n:"Mâverdî",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"castle",
+ o:["Mâverdî","İbn Haldûn","Sîbeveyh","Ebussuud Efendi"],
+ c:["Basra’da doğdum, Bağdat’ta yaşadım.","Şâfiî mezhebinin büyük fakihlerindenim.","Abbâsî halifelerinin yakınında kadılık yaptım.","Devlet yönetimi ve halifelik hukuku üzerine yazdım.","el-Ahkâmü’s-Sultâniyye adlı eserin yazarıyım."],
+ b:"Mâverdî (974–1058), Basra’da doğmuş, Bağdat’ta yaşamış büyük bir Şâfiî fakihi ve siyaset düşünürüdür. Kadılık yaptı. Devlet yönetimi ve halifelik hukukunu ele aldığı el-Ahkâmü’s-Sultâniyye adlı eseriyle tanınır."},
+{n:"Ebussuud Efendi",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"sword",
+ o:["Ebussuud Efendi","Mâverdî","Ahmed Cevdet Paşa","Kâtip Çelebi"],
+ c:["İskilip’te doğdum.","Kanuni Sultan Süleyman döneminde yaşadım.","Kadıaskerlik yaptım.","Otuz yıla yakın Osmanlı’nın Şeyhülislamlığını üstlendim.","Kanuni’nin kanunlarının şer‘î hukukla uyumlu olmasını sağladım."],
+ b:"Ebussuud Efendi (1490–1574), İskilip’te doğmuş büyük bir Osmanlı âlimidir. Kanuni Sultan Süleyman döneminde kadıaskerlik yaptı, ardından uzun yıllar şeyhülislamlık görevinde bulundu. Osmanlı hukukunun şer‘î hukukla uyumlu hâle gelmesinde önemli rol oynadı."},
+{n:"Sîbeveyh",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"book",
+ o:["Sîbeveyh","Câhiz","Mâverdî","İbn Haldûn"],
+ c:["Fars asıllıyım.","Basra’da yaşadım.","Arap diline sonradan öğrenen biri olarak çok bağlandım.","Halîl bin Ahmed’in talebesiydim.","el-Kitâb adlı eserimle Arap dili gramerinin temellerini attım."],
+ b:"Sîbeveyh (ö. yaklaşık 796), Fars asıllı olup Basra’da yetişmiş büyük bir dil âlimidir. Halîl bin Ahmed’in talebesidir. el-Kitâb adlı eseri Arap dili gramerinin ilk büyük kitabıdır."},
+{n:"Ahmed Cevdet Paşa",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"helmet",
+ o:["Ahmed Cevdet Paşa","Kâtip Çelebi","Ebussuud Efendi","Evliya Çelebi"],
+ c:["1822’de Lofça’da doğdum.","Medrese eğitimi aldım ve tarihçilik yaptım.","Osmanlı’nın son dönemlerinde yüksek devlet görevlerinde bulundum.","Adalet Bakanlığı da yaptım.","Mecelle komisyonunun başkanıyım; Tarih-i Cevdet de benim eserimdir."],
+ b:"Ahmed Cevdet Paşa (1822–1895), Lofça’da doğmuş Osmanlı âlimi, devlet adamı ve tarihçisidir. Medrese eğitimi aldı. Mecelle’nin hazırlanmasını sağlayan komisyonun başkanıdır. Tarih-i Cevdet adlı eseriyle tanınır."},
+{n:"Câhiz",cat:"İslam Tarihinin Önemli Şahsiyetleri",ic:"bow",
+ o:["Câhiz","Sîbeveyh","Mes‘ûdî","İbn Haldûn"],
+ c:["Basra’da doğdum.","Gözlerim dışarı doğru çıkık olduğu için bu lakabı aldım.","Edebiyat, doğa ve toplum üzerine çok sayıda kitap yazdım.","Hayvanlar hakkında ansiklopedik bir eser kaleme aldım.","Kitâbü’l-Hayevân ve el-Beyân ve’t-Tebyîn adlı eserlerim meşhurdur."],
+ b:"Câhiz (776–868), Basra’da doğmuş büyük bir Arap edebiyatçısıdır. Edebiyat, doğa bilimi ve toplum üzerine çok sayıda eser yazdı. Kitâbü’l-Hayevân ve el-Beyân ve’t-Tebyîn adlı eserleriyle Arap nesrinin en büyük ustalarından sayılır."},
 {n:"İmam Gazzâlî",cat:"İslam Âlimleri",ic:"book",
  o:["İmam Gazzâlî", "Fahreddin er-Râzî", "İbn Rüşd", "Cüveynî"],
  c:["1058’de Tûs’ta doğdum.", "Bağdat’taki Nizâmiye Medresesi’nde müderrislik yaptım.", "Manevî bir bunalım yaşayıp görevimi bırakarak yıllarca seyahat ve inzivada bulundum.", "İhyâu Ulûmi’d-Dîn adlı eserimi yazdım.", "Lakabım “Huccetü’l-İslâm”dır."],
@@ -15444,7 +16033,95 @@ var PEOPLE=[
 {n:"İmam Nevevî",cat:"İslam Âlimleri",ic:"sword",
  o:["İmam Nevevî", "İbn Kesîr", "İbn Hacer", "Suyûtî"],
  c:["1233’te Şam yakınlarındaki Nevâ köyünde doğdum.", "Şam’da eğitim gördüm.", "Şâfiî fıkhının büyük âlimlerindenim.", "“el-Erbaûn” (Kırk Hadis) adlı eserim çok bilinir.", "“Riyâzü’s-Sâlihîn” adlı hadis derlemesinin yazarıyım."],
- b:"İmam Nevevî (1233–1277), Şâfiî mezhebinin büyük fıkıh ve hadis âlimlerindendir. Şam yakınlarındaki Nevâ’da doğdu; Şam’da eğitim gördü. “Riyâzü’s-Sâlihîn”, “el-Erbaûn” ve “el-Mecmû‘” gibi eserleri meşhurdur. Sade yaşayışı ve takvasıyla tanınır. 1277’de Nevâ’da vefat etti."}];
+ b:"İmam Nevevî (1233–1277), Şâfiî mezhebinin büyük fıkıh ve hadis âlimlerindendir. Şam yakınlarındaki Nevâ’da doğdu; Şam’da eğitim gördü. “Riyâzü’s-Sâlihîn”, “el-Erbaûn” ve “el-Mecmû‘” gibi eserleri meşhurdur. Sade yaşayışı ve takvasıyla tanınır. 1277’de Nevâ’da vefat etti."},
+{n:"Muaviye bin Ebû Süfyan",cat:"İslam Halifeleri",ic:"crown",
+ o:["Muaviye bin Ebû Süfyan", "Yezid bin Muaviye", "Abdülmelik bin Mervan", "Ömer bin Abdülaziz"],
+ c:["İslam'ın ilk dönemlerinde önemli görevler üstlendim.", "Şam merkezli güçlü bir yönetim kurdum.", "Hz. Ali dönemindeki siyasi mücadelelerde karşı karşıya geldim.", "Halifeliği kendi ailesine bırakarak yeni bir yönetim anlayışının başlangıcını yaptım.", "Emevî Devleti'nin kurucusuyum."],
+ b:"Muaviye bin Ebû Süfyan, 661 yılında Emevî yönetimini başlattı. Şam'ı merkez yaptı ve halifeliğin babadan oğula geçmesi uygulamasının önünü açtı."},
+{n:"Yezid bin Muaviye",cat:"İslam Halifeleri",ic:"crown",
+ o:["Yezid bin Muaviye", "Muaviye bin Ebû Süfyan", "Mervan bin Hakem", "Velid bin Abdülmelik"],
+ c:["Babamın ölümünden sonra yönetimin başına geçtim.", "Hükümdarlığım sırasında Müslümanlar arasında büyük siyasi olaylar yaşandı.", "Kerbelâ hadisesi benim dönemimde gerçekleşti.", "Medine'de Harre Olayı da dönemimin önemli olaylarındandır.", "Emevî Devleti'nin ikinci halifesiyim."],
+ b:"Yezid bin Muaviye, 680-683 yılları arasında hüküm sürdü. Kerbelâ hadisesi ve Harre Olayı onun döneminin en önemli ve acı olayları arasındadır."},
+{n:"Abdülmelik bin Mervan",cat:"İslam Halifeleri",ic:"coins",
+ o:["Abdülmelik bin Mervan", "Ömer bin Abdülaziz", "Velid bin Abdülmelik", "Süleyman bin Abdülmelik"],
+ c:["Devletin iç karışıklıklarla mücadele ettiği bir dönemde yönetimi devraldım.", "Arapçayı devletin resmî yazışma dili hâline getirdim.", "İslam dünyasında ilk düzenli İslamî para sisteminin gelişmesini sağladım.", "Kudüs'teki Kubbetü's-Sahra benim dönemimde inşa edildi.", "Emevî Devleti'nin en önemli hükümdarlarından biriyim."],
+ b:"Abdülmelik bin Mervan, 685-705 yılları arasında hüküm sürdü. Devlet yönetimini güçlendirdi, para ve bürokrasi alanında önemli düzenlemeler yaptı."},
+{n:"Ömer bin Abdülaziz",cat:"İslam Halifeleri",ic:"scale",
+ o:["Ömer bin Abdülaziz", "Abdülmelik bin Mervan", "Velid bin Abdülmelik", "Süleyman bin Abdülmelik"],
+ c:["Gösterişten uzak ve sade bir hayat sürmeye çalıştım.", "Yönetimde adaletin sağlanmasına büyük önem verdim.", "Haksız yere alınan malların sahiplerine iade edilmesini istedim.", "Emevî döneminde dinî ve sosyal reformlar gerçekleştirdim.", "Adaletli yönetimim nedeniyle beşinci raşid halife olarak anıldım."],
+ b:"Ömer bin Abdülaziz, 717-720 yılları arasında halifelik yaptı. Adaletli yönetimi, sade yaşamı ve sosyal düzenlemeleriyle tanındı."},
+{n:"Harun Reşid",cat:"İslam Halifeleri",ic:"book",
+ o:["Harun Reşid", "Me'mun", "Mansur", "Mu'tasım"],
+ c:["Bağdat'ın büyük bir bilim ve kültür merkezi olduğu dönemde hüküm sürdüm.", "Bilim insanlarını ve sanatkârları destekledim.", "Bizans ile siyasi ve askerî ilişkiler yürüttüm.", "Binbir Gece Masalları'nda da adım sıkça geçer.", "Abbâsî Devleti'nin en tanınmış halifelerinden biriyim."],
+ b:"Harun Reşid, 786-809 yılları arasında Abbâsî halifeliği yaptı. Onun döneminde Bağdat bilim, kültür ve ticaret açısından önemli bir merkez hâline geldi."},
+{n:"Me'mun",cat:"İslam Halifeleri",ic:"graduation-cap",
+ o:["Me'mun", "Harun Reşid", "Mansur", "Mu'tasım"],
+ c:["Bilimsel çalışmalara ve tercüme faaliyetlerine büyük destek verdim.", "Bağdat'ta Beytülhikme'nin gelişmesine katkıda bulundum.", "Yunanca eserlerin Arapçaya çevrilmesini destekledim.", "Astronomi ve matematik çalışmalarına önem verdim.", "Harun Reşid'in oğluyum."],
+ b:"Me'mun, 813-833 yılları arasında Abbâsî halifesi oldu. Beytülhikme ve tercüme faaliyetlerine verdiği destekle İslam bilim tarihinin önemli dönemlerinden birine öncülük etti."},
+{n:"Mansur",cat:"İslam Halifeleri",ic:"landmark",
+ o:["Mansur", "Me'mun", "Harun Reşid", "Mu'tasım"],
+ c:["Abbâsî Devleti'nin siyasi yapısını güçlendirdim.", "Yeni bir başkent kurmak için büyük bir şehir projesi başlattım.", "Bağdat'ın kuruluşuyla tanınırım.", "Şehrin yuvarlak planlı yapısı dikkat çekiciydi.", "Abbâsîlerin ikinci halifesiyim."],
+ b:"Ebû Cafer el-Mansur, 754-775 yılları arasında hüküm sürdü. 762 yılında Bağdat'ın kuruluşunu gerçekleştirdi ve Abbâsî yönetiminin güçlenmesini sağladı."},
+{n:"Mu'tasım",cat:"İslam Halifeleri",ic:"shield",
+ o:["Mu'tasım", "Me'mun", "Vâsık", "Mütevekkil"],
+ c:["Orduda yeni askerî yapılanmalara önem verdim.", "Türk askerlerini orduda ve yönetimde daha etkili hâle getirdim.", "Bağdat'taki askerî ve toplumsal dengeler nedeniyle yeni bir şehir kurdurdum.", "Samarra şehrinin kuruluşu benim dönemimde gerçekleşti.", "Abbâsî halifelerinden biriyim."],
+ b:"Mu'tasım, 833-842 yılları arasında Abbâsî halifeliği yaptı. Türk askerlerinin ordudaki etkisini artırdı ve Samarra şehrini başkent olarak kurdurdu."},
+{n:"Mütevekkil",cat:"İslam Halifeleri",ic:"landmark",
+ o:["Mütevekkil", "Mu'tasım", "Me'mun", "Mansur"],
+ c:["Abbâsî Devleti'nin siyasi ve dinî tartışmaların yoğun olduğu döneminde hüküm sürdüm.", "Önceki dönemde öne çıkan bazı dinî politikaları değiştirdim.", "Samarra'da önemli imar faaliyetleri gerçekleştirdim.", "Samarra Ulu Camii'nin inşası benim dönemimde yapıldı.", "Abbâsî halifelerinden biriyim ve 861 yılında öldürüldüm."],
+ b:"Mütevekkil, 847-861 yılları arasında Abbâsî halifesi oldu. Dinî politikaları değiştirdi ve Samarra'da büyük mimari eserlerin yapılmasını sağladı."},
+{n:"Sultan Sencer",cat:"İslam Halifeleri",ic:"sword",
+ o:["Sultan Sencer", "Melikşah", "Alparslan", "Tuğrul Bey"],
+ c:["Uzun yıllar doğu bölgelerinde güçlü bir yönetim sürdürdüm.", "Büyük Selçuklu Devleti'nin son büyük hükümdarı olarak anılırım.", "Katvan Savaşı'nda Karahitaylara yenildim.", "Oğuz isyanı sırasında esir düştüm.", "Büyük Selçuklu Devleti'nin son hükümdarıyım."],
+ b:"Sultan Sencer, Büyük Selçuklu Devleti'nin son büyük hükümdarıdır. 1157 yılında vefat etmesiyle devletin merkezi gücü sona erdi."},
+{n:"İbn Teymiyye",cat:"İslam Âlimleri",ic:"landmark",
+ o:["İbn Teymiyye", "İbn Haldun", "İbn Kesîr", "Fahreddin er-Râzî"],
+ c:["1263 yılında Harran'da dünyaya geldim.", "Küçük yaşta ailemle birlikte Şam'a göç ettim.", "Fıkıh, hadis ve akaid alanlarında çalışmalar yaptım.", "Birçok eser kaleme aldım ve dönemin tartışmalarında yer aldım.", "İbn Teymiyye adıyla tanınırım."],
+ b:"İbn Teymiyye, Orta Çağ İslam dünyasının etkili âlimlerinden biridir. Fıkıh, hadis ve inanç konularında çok sayıda eser yazmıştır."},
+{n:"İbn Kayyim el-Cevziyye",cat:"İslam Âlimleri",ic:"feather",
+ o:["İbn Kayyim el-Cevziyye", "İbn Teymiyye", "İmam Nevevî", "İmam Gazzâlî"],
+ c:["1292 yılında Şam'da doğdum.", "İlim hayatımda İbn Teymiyye'den etkilendim.", "Zâdü'l-Meâd adlı eserimi kaleme aldım.", "Ahlak, fıkıh ve hadis konularında çalışmalar yaptım.", "İbn Kayyim adıyla meşhur oldum."],
+ b:"İbn Kayyim el-Cevziyye, Şam'da yetişmiş önemli bir İslam âlimidir. Zâdü'l-Meâd başta olmak üzere birçok eseriyle tanınır."},
+{n:"Fahreddin er-Râzî",cat:"İslam Âlimleri",ic:"graduation-cap",
+ o:["Fahreddin er-Râzî", "İbn Kesîr", "İbn Haldun", "İmam Nevevî"],
+ c:["1149 yılında Rey şehrinde doğdum.", "Kelam, felsefe ve tefsir alanlarında çalışmalar yaptım.", "Mefâtîhu'l-Gayb adlı geniş tefsirimle tanınırım.", "İlim yolculuklarım sırasında farklı şehirlerde dersler verdim.", "Tefsir alanındaki eserimle meşhur oldum."],
+ b:"Fahreddin er-Râzî, kelam ve tefsir alanlarında etkili olmuş bir İslam âlimidir. En tanınmış eseri Mefâtîhu'l-Gayb adlı tefsiridir."},
+{n:"İbn Kesîr",cat:"İslam Âlimleri",ic:"book-open",
+ o:["İbn Kesîr", "Fahreddin er-Râzî", "İmam Nevevî", "Kadı İyaz"],
+ c:["1301 yılında Suriye'de dünyaya geldim.", "Tarih ve tefsir alanlarında eserler yazdım.", "El-Bidâye ve'n-Nihâye adlı tarih kitabını kaleme aldım.", "Kur'an tefsirim günümüzde de yaygın biçimde okunur.", "İsmail bin Ömer ed-Dımaşkî olarak da bilinirim."],
+ b:"İbn Kesîr, tarihçi ve müfessirdir. Tefsîru'l-Kur'âni'l-Azîm adlı tefsiri ve El-Bidâye ve'n-Nihâye adlı tarih eseriyle tanınır."},
+{n:"Kadı İyaz",cat:"İslam Âlimleri",ic:"scale",
+ o:["Kadı İyaz", "İmam Nevevî", "İbn Kayyim el-Cevziyye", "İbn Haldun"],
+ c:["1083 yılında Sebte'de doğdum.", "Endülüs ve Kuzey Afrika ilim çevrelerinde yetiştim.", "Hadis, fıkıh ve biyografi alanlarında çalıştım.", "eş-Şifâ adlı eserimle tanınırım.", "Maliki mezhebinin önemli âlimlerindenim."],
+ b:"Kadı İyaz, Endülüs ve Mağrip bölgesinin tanınmış İslam âlimlerindendir. Özellikle eş-Şifâ adlı eseriyle bilinir."},
+{n:"İbn Rüşd",cat:"İslam Âlimleri",ic:"brain",
+ o:["İbn Rüşd", "İbn Haldun", "Fârâbî", "İbn Sînâ"],
+ c:["1126 yılında Kurtuba'da doğdum.", "Endülüs'te kadılık görevinde bulundum.", "Aristoteles'in eserleri üzerine kapsamlı yorumlar yazdım.", "Fıkıh alanında Bidâyetü'l-Müctehid adlı eserimi kaleme aldım.", "Batı dünyasında Averroes adıyla tanındım."],
+ b:"İbn Rüşd, Endülüs'te yetişmiş filozof, hekim ve fıkıh âlimidir. Felsefe ve hukuk alanındaki çalışmalarıyla hem İslam hem de Avrupa düşünce tarihinde etkili olmuştur."},
+{n:"Fârâbî",cat:"İslam Âlimleri",ic:"lightbulb",
+ o:["Fârâbî", "İbn Rüşd", "İbn Haldun", "İbn Sînâ"],
+ c:["Yaklaşık 872 yılında Farab bölgesinde doğdum.", "Mantık, felsefe ve müzik üzerine çalışmalar yaptım.", "El-Medînetü'l-Fâzıla adlı eserimi yazdım.", "Aristoteles'in düşüncelerini yorumladım.", "Muallim-i Sânî unvanıyla tanındım."],
+ b:"Fârâbî, İslam düşünce tarihinin önemli filozof ve bilim insanlarından biridir. Mantık, siyaset felsefesi ve müzik alanlarında eserler vermiştir."},{n:"Abdülkâdir Geylânî", cat:"Mutasavvıflar", ic:"book-open", o:["Abdülkâdir Geylânî", "Ahmed er-Rifâî", "Hacı Bektaş Veli", "Hacı Bayram Veli"], c:["1077 yılında Geylan bölgesinde dünyaya geldim.", "Genç yaşta ilim öğrenmek için Bağdat'a gittim.", "Vaazlarım ve tasavvufî öğretilerimle tanındım.", "Kâdiriyye tarikatı benim adımla anılır.", "Gavs-ı Âzam unvanıyla meşhur oldum."], b:"Abdülkâdir Geylânî, Bağdat'ta yaşamış önemli bir İslam âlimi ve mutasavvıftır. Kâdiriyye tarikatının kurucusu kabul edilir."},
+{n:"Süyûtî",cat:"İslam Âlimleri",ic:"book",
+ o:["Süyûtî","İbn Kesîr","Fahreddin er-Râzî","İmam Nevevî"],
+ c:["1445’te Kahire’de doğdum.","Babamı küçük yaşta kaybettim ve Kur’an’ı sekiz yaşında ezberledim.","Tefsir, hadis, fıkıh, tarih ve dil gibi birçok alanda eser yazdım.","Kırk yaşından sonra Nil kıyısında inzivaya çekilip eser yazmaya devam ettim.","Celâleddin el-Mahallî ile birlikte yazdığımız Tefsîru’l-Celâleyn’i tamamladım."],
+ b:"Süyûtî (1445–1505), Kahire’de doğmuş büyük bir İslam âlimidir. Tefsir, hadis, fıkıh, tarih ve dil gibi birçok alanda yüzlerce eser yazdı. Kırk yaşından sonra Nil kıyısında inzivaya çekildi. Hocası Celâleddin el-Mahallî’nin başladığı Tefsîru’l-Celâleyn’i tamamladı. el-İtkân fî Ulûmi’l-Kur’ân adlı eseri de çok bilinir."},
+{n:"Ahmed er-Rifâî", cat:"Mutasavvıflar", ic:"heart", o:["Ahmed er-Rifâî", "Abdülkâdir Geylânî", "Mevlânâ", "Yunus Emre"], c:["1118 yılında Irak'ın Basra bölgesinde doğdum.", "Küçük yaşta babamı kaybettim.", "Tasavvuf eğitimi aldım ve çevremde çok sayıda mürid yetişti.", "Rifâiyye tarikatı benim adımla anılır.", "Rifâî tarikatının kurucusu olarak tanınırım."], b:"Ahmed er-Rifâî, 12. yüzyılda yaşamış önemli bir mutasavvıftır. Rifâiyye tarikatının kurucusudur."},
+{n:"Hacı Bektaş Veli", cat:"Mutasavvıflar", ic:"landmark", o:["Hacı Bektaş Veli", "Hacı Bayram Veli", "Abdülkâdir Geylânî", "Ahmed er-Rifâî"], c:["13. yüzyılda Anadolu'da yaşamış önemli bir mutasavvıfım.", "Horasan'dan Anadolu'ya geldiğim kabul edilir.", "Nevşehir'in bugün adımı taşıyan ilçesiyle özdeşleştim.", "Makalât adlı eserle ilişkilendirilirim.", "Bektaşilik geleneği benim adımla anılır."], b:"Hacı Bektaş Veli, Anadolu'nun manevi ve kültürel tarihinde önemli bir yere sahiptir. Bektaşilik geleneğinin temel isimlerinden biri olarak kabul edilir."},
+{n:"Hacı Bayram Veli", cat:"Mutasavvıflar", ic:"sprout", o:["Hacı Bayram Veli", "Yunus Emre", "Hacı Bektaş Veli", "Şems-i Tebrîzî"], c:["14. yüzyılın sonlarında Ankara'nın Solfasol köyünde doğdum.", "İlk dönemimde medrese eğitimi aldım.", "Somuncu Baba olarak bilinen Hamîdüddin Aksarâyî ile tanıştım.", "Bayramiyye tarikatının kurucusuyum.", "Ankara'daki türbem, Hacı Bayram Camii'nin yanında bulunur."], b:"Hacı Bayram Veli, Anadolu tasavvuf geleneğinin önemli isimlerindendir. Bayramiyye tarikatını kurmuş ve Ankara'da yaşamıştır."},
+{n:"Şems-i Tebrîzî", cat:"Mutasavvıflar", ic:"sun", o:["Şems-i Tebrîzî", "Mevlânâ", "Sadrüddin Konevî", "Yunus Emre"], c:["1185 yılı civarında Tebriz'de doğduğum kabul edilir.", "Hayatım boyunca farklı şehirleri dolaştım.", "Tasavvuf yolunda birçok âlim ve dervişle görüştüm.", "Konya'da Mevlânâ ile tanışmam büyük bir değişime yol açtı.", "Adım, Mevlânâ'nın hayatındaki önemli dönüm noktalarından biriyle özdeşleşti."], b:"Şems-i Tebrîzî, Mevlânâ Celâleddîn-i Rûmî üzerindeki etkisiyle tanınan mutasavvıftır. İki isim arasındaki manevi dostluk, tasavvuf tarihinde önemli bir yer tutar."},
+{n:"Sadrüddin Konevî", cat:"Mutasavvıflar", ic:"book", o:["Sadrüddin Konevî", "İbn Arabî", "Mevlânâ", "Şems-i Tebrîzî"], c:["13. yüzyılda yaşamış önemli bir mutasavvıfım.", "Hayatımın büyük bölümünü Konya'da geçirdim.", "İbn Arabî'nin düşüncelerinin anlaşılmasında etkili oldum.", "Vahdet-i vücûd düşüncesi üzerine çalışmalar yaptım.", "Konevî adıyla tanınırım."], b:"Sadrüddin Konevî, İbn Arabî'nin düşüncelerini açıklayan ve geliştiren önemli bir tasavvuf düşünürüdür. Konya'da yaşamış ve eserler vermiştir."},
+{n:"Ebü'l-Hasan eş-Şâzelî", cat:"Mutasavvıflar", ic:"moon", o:["Ebü'l-Hasan eş-Şâzelî", "Ahmed er-Rifâî", "Abdülkâdir Geylânî", "Hacı Bayram Veli"], c:["1196 yılında Kuzey Afrika'da doğdum.", "İlim yolculuklarım sırasında farklı bölgeleri dolaştım.", "Hayatımın önemli bir dönemini Mısır'da geçirdim.", "Şâzeliyye tarikatı benim adımla anılır.", "Tasavvuf tarihinde Şâzelî adıyla tanınırım."], b:"Ebü'l-Hasan eş-Şâzelî, Kuzey Afrika ve Mısır tasavvuf tarihinde etkili olmuş bir mutasavvıftır. Şâzeliyye tarikatının kurucusudur."},
+{n:"Bahaeddin Veled", cat:"Mutasavvıflar", ic:"graduation-cap", o:["Bahaeddin Veled", "Mevlânâ", "Şems-i Tebrîzî", "Sadrüddin Konevî"], c:["12. yüzyılın sonlarında Belh'te yaşadım.", "İlim ve vaaz faaliyetleriyle tanındım.", "Ailemle birlikte uzun bir yolculuğa çıktım.", "Anadolu'ya yerleşerek hayatımın son dönemini burada geçirdim.", "Mevlânâ Celâleddîn-i Rûmî'nin babasıyım."], b:"Bahaeddin Veled, Mevlânâ'nın babası ve dönemin tanınmış din âlimlerinden biridir. Ailesiyle yaptığı yolculuk sonrasında Anadolu'ya yerleşmiştir."},{n:"Zemahşerî", cat:"Müfessirler", ic:"scroll", o:["Zemahşerî", "Taberî", "Kurtubî", "Beydâvî"], c:["1075 yılında Harezm bölgesinde doğdum.", "İlim öğrenmek için farklı merkezlere seyahat ettim.", "Arap dili ve belagatı üzerine çalışmalar yaptım.", "Keşşâf adlı tefsirimi kaleme aldım.", "Dil ve edebiyat yönü güçlü tefsirimle tanındım."], b:"Zemahşerî, Arap dili ve belagatı konusundaki uzmanlığıyla tanınan müfessirdir. Keşşâf adlı tefsiri özellikle dil ve edebî yorumlarıyla bilinir."},
+{n:"Kurtubî", cat:"Müfessirler", ic:"book", o:["Kurtubî", "Taberî", "Zemahşerî", "Beydâvî"], c:["13. yüzyılda Endülüs'te dünyaya geldim.", "Daha sonra Mısır'a yerleştim.", "Kur'an ayetlerinin hükümleri üzerine yoğunlaştım.", "El-Câmi' li-Ahkâmi'l-Kur'ân adlı eserimi yazdım.", "Özellikle ahkâm ayetlerini açıklayan tefsirimle tanınırım."], b:"Kurtubî, Endülüs kökenli önemli bir müfessirdir. Tefsirinde ayetlerin fıkhî hükümlerini ayrıntılı biçimde ele almıştır."},
+{n:"Beydâvî", cat:"Müfessirler", ic:"feather", o:["Beydâvî", "Nesefî", "Taberî", "Zemahşerî"], c:["13. yüzyılda İran'ın Fars bölgesinde yaşadım.", "Tefsir ve fıkıh alanlarında çalışmalar yaptım.", "Envârü't-Tenzîl adlı tefsirimi kaleme aldım.", "Eserimde kendimden önceki tefsirlerden de yararlandım.", "Beydâvî adıyla tanınan müfessirim."], b:"Kadı Beydâvî, tefsir ve fıkıh alanlarında tanınmış bir İslam âlimidir. Envârü't-Tenzîl adlı eseri yüzyıllar boyunca medreselerde okutulmuştur."},
+{n:"Nesefî", cat:"Müfessirler", ic:"book-open", o:["Nesefî", "Beydâvî", "Kurtubî", "Taberî"], c:["13. yüzyılda Mâverâünnehir bölgesinde yaşadım.", "Fıkıh ve tefsir alanlarında eserler verdim.", "Medârikü't-Tenzîl adlı tefsirimi yazdım.", "Eserim, Osmanlı medreselerinde de okutuldu.", "Abdullah bin Ahmed en-Nesefî olarak bilinirim."], b:"Nesefî, Hanefî geleneğine mensup önemli bir müfessirdir. Medârikü't-Tenzîl adlı tefsiri, İslam ilim tarihinde tanınan eserler arasındadır."},
+{n:"İbn Atıyye", cat:"Müfessirler", ic:"landmark", o:["İbn Atıyye", "İbn Kesîr", "Taberî", "Kurtubî"], c:["1088 yılında Endülüs'te doğdum.", "Granada ve çevresindeki ilim ortamında yetiştim.", "Hadis, fıkıh ve tefsir alanlarında çalıştım.", "El-Muharrerü'l-Vecîz adlı tefsirimi yazdım.", "Endülüs tefsir geleneğinin önemli temsilcilerindenim."], b:"İbn Atıyye, Endülüs'te yetişmiş önemli bir müfessirdir. El-Muharrerü'l-Vecîz adlı eseri, rivayet ve dirayet yöntemlerini bir araya getiren tefsirlerdendir."},
+{n:"Ebû Hayyân el-Endelüsî", cat:"Müfessirler", ic:"languages", o:["Ebû Hayyân el-Endelüsî", "Zemahşerî", "Beydâvî", "Nesefî"], c:["1256 yılında Endülüs'te doğdum.", "Arap dili ve grameri üzerine derin çalışmalar yaptım.", "Daha sonra Kahire'de yaşadım.", "El-Bahrü'l-Muhît adlı tefsirimi kaleme aldım.", "Tefsirimde dil bilgisi ve dil çözümlemelerine geniş yer verdim."], b:"Ebû Hayyân el-Endelüsî, Arap dili ve tefsir alanlarında uzmanlaşmış bir âlimdir. El-Bahrü'l-Muhît adlı eseri dil incelemeleriyle öne çıkar."},
+{n:"Âlûsî", cat:"Müfessirler", ic:"book", o:["Âlûsî", "Taberî", "Kurtubî", "İbn Atıyye"], c:["1802 yılında Bağdat'ta doğdum.", "Genç yaşta dinî ilimlerle ilgilenmeye başladım.", "Bağdat'ta müftülük görevinde bulundum.", "Rûhu'l-Meânî adlı geniş tefsirimi yazdım.", "Bağdatlı büyük müfessir olarak tanınırım."], b:"Mahmud el-Âlûsî, Osmanlı döneminde yaşamış Bağdatlı müfessirdir. Rûhu'l-Meânî adlı eseri, farklı tefsir yorumlarını bir araya getiren kapsamlı bir çalışmadır."},
+{n:"İsmail Hakkı Bursevî", cat:"Müfessirler", ic:"feather", o:["İsmail Hakkı Bursevî", "Âlûsî", "Beydâvî", "Nesefî"], c:["1653 yılında Aydos'ta dünyaya geldim.", "Osmanlı döneminde yaşadım.", "Tasavvuf, vaaz ve tefsir alanlarında eserler verdim.", "Rûhu'l-Beyân adlı tefsirimi kaleme aldım.", "Bursa'da uzun yıllar görev yaptığım için Bursevî adıyla tanındım."], b:"İsmail Hakkı Bursevî, Osmanlı dönemi mutasavvıf ve müfessirlerindendir. Rûhu'l-Beyân adlı tefsirinde ayetleri tasavvufî yorumlarla da açıklamıştır."},
+{n:"Elmalılı Hamdi Yazır", cat:"Müfessirler", ic:"library", o:["Elmalılı Hamdi Yazır", "İsmail Hakkı Bursevî", "Âlûsî", "Kurtubî"], c:["1878 yılında Antalya'nın Elmalı ilçesinde doğdum.", "Osmanlı'nın son döneminde ve Cumhuriyet'in ilk yıllarında yaşadım.", "Felsefe, hukuk ve dinî ilimler üzerine eğitim aldım.", "Hak Dini Kur'an Dili adlı tefsirimi yazdım.", "Türkiye'de en çok tanınan müfessirlerden biri oldum."], b:"Elmalılı Muhammed Hamdi Yazır, Türk İslam düşüncesinin önemli müfessirlerindendir. Hak Dini Kur'an Dili adlı eseri Türkiye'de yaygın biçimde okunmaktadır."},
+];
 var CATS=["İslam Tarihi", "Osmanlı Tarihi", "Türk-İslam Tarihi", "Peygamberler Tarihi", "Sahabeler", "Ehl-i Beyt", "Kadın Sahabeler", "İslam Halifeleri", "İslam Komutanları", "İslam Âlimleri", "Mutasavvıflar", "Müfessirler", "Muhaddisler", "Fakihler", "Mütekellimler", "İslam Bilim İnsanları", "İslam Şairleri ve Edebiyatçıları", "İslam Davetçileri", "İslam Mimarları", "İslam Devletleri ve Hükümdarları", "İslam Tarihinin Önemli Kadınları", "Kıraat Âlimleri", "Tarikat Büyükleri", "İslam Tarihinin Önemli Şahsiyetleri"];
 function inCat(c){var a=[];PEOPLE.forEach(function(p,i){if(p.cat===c)a.push(i)});return a}
 function $(id){return document.getElementById(id)}
@@ -15473,14 +16150,15 @@ var LOCK='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="cu
 function steps(r){var h='<div class="gk-steps">';for(var i=1;i<=5;i++){var c=i<r.c?'ok':(i===r.c?'on':(i===r.c+1?'nx':'lk'));h+='<button type="button" class="gk-st '+c+'" data-a="clue" data-k="'+i+'" aria-label="İpucu '+i+', '+SC[i-1]+' puan'+(i>r.c?', kilitli':'')+'"><i>'+(i>r.c?LOCK:i)+'</i><small>'+SC[i-1]+'</small></button>'}return h+'</div>'}
 var GKL={'İslam Tarihi':'İslam’ın İz Bırakanları','Osmanlı Tarihi':'Osmanlı’nın İz Bırakanları'};
 function gkLbl(c){return GKL[c]||'Kim Bu? Sıradaki Şahsiyet'}
+function headc(){return '<div class="gk-head gk-headc"><button type="button" class="gk-back" data-a="back" aria-label="Geri"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button></div>'}
 function homeV(){
  var h='';
  CATS.forEach(function(c){var ids=inCat(c);if(!ids.length)return;var d=0,pts=0;ids.forEach(function(i){var r=rec(i);if(r&&r.d){d++;pts+=r.pts|0}});
   var isOpen=OPEN.indexOf(c)>=0,nu=(c===newCat),cls='gk-hi',da='cat',ic,sm,rs;
   if(!isOpen){cls+=' gk-lk';da='locked';ic='<span class="gk-lkic">'+LOCK+'</span>';sm='Kilitli';rs='<span class="gk-hr lk">'+LOCK+'</span>'}
   else{cls+=(d===ids.length?' gk-won':' gk-op');ic=svgI(PEOPLE[ids[0]].ic)+(nu?'<span class="gk-lkout">'+LOCK+'</span>':'');sm=ids.filter(unl).length+' kişi açıldı';rs=(d===ids.length?'<span class="gk-hr win">✓</span>':'<span class="gk-hr go"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:0 auto"><path d="M9 5l7 7-7 7"/></svg></span>');if(nu)cls+=' gk-unl'}
-  h+='<button type="button" class="'+cls+'" data-a="'+da+'" data-c="'+esc(c)+'"'+(isOpen?'':' aria-disabled="true"')+'><span class="gk-hic">'+ic+'</span><span class="gk-hm"><b>'+esc(c)+'</b><small>'+sm+'</small></span>'+rs+'</button>'});
- return head('GİZLİ KİMLİK',1)+'<div class="gk-scroll"><p class="gk-sub">İpuçlarını çöz, kim olduğunu bul!</p><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">KATEGORİ SEÇ</div><div class="gk-list">'+h+'</div><p class="gk-foot">Gizli Kimlik puanları ayrı tutulur; İlim Puanı ve Dirhem’e eklenmez. Her kişiden puan yalnızca bir kez kazanılır.</p></div>'}
+  h+='<button type="button" class="'+cls+'" data-a="'+da+'" data-c="'+esc(c)+'"'+(isOpen?'':' aria-disabled="true"')+'><span class="gk-hic">'+ic+'</span><span class="gk-hm"><b'+(c.length>=26?' class="gk-lg"':'')+'>'+esc(c)+'</b><small>'+sm+'</small></span>'+rs+'</button>'});
+ return headc()+'<div class="gk-scroll gk-nos"><div class="gk-list gk-grid">'+h+'</div></div>'}
 var SEENK='gkUnlockSeenV2';
 var OPENK='gizliKimlikCatsV2',PER=99; /* PER: her kategoride açık kişi sayısı (kişiler sırayla açılır) */
 var OPEN=(function(){var a=null;try{a=JSON.parse(localStorage.getItem(OPENK)||'null')}catch(e){}return Array.isArray(a)&&a.length?a:['İslam Tarihi']})();
@@ -15489,9 +16167,10 @@ var newCat='';
 function catDone(c){var ids=inCat(c).filter(unl);return ids.length>0&&ids.every(function(i){var r=rec(i);return r&&r.d})}
 function nextCat(c){var k=CATS.indexOf(c);for(var j=k+1;j<CATS.length;j++)if(inCat(CATS[j]).length)return CATS[j];return ''}
 /* Kilit: yalnızca İslam Tarihi kategorisindeki ilk kişi açık; diğer her şey kilitli */
-function unl(i){if(OPEN.indexOf(PEOPLE[i].cat)<0)return false;var ids=inCat(PEOPLE[i].cat),n=ids.indexOf(i);if(n>=PER)return false;if(n<=0)return true;var pr=rec(ids[n-1]);return !!((pr&&pr.d)||rec(i))}
+var gkIgn=false;
+function unl(i){if(!gkIgn&&gkLocked())return false;if(OPEN.indexOf(PEOPLE[i].cat)<0)return false;var ids=inCat(PEOPLE[i].cat),n=ids.indexOf(i);if(n>=PER)return false;if(n<=0)return true;var pr=rec(ids[n-1]);return !!((pr&&pr.d)||rec(i))}
 function seenGet(){var a=null;try{a=JSON.parse(localStorage.getItem(SEENK)||'null')}catch(e){}
- if(!Array.isArray(a)){a=[];PEOPLE.forEach(function(p,i){if(unl(i))a.push(p.n)});try{localStorage.setItem(SEENK,JSON.stringify(a))}catch(e){}}
+ if(!Array.isArray(a)){a=[];gkIgn=true;try{PEOPLE.forEach(function(p,i){if(unl(i))a.push(p.n)})}finally{gkIgn=false}try{localStorage.setItem(SEENK,JSON.stringify(a))}catch(e){}}
  return a}
 function catV(){
  var h='',seen=seenGet(),ns=[];
@@ -15506,25 +16185,38 @@ function catV(){
   }
   h+='<button type="button" class="'+cls+'" data-a="'+da+'" data-i="'+i+'"'+(u?'':' aria-disabled="true"')+'><span class="gk-hic'+(d&&u?'':' q')+'">'+ic+'</span><span class="gk-hm"><b>'+st+'</b><small>'+sm+'</small></span>'+rs+'</button>'});
  if(ns.length){seen=seen.concat(ns);try{localStorage.setItem(SEENK,JSON.stringify(seen))}catch(e){}}
- return head(esc(curCat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-silw">'+sil('sm')+'</div><div class="gk-lab">KİM BU?</div><div class="gk-list">'+h+'</div></div>'}
+ return headc()+'<div class="gk-scroll"><div class="gk-list">'+h+'</div></div>'}
 
+function pbtns(r){var h='<div class="gk-pbs">';for(var i=1;i<=5;i++){var c=i===r.c?'on':(i<r.c?'ok':(i===r.c+1?'nx':'lk'));h+='<button type="button" class="gk-pb '+c+'" data-a="clue" data-k="'+i+'" aria-label="İpucu '+i+', '+SC[i-1]+' puan'+(i>r.c?', kilitli':'')+'">'+(i>r.c+1?LOCK:'')+'<span>'+SC[i-1]+'</span></button>'}return h+'</div>'}
 function playV(newClue){
  var p=PEOPLE[cur],r=ensure(cur),ord=order(cur);
- var cl='';
- for(var i=1;i<=5;i++){
-  if(i<=r.c)cl+='<div class="gk-cl '+(i===r.c?'cur'+(newClue?' new':''):'open')+'"><i>'+i+'</i><p>'+esc(p.c[i-1])+'</p></div>';
-  else cl+='<div class="gk-cl lock"><i>'+LOCK+'</i><p>'+(i===r.c+1?'Açmak için üstteki <b>'+SC[i-1]+'</b> puana tıklayın':'İpucu '+i+' kilitli')+'</p></div>'}
+ var tx='';
+ for(var i=1;i<=r.c;i++){var an=(i===r.c&&newClue);tx+='<span class="gk-tx'+(i===r.c?' cur':'')+'"'+(an?' data-t="'+esc(p.c[i-1])+'"':'')+'>'+(an?'':esc(p.c[i-1]))+'</span> '}
  var guessed=r.gc===r.c,op='';
  ord.forEach(function(oi){var w=r.w.indexOf(oi)>=0;op+='<button type="button" class="gk-opt'+(w?' x':'')+'" data-a="guess" data-o="'+oi+'"'+((w||guessed)?' disabled':'')+'>'+esc(p.o[oi])+'</button>'});
- var last=r.c>=5,msg=guessed?'Yanlış tahmin! '+(last?'Cevap gösteriliyor…':'Yeni ipucu için üstteki puana tıklayın.'):'';
- return head(gkLbl(PEOPLE[cur].cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-play"><div class="gk-stepsw">'+steps(r)+'<div class="gk-tap">'+(last?'Son ipucu · doğru kişiyi seç':'İpucu için puanlara tıklayın')+'</div></div><div class="gk-scroll"><div class="gk-catw"><span class="gk-cat">'+esc(p.cat)+'</span></div><div class="gk-clues">'+cl+'</div></div><div class="gk-dock"><div class="gk-worth">Şimdi bilirsen <b>'+SC[r.c-1]+' puan</b></div><div class="gk-opts">'+op+'</div><div class="gk-msg'+(guessed?' bad':'')+'" id="gkMsg">'+msg+'</div></div></div>'}
+ var last=r.c>=5,msg=guessed?'Yanlış tahmin! '+(last?'Cevap gösteriliyor…':'Yeni ipucu için puana tıklayın.'):'';
+ return head('<span class="gk-cat">'+esc(p.cat)+'</span>')+'<div class="gk-play"><div class="gk-tw" id="gkTw"><div class="gk-twin">'+tx+'</div></div><div class="gk-pbsw"><div class="gk-tap">'+(last?'Son ipucu · doğru kişiyi seç':'İpucu için puanlara tıklayın')+'</div>'+pbtns(r)+'</div><div class="gk-dock"><div class="gk-opts">'+op+'</div><div class="gk-msg'+(guessed?' bad':'')+'" id="gkMsg">'+msg+'</div></div></div>'}
+/* daktilo efekti */
+var twT=0,twEl=null,twFull='';
+function twStop(){if(twT){clearInterval(twT);twT=0}}
+function twFinish(){if(twT&&twEl){clearInterval(twT);twT=0;twEl.textContent=twFull;twEl.classList.remove('typing')}}
+function twRun(){
+ twStop();var el=scr&&scr.querySelector('.gk-tx[data-t]');if(!el)return;
+ var full=el.getAttribute('data-t'),n=0,box=scr.querySelector('.gk-tw');el.removeAttribute('data-t');
+ if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches){el.textContent=full;return}
+ twEl=el;twFull=full;el.classList.add('typing');
+ twT=setInterval(function(){
+  if(!el.isConnected){clearInterval(twT);twT=0;return}
+  n++;el.textContent=full.slice(0,n);if(box)box.scrollTop=box.scrollHeight;
+  if(n>=full.length){clearInterval(twT);twT=0;el.classList.remove('typing')}
+ },18)}
 function resV(i,anim){
  var p=PEOPLE[i],r=rec(i),b='';
  if(r&&r.d){b=r.ok?'<div class="gk-badge win"><span>'+r.sc+'. ipucunda buldun</span><b>+'+r.pts+' puan</b></div>':'<div class="gk-badge lose"><span>Bu sefer bulunamadı</span><b>0 puan</b></div>'}
  var nc=nextCat(p.cat),cg=!!(r&&r.d&&nc&&OPEN.indexOf(nc)<0&&catDone(p.cat)),ci=inCat(p.cat),pos=ci.indexOf(i),nx=(pos+1<ci.length&&unl(ci[pos+1]))?'<button type="button" class="gk-btn2 gk-go" data-a="nextp" data-i="'+ci[pos+1]+'">DEVAM <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>':'';
  return head(esc(p.cat).toLocaleUpperCase('tr-TR'))+'<div class="gk-scroll"><div class="gk-res">'+(anim?'<div class="gk-ring"></div>':'')+'<div class="gk-port'+(anim?' rev':'')+'">'+svgI(p.ic)+'</div><div class="gk-rname">'+esc(p.n)+'</div><div class="gk-rcat"><span class="gk-cat">'+esc(p.cat)+'</span></div>'+b+'<div class="gk-bio"><h4>KISA BİYOGRAFİ</h4>'+esc(p.b)+'</div>'+(cg?'':'<div class="gk-row2"'+(nx?'':' style="grid-template-columns:1fr"')+'><button type="button" class="gk-btn2" data-a="cat">KİŞİLER</button>'+nx+'</div>')+'</div></div>'+(cg?'<div class="gk-cgov" role="dialog" aria-modal="true" aria-label="Tebrikler"><div class="gk-cgbox"><div class="gk-cong"><div class="gk-cong-t">🎉 Tebrikler!</div><p>Bir sonraki bölüme geçtiniz.</p><b>'+esc(nc)+'</b></div><button type="button" class="gk-btn2 gk-cong-b" data-a="next" data-c="'+esc(nc)+'">DEVAM</button><div class="gk-cghint">👆 Devam etmek için dokun</div></div></div>':'')}
 function render(opt){
- if(!scr)return;opt=opt||{};
+ if(!scr)return;opt=opt||{};twStop();
  var h;
  if(view==='play')h=playV(opt.newClue);else if(view==='res')h=resV(cur,opt.anim);else if(view==='cat')h=catV();else h=homeV();
  var tc=(view==='play'||view==='res')?PEOPLE[cur].cat:(view==='cat'?curCat:''),T=theme(tc);
@@ -15532,6 +16224,7 @@ function render(opt){
  var nb=document.createElement('div');nb.className='gk-body'+(opt.enter?' gk-enter':'');nb.innerHTML=h;
  var ob=null;for(var q=0;q<scr.children.length;q++)if(scr.children[q].classList.contains('gk-body')){ob=scr.children[q];break}
  if(ob)scr.replaceChild(nb,ob);else scr.insertBefore(nb,scr.firstChild);
+ if(view==='play'&&opt.newClue)twRun();
  if(opt.anim&&opt.win){confetti();burstRes()}
 }
 function confetti(){var w=scr.querySelector('.gk-res');if(!w)return;var c=document.createElement('div');c.className='gk-conf';var cols=['#ffe48a','#f0c24a','#fff4d6','#7cf7b0','#9fc3ff'],s='';for(var i=0;i<34;i++)s+='<i style="left:'+(Math.random()*100).toFixed(1)+'%;background:'+cols[i%cols.length]+';animation-delay:'+(Math.random()*.9).toFixed(2)+'s;animation-duration:'+(1.6+Math.random()*1.2).toFixed(2)+'s;transform:rotate('+Math.round(Math.random()*180)+'deg)"></i>';c.innerHTML=s;scr.appendChild(c);setTimeout(function(){if(c.parentNode)c.remove()},3600)}
@@ -15608,31 +16301,44 @@ function guess(o){
   else render()}
 }
 function openClue(k){
- if(busy)return;var r=ensure(cur);if(r.d||k<1||k>5)return;
+ if(busy)return;twFinish();var r=ensure(cur);if(r.d||k<1||k>5)return;
  if(k<=r.c)return;
  if(k>r.c+1){var m=$('gkMsg');if(m){m.className='gk-msg bad';m.textContent='Önce sıradaki ipucunu aç.'}return}
  r.c++;save();render({newClue:true})}
 function openPerson(i,enter){if(!unl(i))return;cur=i;curCat=PEOPLE[i].cat;var r=rec(i);if(r&&r.d)go('res',{enter:enter});else{ensure(i);go('play',{newClue:true,enter:enter})}}
 
 /* ---- Gizli Kimlik kilidi: ilim puanı en az GK_NEED olmadan açılmaz ---- */
-var GK_NEED=100;
+var GK_NEED=50;
 function gkPts(){var v=0;try{v=Math.max(+localStorage.getItem('islamibilgi_pts')||0,+localStorage.getItem('ilimJourneyPointsV1')||0)}catch(e){}return v>0?v:0}
 function gkLocked(){return gkPts()<GK_NEED}
 var gkLt=null,gkLtT=0;
-function gkLockMsg(){
+function gkLockMsg(persist){
  if(!gkLt){gkLt=document.createElement('div');gkLt.id='gkLockToast';gkLt.setAttribute('role','status');document.body.appendChild(gkLt)}
  var p=Math.floor(gkPts());
- gkLt.innerHTML='<div class="gkl-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="9.5" rx="2.2"/><circle cx="12" cy="15.6" r="1.2"/></svg></div><b>Gizli Kimlik kilitli</b><p>İlim Puanı bölümünde en az <em>'+GK_NEED+' puan</em> kazanmalısın.</p><small>Şu anki puanın: '+p+' / '+GK_NEED+'</small>';
+ gkLt.innerHTML='<div class="gkl-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="9.5" rx="2.2"/><circle cx="12" cy="15.6" r="1.2"/></svg></div><b>Gizli Kimlik pasif</b><p>İlim Puanı bölümünde <em>'+GK_NEED+' puan</em> topladıktan sonra aktifleşecektir.</p><small>Şu anki puanın: '+p+' / '+GK_NEED+'</small>'+(persist?'<div class="gkl-tap">Geri dönmek için dokun</div>':'');
  gkLt.classList.remove('show');void gkLt.offsetWidth;gkLt.classList.add('show');
- clearTimeout(gkLtT);gkLtT=setTimeout(function(){gkLt.classList.remove('show')},2800);
+ clearTimeout(gkLtT);if(!persist)gkLtT=setTimeout(function(){gkLt.classList.remove('show')},2800);
  try{if(navigator.vibrate)navigator.vibrate([40,40,40])}catch(x){}}
-function open(){if(gkLocked()){gkLockMsg();return}build();view='home';render();if(typeof window.show==='function')window.show('sGizli')}
-function back(){if(!scr||!scr.classList.contains('on'))return false;if(scr.querySelector('.gk-ul')){finishUnlock();return true}if(view==='play'||view==='res'){go('cat');return true}if(view==='cat'){go('home');return true}if(typeof window.show==='function')window.show('sLogin');return true}
+var gkBlk=null;
+function gkBlackOn(){
+ if(gkBlk)return;
+ gkBlk=document.createElement('div');gkBlk.id='gkBlackout';gkBlk.setAttribute('aria-hidden','true');
+ gkBlk.addEventListener('click',function(e){e.stopPropagation();e.preventDefault();back()});
+ document.body.appendChild(gkBlk)}
+function gkBlackOff(){
+ if(gkBlk){gkBlk.remove();gkBlk=null}
+ clearTimeout(gkLtT);if(gkLt)gkLt.classList.remove('show')}
+function open(){
+ build();view='home';render();
+ if(typeof window.show==='function')window.show('sGizli');
+ if(gkLocked()){gkBlackOn();gkLockMsg(true)}}
+function back(){if(gkBlk){gkBlackOff();if(typeof window.show==='function')window.show('sLogin');return true}if(!scr||!scr.classList.contains('on'))return false;if(scr.querySelector('.gk-ul')){finishUnlock();return true}if(view==='play'||view==='res'){go('cat');return true}if(view==='cat'){go('home');return true}if(typeof window.show==='function')window.show('sLogin');return true}
 function build(){
  if(scr)return;
  scr=document.createElement('section');scr.className='screen';scr.id='sGizli';scr.setAttribute('aria-label','Gizli Kimlik');
  scr.addEventListener('click',function(e){
   var b=e.target.closest('[data-a]');if(!b||!scr.contains(b))return;var a=b.getAttribute('data-a');
+  if(gkLocked()&&(a==='open'||a==='guess'||a==='clue'||a==='nextp'||a==='next')){gkLockMsg(true);return}
   if(a==='back')back();else if(a==='open')openPerson(+b.getAttribute('data-i'));else if(a==='locked'){b.classList.remove('gk-shake');void b.offsetWidth;b.classList.add('gk-shake');try{if(navigator.vibrate)navigator.vibrate(60)}catch(x){}}else if(a==='guess')guess(+b.getAttribute('data-o'));else if(a==='clue')openClue(+b.getAttribute('data-k'));
   else if(a==='cat'){if(b.getAttribute('data-c'))curCat=b.getAttribute('data-c');go('cat')}else if(a==='home')go('home');
   else if(a==='nextp')nextPerson(+b.getAttribute('data-i'));else if(a==='next')unlockCat(b.getAttribute('data-c'));else if(a==='ulgo')finishUnlock();
@@ -15656,10 +16362,10 @@ function gkRefreshCard(){
  var b=document.querySelector('#hcHome .hc-gizli');if(!b)return;
  var lk=gkLocked(),sm=b.querySelector('small'),ic=b.querySelector('.gkl-badge');
  b.classList.toggle('gk-lockedcard',lk);b.setAttribute('aria-disabled',lk?'true':'false');
- if(sm)sm.textContent=lk?(GK_NEED+' ilim puanı kazanınca açılır'):'İpuçlarını çöz, gizli kişiyi bul';
+ if(sm)sm.textContent=lk?('Pasif · '+GK_NEED+' İlim Puanı’nda aktifleşir'):'İpuçlarını çöz, gizli kişiyi bul';
  if(lk&&!ic){ic=document.createElement('span');ic.className='gkl-badge';ic.setAttribute('aria-hidden','true');ic.innerHTML='<svg viewBox="0 0 24 24"><path d="M8 11V8a4 4 0 0 1 8 0v3"/><rect x="5" y="11" width="14" height="9.5" rx="2.2"/></svg>';b.appendChild(ic)}
  if(!lk&&ic)ic.remove()}
-setInterval(gkRefreshCard,1200);
+setInterval(function(){gkRefreshCard();if(gkBlk&&(!scr||!scr.classList.contains('on')))gkBlackOff()},1200);
 document.addEventListener('visibilitychange',gkRefreshCard);
 if(!addCard()){var n=0,t=setInterval(function(){if(addCard()||++n>120)clearInterval(t)},250)}
 

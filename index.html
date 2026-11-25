@@ -21530,7 +21530,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     $('dzUndo').addEventListener('click',function(){var c=load();if(c[sel]>0){c[sel]--;save(c);render();}});
     var rs=$('dzReset');
     rs.addEventListener('click',function(){
-      if(rs.getAttribute('data-arm')){clearTimeout(rt);rs.removeAttribute('data-arm');rs.textContent='Sıfırla';var c=load();c[sel]=0;save(c);render();}
+      if(rs.getAttribute('data-arm')){clearTimeout(rt);rs.removeAttribute('data-arm');rs.textContent='Sıfırla';var c=load();c[sel]=0;save(c);try{played[sel]=false;}catch(e){}render();}
       else{rs.setAttribute('data-arm','1');rs.textContent='Emin misin?';rt=setTimeout(function(){rs.removeAttribute('data-arm');rs.textContent='Sıfırla';},3000);}
     });
     $('dzvNext').addEventListener('click',function(){select(parseInt(this.getAttribute('data-i'),10)||0);});
@@ -21889,8 +21889,8 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     ['subhanallah.mp3','Sübhanallah.mp3','subhan-allah.mp3'],
     ['elhamdulillah.mp3','Elhamdülillah.mp3','elhamdülillah.mp3'],
     ['allahuekber.mp3','Allahu Ekber.mp3','allahu-ekber.mp3'],
-    ['estakfurullah.mp3'],
-    ['lailaheillah.mp3'],
+    ['estakfurullah.mp3','./estakfurullah.mp3'],
+    ['lailaheillah.mp3','./lailaheillah.mp3'],
     ['salavat.mp3','salavati.mp3','Salât-ı Şerife.mp3','salat-i-serife.mp3','salatiserife.mp3']
   ];
   var played={};

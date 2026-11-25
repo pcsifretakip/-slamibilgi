@@ -21517,47 +21517,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     toast.textContent=Z[sel][0]+' tamamlandı. Günlük '+T+' okuma hedefini bitirdin.';
     toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},3800);
   }
-  /* Her zikir için yalnızca ilk sayaç dokunuşunda ses çal. GitHub Pages'te
-     ses dosyaları index.html ile aynı klasördeyse relative URL doğrudan çalışır.
-     Dosya adı varyasyonları sırayla denenir; başarılı olan ilk dosya kullanılır. */
-  var zikirAudioPlayed={};
-  var ZIKIR_AUDIO=[
-    ['subhanallah.mp3','Subhanallah.mp3'],
-    ['elhamdulillah.mp3','Elhamdulillah.mp3'],
-    ['allahuekber.mp3','AllahuEkber.mp3','allahuekber.mp3'],
-    ['estagfirullah.mp3','Estağfirullah.mp3','estagfirullah.mp3'],
-    ['lailaheillallah.mp3','La ilahe illallah.mp3','lailaheillallah.mp3'],
-    ['salat-i-serife.mp3','salat-iserife.mp3','Salat-i-Serife.mp3','salavati.mp3']
-  ];
-  function playZikirVoice(i){
-    if(zikirAudioPlayed[i])return;
-    zikirAudioPlayed[i]=true;
-    var files=ZIKIR_AUDIO[i]||[],pos=0,a=null;
-    function tryNext(){
-      if(pos>=files.length){
-        /* GitHub'taki dosya adı farklıysa bile ilk dokunuş sessiz kalmasın. */
-        try{
-          if('speechSynthesis' in window){
-            var u=new SpeechSynthesisUtterance(Z[i][0]);u.lang='tr-TR';u.rate=.9;u.pitch=1;
-            speechSynthesis.speak(u);
-          }
-        }catch(e){}
-        return;
-      }
-      try{
-        a=new Audio(new URL(files[pos++],document.baseURI).href);
-        a.preload='auto';a.volume=1;
-        a.addEventListener('error',tryNext,{once:true});
-        var pr=a.play();
-        if(pr&&pr.catch)pr.catch(function(){tryNext();});
-      }catch(e){tryNext();}
-    }
-    tryNext();
-  }
-  function tap(){var c=load();if(c[sel]>=T)return;
-    /* Sayaç artmadan hemen önceki ilk dokunuşta seçili zikrin sesini başlat. */
-    playZikirVoice(sel);
-    c[sel]++;save(c);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
+  function tap(){var c=load();if(c[sel]>=T)return;c[sel]++;save(c);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
     var ch=document.querySelector('#dzBar .dz-chip[data-i="'+sel+'"]'),fl=ch&&ch.querySelector('.dz-fill');
     if(fl){fl.style.transition='none';fl.style.width=(c[sel]-1)+'%';void fl.offsetWidth;fl.style.transition='';fl.style.width=Math.min(100,c[sel])+'%';}
     if(ch&&c[sel]>=T){ch.classList.remove('puff');void ch.offsetWidth;ch.classList.add('puff');}
@@ -21917,6 +21877,64 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   document.addEventListener('DOMContentLoaded',hook);
   window.addEventListener('load',hook);
   var t=0,iv=setInterval(function(){if(hook()||++t>40)clearInterval(iv);},250);
+})();
+</script>
+<script id="daily-zikir-audio-fix">
+(function(){
+  'use strict';
+  /* Sesler GitHub Pages'te index.html ile aynı klasörden alınır. Sistem/TTS sesi kullanılmaz. */
+  var A=[
+    ['subhanallah.mp3','Sübhanallah.mp3','subhan-allah.mp3'],
+    ['elhamdulillah.mp3','Elhamdülillah.mp3','elhamdülillah.mp3'],
+    ['allahuekber.mp3','Allahu Ekber.mp3','allahu-ekber.mp3'],
+    ['estagfirullah.mp3','Estağfirullah.mp3','estağfirullah.mp3','estagfurullah.mp3'],
+    ['lailaheillallah.mp3','Lâ ilâhe illallah.mp3','la-ilaha-illallah.mp3','lailaheillallah.mp3'],
+    ['salavat.mp3','salavati.mp3','Salât-ı Şerife.mp3','salat-i-serife.mp3','salatiserife.mp3']
+  ];
+  var played={};
+  var audio=null;
+  function urls(i){
+    var out=[],list=A[i]||[];
+    for(var j=0;j<list.length;j++){
+      var n=list[j];
+      out.push(new URL(n,document.baseURI).href);
+    }
+    return out;
+  }
+  function play(i){
+    if(played[i])return;
+    played[i]=true;
+    var list=urls(i),k=0;
+    function next(){
+      if(k>=list.length){played[i]=false;return;}
+      var u=list[k++];
+      try{
+        if(audio){try{audio.pause();}catch(e){}}
+        audio=new Audio(u);
+        audio.preload='auto';
+        audio.volume=1;
+        var p=audio.play();
+        if(p&&p.catch)p.catch(function(){next();});
+      }catch(e){next();}
+    }
+    next();
+  }
+  function hook(){
+    var b=document.getElementById('dzTap');
+    if(!b||b.dataset.audioFix==='1')return;
+    b.dataset.audioFix='1';
+    b.addEventListener('click',function(){
+      var name=document.getElementById('dzvName');
+      if(!name)return;
+      var map={'Sübhanallah':0,'Elhamdülillah':1,'Allahu Ekber':2,'Estağfirullah':3,'Lâ ilâhe illallah':4,'Salât-ı Şerife':5};
+      var i=map[name.textContent.trim()];
+      if(i!=null)play(i);
+    },true);
+  }
+  hook();
+  document.addEventListener('DOMContentLoaded',hook);
+  window.addEventListener('load',hook);
+  var n=0,iv=setInterval(function(){hook();if(++n>40)clearInterval(iv);},250);
 })();
 </script>
 <script id="daily-zikir-rest-js">

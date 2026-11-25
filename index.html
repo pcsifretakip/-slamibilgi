@@ -3326,7 +3326,7 @@ async function doDelete(localOnly){
     })(),60000).catch(e=>console.warn('arka plan hesap silme başarısız',e));
     if(n)lbSet(lbGet().filter(r=>(r.n||'').toLocaleLowerCase('tr')!==n.toLocaleLowerCase('tr')));
     let users=[];try{users=JSON.parse(localStorage.getItem(USER_KEY)||'[]')}catch(e){}if(Array.isArray(users))localStorage.setItem(USER_KEY,JSON.stringify(users.filter(u=>String(u).toLocaleLowerCase('tr')!==n.toLocaleLowerCase('tr'))));
-    [NM_KEY,AV_KEY,RK_KEY,PTS_KEY,AUTH_KEY,ACCOUNT_KEY,GOOGLE_SUB_KEY,FACEBOOK_SUB_KEY,'islamQuizWalletV1','islamQuizJokersV1','islamQuizStarterJokersV1','ilimJourneyPointsV1','ilimEconomyV2','ilimJourneyAvatarV1','ilimResumeV1','islamibilgi_stats','ibRewardsV1','islamibilgi_pid','islamibilgi_wallet_pend','islamibilgi_fb_graph_uid'].forEach(k=>localStorage.removeItem(k));
+    [NM_KEY,AV_KEY,RK_KEY,PTS_KEY,AUTH_KEY,ACCOUNT_KEY,GOOGLE_SUB_KEY,FACEBOOK_SUB_KEY,'islamQuizWalletV1','islamQuizJokersV1','islamQuizStarterJokersV1','ilimJourneyPointsV1','ilimEconomyV2','ilimJourneyAvatarV1','ilimResumeV1','islamibilgi_stats','ibRewardsV1','islamibilgi_pid','islamibilgi_wallet_pend','islamibilgi_fb_graph_uid'].forEach(k=>localStorage.removeItem(k));try{if(window.__ibWipeZikir)window.__ibWipeZikir(n,true)}catch(e){}
     isDeleting=false;clearAccountModals();if(window.__restoreLoginScreen)window.__restoreLoginScreen();else if(typeof show==='function')show('sLogin',true)
   }catch(e){console.warn('account deletion failed',e);isDeleting=false;
     const c=String(e&&e.code||'').toLowerCase();
@@ -3367,12 +3367,12 @@ function playUiClick(){if(!SND)return;try{uiClickAudio.currentTime=0;const p=uiC
  document.addEventListener('pointerdown',e=>{
    uiPointerSoundAt=Date.now();
   const inGame=document.body.classList.contains('play'),gameClick=e.target.closest('.opt,#cfYes,#cfNo,#toastH,#toastX,#bGameHome,#bHome,#bAgain,#bStart,#ldNext'),control=e.target.closest('button,[role="button"],a,input[type="button"],input[type="submit"]');
-  if(control&&(!inGame||gameClick))playUiClick();
+  if(control&&(!inGame||gameClick)&&!e.target.closest('#dzTap'))playUiClick();
   const b=e.target.closest('button');if(!b||b.disabled||b.classList.contains('opt'))return;
   b.animate([{filter:'brightness(1.5)'},{filter:'brightness(1)'}],{duration:250});
   vib(12);
 });
- document.addEventListener('click',e=>{const g=e.target.closest('.opt,#cfYes,#cfNo,#toastH,#toastX,#bGameHome,#bHome,#bAgain,#bStart,#ldNext'),control=e.target.closest('button,[role="button"],a,input[type="button"],input[type="submit"]');if(e.detail===0&&control&&Date.now()-uiPointerSoundAt>500&&(!document.body.classList.contains('play')||g))playUiClick()},true);
+ document.addEventListener('click',e=>{const g=e.target.closest('.opt,#cfYes,#cfNo,#toastH,#toastX,#bGameHome,#bHome,#bAgain,#bStart,#ldNext'),control=e.target.closest('button,[role="button"],a,input[type="button"],input[type="submit"]');if(e.detail===0&&control&&!e.target.closest('#dzTap')&&Date.now()-uiPointerSoundAt>500&&(!document.body.classList.contains('play')||g))playUiClick()},true);
 </script>
 <script>
 (function(){var s=document.getElementById('sky');if(!s)return;var h='';
@@ -3699,7 +3699,7 @@ function afterFacebook(user){
       var current=localStorage.getItem(NM_KEY)||'',wanted=n.toLocaleLowerCase('tr'),users=JSON.parse(localStorage.getItem(USER_KEY)||'[]');if(!Array.isArray(users))users=[];
       var taken=users.some(function(u){return String(u).toLocaleLowerCase('tr')===wanted})||lbGet().some(function(r){return String(r.n||'').toLocaleLowerCase('tr')===wanted});
       if(wanted!==(current||'').toLocaleLowerCase('tr')&&taken){ERR.textContent='Bu kullanıcı adı daha önce alınmış. Başka bir ad seç.';NMI.classList.remove('bad');void NMI.offsetWidth;NMI.classList.add('bad');try{NMI.focus()}catch(e){}return}
-      if(!users.some(function(u){return String(u).toLocaleLowerCase('tr')===wanted})){users.push(n);localStorage.setItem(USER_KEY,JSON.stringify(users));/* yeni kayıt: 100 dirhem hediye + her jokerden 2 hak */localStorage.setItem('islamQuizWalletV1','100');localStorage.setItem('ilimJourneyPointsV1','0');localStorage.removeItem('ilimEconomyV2');localStorage.removeItem('ibRewardsV1');localStorage.removeItem('ilimResumeV1');localStorage.removeItem('islamibilgi_pts');localStorage.removeItem('islamibilgi_rk');localStorage.setItem('islamQuizJokersV1',JSON.stringify({feraset:2,seyirci:2,molla:2,ciftcevap:2}));localStorage.setItem('islamQuizStarterJokersV1','1')}
+      if(!users.some(function(u){return String(u).toLocaleLowerCase('tr')===wanted})){users.push(n);localStorage.setItem(USER_KEY,JSON.stringify(users));try{if(window.__ibWipeZikir)window.__ibWipeZikir(n)}catch(e){}/* yeni kayıt (günlük zikirler sıfırdan başlar): 100 dirhem hediye + her jokerden 2 hak */localStorage.setItem('islamQuizWalletV1','100');localStorage.setItem('ilimJourneyPointsV1','0');localStorage.removeItem('ilimEconomyV2');localStorage.removeItem('ibRewardsV1');localStorage.removeItem('ilimResumeV1');localStorage.removeItem('islamibilgi_pts');localStorage.removeItem('islamibilgi_rk');localStorage.setItem('islamQuizJokersV1',JSON.stringify({feraset:2,seyirci:2,molla:2,ciftcevap:2}));localStorage.setItem('islamQuizStarterJokersV1','1')}
       if(!current){localStorage.setItem(NM_KEY,n);if(!currentAccountProvider())localStorage.setItem(ACCOUNT_KEY,'username')}localStorage.setItem(AV_KEY,String(selAv));localStorage.removeItem(AUTH_KEY)
     }catch(e){}updateSavedName()
     applyAv();homeUpd();closeIntro()}
@@ -14181,6 +14181,7 @@ html body #hcHome .hc-sk svg{position:relative;z-index:1;stroke:none;stroke-widt
   }
   function allowed(){
     if(!musOn()||document.hidden||document.body.classList.contains('hatim-open'))return false;
+    var zk=document.getElementById('dailyZikirPage');if(zk&&zk.classList.contains('on'))return false;
     var h=document.getElementById('sLogin');if(!h||!h.classList.contains('on'))return false;
     var I=document.getElementById('intro');
     if(I){var c=getComputedStyle(I);if(c.display!=='none'&&c.visibility!=='hidden')return false}
@@ -21482,6 +21483,25 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts'+accountScope()+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function load(){var c=Z.map(function(){return 0;});try{var s=JSON.parse(localStorage.getItem(key())||'null');if(Array.isArray(s))c=Z.map(function(_,i){var n=Number(s[i]);return isFinite(n)?Math.max(0,Math.min(T,Math.floor(n))):0;});}catch(e){}return c;}
   function save(c){try{localStorage.setItem(key(),JSON.stringify(c));}catch(e){}}
+  /* Hesap başına zikir kayıtlarını (tüm günler + seçili zikir) siler; yeni kayıtta ve hesap silinince çağrılır */
+  function scopeOf(name){var nm=String(name||'').trim().toLocaleLowerCase('tr');return nm?'_'+encodeURIComponent(nm):'_guest';}
+  window.__ibWipeZikir=function(name,alsoGuest){
+    var scopes=[scopeOf(name)];
+    if(alsoGuest&&scopes.indexOf('_guest')<0)scopes.push('_guest');
+    try{
+      var del=[],i,j,k,pc;
+      for(i=0;i<localStorage.length;i++){
+        k=localStorage.key(i);if(!k)continue;
+        for(j=0;j<scopes.length;j++){
+          pc='maneviYolculuk_dailyZikirCounts'+scopes[j]+'_';
+          if(k.indexOf(pc)===0&&/^\d{4}-\d{2}-\d{2}$/.test(k.slice(pc.length))){del.push(k);break;}
+          if(k==='maneviYolculuk_dailyZikirSelected'+scopes[j]){del.push(k);break;}
+        }
+      }
+      del.forEach(function(x){localStorage.removeItem(x);});
+    }catch(e){}
+    try{if(scopes.indexOf(accountScope())>-1)sel=0;render();}catch(e){}
+  };
   function chip(i,c){var ok=c[i]>=T,b=document.createElement('button');b.type='button';b.className='dz-chip'+(ok?' ok':'')+(i===sel?' sel':'');b.setAttribute('data-i',i);b.innerHTML='<span class="dz-fill" style="width:'+Math.min(100,c[i])+'%"></span><span class="dz-cn">'+(ok?'✓ ':'')+Z[i][0]+'</span><em>'+c[i]+'/'+T+'</em>';return b;}
   function nextPending(c){for(var k=1;k<=Z.length;k++){var j=(sel+k)%Z.length;if(c[j]<T)return j;}return -1;}
   function badge(c){
@@ -21556,6 +21576,13 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   document.addEventListener('DOMContentLoaded',start);
   window.addEventListener('load',start);
   var tries=0,iv=setInterval(function(){start();if(document.querySelector('.hc-daily-zikir-card.dzb')||++tries>40)clearInterval(iv);},250);
+  /* Hesap değişince (giriş/çıkış/yeni kayıt/silme) seçili zikir ve ana ekran rozeti yeni hesaba göre yenilenir */
+  var lastScope=accountScope();
+  setInterval(function(){
+    var sc=accountScope();if(sc===lastScope)return;lastScope=sc;
+    try{sel=Math.min(Z.length-1,Math.max(0,parseInt(localStorage.getItem(selKey())||'0',10)||0));}catch(e){sel=0;}
+    try{render();}catch(e){}
+  },700);
 })();
 </script>
 
@@ -21884,59 +21911,70 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
 <script id="daily-zikir-audio-fix">
 (function(){
   'use strict';
-  /* Sesler GitHub Pages'te index.html ile aynı klasörden alınır. Sistem/TTS sesi kullanılmaz. */
+  /* Zikir sesleri index.html ile aynı klasörden alınır. Her dokunuşta seçili zikrin sesi baştan çalar,
+     başka zikrin sesi aynı anda çalmaz; Ses ayarı kapalıysa çalmaz; sayfa kapanınca/zikir değişince durur. */
   var A=[
     ['subhanallah.mp3','Sübhanallah.mp3','subhan-allah.mp3'],
     ['elhamdulillah.mp3','Elhamdülillah.mp3','elhamdülillah.mp3'],
     ['allahuekber.mp3','Allahu Ekber.mp3','allahu-ekber.mp3'],
-    ['estakfurullah.mp3','./estakfurullah.mp3'],
-    ['lailaheillah.mp3','./lailaheillah.mp3'],
+    ['estakfurullah.mp3','estagfirullah.mp3'],
+    ['lailaheillah.mp3','la-ilahe-illallah.mp3'],
     ['salavat.mp3','salavati.mp3','Salât-ı Şerife.mp3','salat-i-serife.mp3','salatiserife.mp3']
   ];
-  var played={};
-  var audio=null;
-  function urls(i){
-    var out=[],list=A[i]||[];
-    for(var j=0;j<list.length;j++){
-      var n=list[j];
-      out.push(new URL(n,document.baseURI).href);
-    }
-    return out;
+  var NAMES={'Sübhanallah':0,'Elhamdülillah':1,'Allahu Ekber':2,'Estağfirullah':3,'Lâ ilâhe illallah':4,'Salât-ı Şerife':5};
+  var pool={};
+  function soundOn(){try{return localStorage.getItem('islamibilgi_snd')!=='0';}catch(e){return true;}}
+  function make(i){
+    var list=A[i]||[],st={a:null,k:-1};
+    st.next=function(){
+      st.k++;
+      if(st.k>=list.length){st.a=null;try{console.warn('Zikir sesi bulunamadı:',list.join(', '));}catch(e){}return;}
+      var a=new Audio();a.preload='auto';
+      a.addEventListener('error',function(){if(st.a===a)st.next();}); /* dosya yok/bozuk: sıradaki dosya adı */
+      a.src=new URL(list[st.k],document.baseURI).href;
+      st.a=a;
+    };
+    st.next();
+    return st;
+  }
+  function get(i){return pool[i]||(pool[i]=make(i));}
+  function stopAll(except){
+    for(var k in pool){if(+k===except)continue;var a=pool[k]&&pool[k].a;if(a){try{a.pause();}catch(e){}}}
   }
   function play(i){
-    if(played[i])return;
-    played[i]=true;
-    var list=urls(i),k=0;
-    function next(){
-      if(k>=list.length){played[i]=false;return;}
-      var u=list[k++];
-      try{
-        if(audio){try{audio.pause();}catch(e){}}
-        audio=new Audio(u);
-        audio.preload='auto';
-        audio.volume=1;
-        var p=audio.play();
-        if(p&&p.catch)p.catch(function(){next();});
-      }catch(e){next();}
-    }
-    next();
+    if(!soundOn()||i==null||i<0||i>=A.length)return;
+    stopAll(i);
+    var a=get(i).a;if(!a)return;
+    try{a.currentTime=0;}catch(e){}
+    try{var p=a.play();if(p&&p.catch)p.catch(function(){});}catch(e){}
   }
+  function selIdx(){
+    var c=document.querySelector('#dzBar .dz-chip.sel'),i=c?parseInt(c.getAttribute('data-i'),10):NaN;
+    if(!isNaN(i))return i;
+    var n=document.getElementById('dzvName'),m=n?NAMES[n.textContent.trim()]:null;
+    return m==null?-1:m;
+  }
+  function warm(){for(var i=0;i<A.length;i++)get(i);} /* sayfa açılınca tüm sesler önceden yüklenir */
   function hook(){
-    var b=document.getElementById('dzTap');
-    if(!b||b.dataset.audioFix==='1')return;
-    b.dataset.audioFix='1';
+    var b=document.getElementById('dzTap'),pg=document.getElementById('dailyZikirPage');
+    if(!b||!pg||b.dataset.audioFix==='2')return;
+    b.dataset.audioFix='2';
+    /* yakalama aşaması: sayaç artmadan önce çalışır; 100'e ulaşmış zikirde (sayılmayan dokunuş) ses yok */
     b.addEventListener('click',function(){
-      var name=document.getElementById('dzvName');
-      if(!name)return;
-      var map={'Sübhanallah':0,'Elhamdülillah':1,'Allahu Ekber':2,'Estağfirullah':3,'Lâ ilâhe illallah':4,'Salât-ı Şerife':5};
-      var i=map[name.textContent.trim()];
-      if(i!=null)play(i);
+      var n=parseInt((document.getElementById('dzCnt')||{}).textContent,10)||0;
+      if(n>=100)return;
+      play(selIdx());
     },true);
+    pg.addEventListener('click',function(e){if(e.target.closest&&e.target.closest('.dz-chip,#dzvNext'))stopAll(-1);},true);
+    new MutationObserver(function(){if(pg.classList.contains('on'))warm();else stopAll(-1);}).observe(pg,{attributes:true,attributeFilter:['class']});
+    document.addEventListener('visibilitychange',function(){if(document.hidden)stopAll(-1);});
+    if(pg.classList.contains('on'))warm();
   }
   hook();
   document.addEventListener('DOMContentLoaded',hook);
   window.addEventListener('load',hook);
   var n=0,iv=setInterval(function(){hook();if(++n>40)clearInterval(iv);},250);
+  window.__dzAudio={play:play,stop:function(){stopAll(-1);}};
 })();
 </script>
 <script id="daily-zikir-rest-js">

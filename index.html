@@ -21517,7 +21517,47 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     toast.textContent=Z[sel][0]+' tamamlandı. Günlük '+T+' okuma hedefini bitirdin.';
     toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},3800);
   }
-  function tap(){var c=load();if(c[sel]>=T)return;c[sel]++;save(c);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
+  /* Her zikir için yalnızca ilk sayaç dokunuşunda ses çal. GitHub Pages'te
+     ses dosyaları index.html ile aynı klasördeyse relative URL doğrudan çalışır.
+     Dosya adı varyasyonları sırayla denenir; başarılı olan ilk dosya kullanılır. */
+  var zikirAudioPlayed={};
+  var ZIKIR_AUDIO=[
+    ['subhanallah.mp3','Subhanallah.mp3'],
+    ['elhamdulillah.mp3','Elhamdulillah.mp3'],
+    ['allahuekber.mp3','AllahuEkber.mp3','allahuekber.mp3'],
+    ['estagfirullah.mp3','Estağfirullah.mp3','estagfirullah.mp3'],
+    ['lailaheillallah.mp3','La ilahe illallah.mp3','lailaheillallah.mp3'],
+    ['salat-i-serife.mp3','salat-iserife.mp3','Salat-i-Serife.mp3','salavati.mp3']
+  ];
+  function playZikirVoice(i){
+    if(zikirAudioPlayed[i])return;
+    zikirAudioPlayed[i]=true;
+    var files=ZIKIR_AUDIO[i]||[],pos=0,a=null;
+    function tryNext(){
+      if(pos>=files.length){
+        /* GitHub'taki dosya adı farklıysa bile ilk dokunuş sessiz kalmasın. */
+        try{
+          if('speechSynthesis' in window){
+            var u=new SpeechSynthesisUtterance(Z[i][0]);u.lang='tr-TR';u.rate=.9;u.pitch=1;
+            speechSynthesis.speak(u);
+          }
+        }catch(e){}
+        return;
+      }
+      try{
+        a=new Audio(new URL(files[pos++],document.baseURI).href);
+        a.preload='auto';a.volume=1;
+        a.addEventListener('error',tryNext,{once:true});
+        var pr=a.play();
+        if(pr&&pr.catch)pr.catch(function(){tryNext();});
+      }catch(e){tryNext();}
+    }
+    tryNext();
+  }
+  function tap(){var c=load();if(c[sel]>=T)return;
+    /* Sayaç artmadan hemen önceki ilk dokunuşta seçili zikrin sesini başlat. */
+    playZikirVoice(sel);
+    c[sel]++;save(c);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
     var ch=document.querySelector('#dzBar .dz-chip[data-i="'+sel+'"]'),fl=ch&&ch.querySelector('.dz-fill');
     if(fl){fl.style.transition='none';fl.style.width=(c[sel]-1)+'%';void fl.offsetWidth;fl.style.transition='';fl.style.width=Math.min(100,c[sel])+'%';}
     if(ch&&c[sel]>=T){ch.classList.remove('puff');void ch.offsetWidth;ch.classList.add('puff');}

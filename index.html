@@ -21475,30 +21475,6 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     ['Salât-ı Şerife','Allahümme salli alâ seyyidinâ Muhammed.','ٱللَّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ']
   ];
   var T=100,SELK='maneviYolculuk_dailyZikirSelected',sel=0,toast=null,tt=null,rt=null;
-
-  /* Günlük zikir sesleri: GitHub Pages/repo'da index.html ile aynı klasördeki MP3'lerden alınır. */
-  var ZIKIR_AUDIO=[
-    'subhanallah.mp3',
-    'elhamdulillah.mp3',
-    'allahuekber.mp3',
-    'estağfurullah.mp3',
-    'lailaheillah.mp3',
-    'salavati.mp3'
-  ];
-  var playedZikirAudio={};
-  function playZikirAudio(i){
-    if(playedZikirAudio[i])return;
-    playedZikirAudio[i]=true;
-    try{
-      var a=new Audio(new URL(ZIKIR_AUDIO[i],document.baseURI).href);
-      a.preload='auto';
-      a.volume=1;
-      var pr=a.play();
-      if(pr&&pr.catch)pr.catch(function(){playedZikirAudio[i]=false;});
-      a.addEventListener('error',function(){playedZikirAudio[i]=false;});
-    }catch(e){playedZikirAudio[i]=false;}
-  }
-
   try{sel=Math.min(Z.length-1,Math.max(0,parseInt(localStorage.getItem(SELK)||'0',10)||0));}catch(e){}
   function $(id){return document.getElementById(id);}
   function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
@@ -21534,7 +21510,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     if(pop){ring.classList.remove('pop');void ring.offsetWidth;ring.classList.add('pop');}
     badge(c);
   }
-  function select(i){sel=i;try{localStorage.setItem(SELK,String(i));}catch(e){}playZikirAudio(i);render();}
+  function select(i){sel=i;try{localStorage.setItem(SELK,String(i));}catch(e){}render();}
   function showToast(){
     var pg=$('dailyZikirPage');if(!pg)return;
     if(!toast){toast=document.createElement('div');toast.id='dzCompleteToast';toast.setAttribute('role','status');pg.appendChild(toast);}
@@ -21557,7 +21533,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     });
     $('dzvNext').addEventListener('click',function(){select(parseInt(this.getAttribute('data-i'),10)||0);});
     pg.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('.dz-chip'):null;if(b)select(parseInt(b.getAttribute('data-i'),10)||0);});
-    new MutationObserver(function(){if(pg.classList.contains('on')){render();playZikirAudio(sel);}}).observe(pg,{attributes:true,attributeFilter:['class']});
+    new MutationObserver(function(){if(pg.classList.contains('on'))render();}).observe(pg,{attributes:true,attributeFilter:['class']});
     render();
   }
   function beads(){

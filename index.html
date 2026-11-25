@@ -21475,9 +21475,11 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     ['Salât-ı Şerife','Allahümme salli alâ seyyidinâ Muhammed.','ٱللَّٰهُمَّ صَلِّ عَلَىٰ سَيِّدِنَا مُحَمَّدٍ']
   ];
   var T=100,SELK='maneviYolculuk_dailyZikirSelected',sel=0,toast=null,tt=null,rt=null;
-  try{sel=Math.min(Z.length-1,Math.max(0,parseInt(localStorage.getItem(SELK)||'0',10)||0));}catch(e){}
+  function selKey(){var n='';try{n=localStorage.getItem('islamibilgi_name')||''}catch(e){}n=String(n).trim().toLocaleLowerCase('tr');return SELK+(n?'_'+encodeURIComponent(n):'_guest');}
+  try{sel=Math.min(Z.length-1,Math.max(0,parseInt(localStorage.getItem(selKey())||'0',10)||0));}catch(e){}
   function $(id){return document.getElementById(id);}
-  function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function accountScope(){var n='';try{n=localStorage.getItem('islamibilgi_name')||''}catch(e){}n=String(n).trim().toLocaleLowerCase('tr');return n?'_'+encodeURIComponent(n):'_guest';}
+  function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts'+accountScope()+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function load(){var c=Z.map(function(){return 0;});try{var s=JSON.parse(localStorage.getItem(key())||'null');if(Array.isArray(s))c=Z.map(function(_,i){var n=Number(s[i]);return isFinite(n)?Math.max(0,Math.min(T,Math.floor(n))):0;});}catch(e){}return c;}
   function save(c){try{localStorage.setItem(key(),JSON.stringify(c));}catch(e){}}
   function chip(i,c){var ok=c[i]>=T,b=document.createElement('button');b.type='button';b.className='dz-chip'+(ok?' ok':'')+(i===sel?' sel':'');b.setAttribute('data-i',i);b.innerHTML='<span class="dz-fill" style="width:'+Math.min(100,c[i])+'%"></span><span class="dz-cn">'+(ok?'✓ ':'')+Z[i][0]+'</span><em>'+c[i]+'/'+T+'</em>';return b;}
@@ -21510,7 +21512,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     if(pop){ring.classList.remove('pop');void ring.offsetWidth;ring.classList.add('pop');}
     badge(c);
   }
-  function select(i){sel=i;try{localStorage.setItem(SELK,String(i));}catch(e){}render();}
+  function select(i){sel=i;try{localStorage.setItem(selKey(),String(i));}catch(e){}render();}
   function showToast(){
     var pg=$('dailyZikirPage');if(!pg)return;
     if(!toast){toast=document.createElement('div');toast.id='dzCompleteToast';toast.setAttribute('role','status');pg.appendChild(toast);}
@@ -21951,7 +21953,8 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   ];
   var ov=null,timer=null,last=null;
   function $(id){return document.getElementById(id);}
-  function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+  function accountScope(){var n='';try{n=localStorage.getItem('islamibilgi_name')||''}catch(e){}n=String(n).trim().toLocaleLowerCase('tr');return n?'_'+encodeURIComponent(n):'_guest';}
+  function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts'+accountScope()+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function load(){var c=Z.map(function(){return 0;});try{var s=JSON.parse(localStorage.getItem(key())||'null');if(Array.isArray(s))c=Z.map(function(_,i){var n=Number(s[i]);return isFinite(n)?Math.max(0,Math.min(T,Math.floor(n))):0;});}catch(e){}return c;}
   function selIdx(){var s=document.querySelector('#dzBar .dz-chip.sel');return s?(parseInt(s.getAttribute('data-i'),10)||0):0;}
 

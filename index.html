@@ -5150,26 +5150,29 @@ text-shadow:0 2px 3px #000,0 0 3px #000,0 0 6px rgba(0,0,0,.8);animation:none}
     var mlCur=1;
     function mlPageOf(abs){data();var lo=1,hi=604;while(lo<hi){var mid=(lo+hi+1)>>1;if(D.p[mid-1]<=abs)lo=mid;else hi=mid-1}return lo}
     function mlFit(){
-      var pt=$('mlPt'),sh=$('mlSh'),fs=38;pt.style.fontSize=fs+'px';
-      while(fs>12&&pt.scrollHeight>sh.clientHeight-4){fs-=1;pt.style.fontSize=fs+'px'}
+      var pt=$('mlPt');
+      /* Ayet-meal kartları kendi doğal yüksekliğinde kalsın; sayfa dikey kaydırılsın. */
+      pt.style.fontSize='clamp(23px, 6.2vw, 30px)';
     }
     function mlRender(p,dir){
       data();p=Math.max(1,Math.min(604,p));mlCur=p;mlM.classList.remove('on');
       var pt=$('mlPt'),st=D.p[p-1],en=D.p[p]-1,html='';
       for(var abs=st;abs<=en;abs++){
-        var s1=sOf(abs),a1=aOf(abs);
+        var s1=sOf(abs),a1=aOf(abs),mr=mlMeal(abs),meal=mr?mr[2]:'Bu ayetin meali bulunamadı.';
         if(a1===1)html+='<div class="ml-sb">سورة '+D.n[s1-1][0]+'</div>';
-        html+='<span class="ml-ay" data-abs="'+abs+'">'+(D.t[abs-1]||'')+' <span class="ae">'+a1+'</span></span> '
+        html+='<section class="ml-verse"><div class="ml-ar" lang="ar" dir="rtl">'+(D.t[abs-1]||'')+' <span class="ae">'+mlAr(a1)+'</span></div><div class="ml-tr" lang="tr" dir="ltr">'+meal+'</div></section>'
       }
       pt.innerHTML=html;$('mlPn').textContent=p+' / 604';
-      /* satır içi !important: başka kurallar akışı bozamasın (ayetler kelime kelime kutulara bölünmesin) */
-      (function(){var P=function(el,o){for(var k in o)el.style.setProperty(k,o[k],'important')};
-        P(pt,{display:'block',float:'none',columns:'auto','column-count':'auto','flex-wrap':'nowrap',width:'100%','max-width':'100%','white-space':'normal'});
-        [].forEach.call(pt.children,function(c){
-          if(c.classList.contains('ml-ay'))P(c,{display:'inline',float:'none',width:'auto','max-width':'none',position:'static','flex':'none'});
-          else if(c.classList.contains('ml-sb'))P(c,{display:'flex',float:'none',width:'100%','box-sizing':'border-box'})})})();
+      pt.style.setProperty('display','block','important');
+      pt.style.setProperty('float','none','important');
+      pt.style.setProperty('columns','auto','important');
+      pt.style.setProperty('column-count','auto','important');
+      pt.style.setProperty('width','100%','important');
+      pt.style.setProperty('max-width','100%','important');
+      pt.style.setProperty('white-space','normal','important');
       pt.classList.remove('fl','fr');if(dir){void pt.offsetWidth;pt.classList.add(dir>0?'fl':'fr')}
-      mlFit()
+      mlFit();
+      $('mlSh').scrollTop=0;
     }
     function mlRead(st,en){
       try{if(window.__mpStopAudio)window.__mpStopAudio(true)}catch(e){}
@@ -11194,6 +11197,15 @@ html body #frm.fjn #famBox .fam-join .fam-sub{text-align:center;font-weight:800;
  init();
 })();
 </script>
+<style id="ml-ayah-meal-layout">
+#qrScreen #qrMeal .ml-sheet{display:block!important;overflow-y:auto!important;overflow-x:hidden!important;align-items:stretch!important;-webkit-overflow-scrolling:touch!important;touch-action:pan-y!important}
+#qrScreen #qrMeal .ml-sheet .ml-pt{display:block!important;direction:rtl!important;text-align:initial!important;max-height:none!important;line-height:1.8!important;font-size:clamp(23px,6.2vw,30px)!important}
+#qrScreen #qrMeal .ml-sheet .ml-verse{display:block!important;width:100%!important;box-sizing:border-box!important;margin:0 0 13px!important;padding:13px 12px 11px!important;border:1px solid #e4d3a2!important;border-radius:13px!important;background:#fffdf6!important;box-shadow:0 2px 6px rgba(120,90,20,.10)!important}
+#qrScreen #qrMeal .ml-sheet .ml-ar{display:block!important;direction:rtl!important;text-align:right!important;color:#211b10!important;font-family:"Amiri","Scheherazade New","Noto Naskh Arabic","Traditional Arabic",serif!important;font-weight:700!important;line-height:1.9!important;overflow-wrap:anywhere!important}
+#qrScreen #qrMeal .ml-sheet .ml-tr{display:block!important;direction:ltr!important;text-align:left!important;margin-top:9px!important;padding-top:9px!important;border-top:1px solid #e8dfc8!important;color:#315b4b!important;font:600 14px/1.55 "Nunito",system-ui,sans-serif!important;unicode-bidi:plaintext!important}
+#qrScreen #qrMeal .ml-sheet .ml-ar .ae{display:inline-flex!important;vertical-align:middle!important;margin-inline-start:5px!important}
+</style>
+
 </body>
 </html><style>
 /* Eski sürümden aktarılan Molla ve Cemaat joker tasarımı */

@@ -6935,7 +6935,7 @@ window.__ibWipe=async function(){
     ...['friends','blocked'].map(async sub=>{const sn=await F.getDocs(F.collection(D0,'users',U0,sub));await Promise.all(sn.docs.map(d=>F.deleteDoc(d.ref)))}),
     (async()=>{const reqs=await Promise.all(['from','to'].map(field=>F.getDocs(F.query(F.collection(D0,'friendReqs'),F.where(field,'==',U0)))));const m=new Map();reqs.forEach(sn=>sn.docs.forEach(d=>m.set(d.ref.path,d.ref)));await Promise.all([...m.values()].map(ref=>F.deleteDoc(ref)))})()
   ]);
-  await Promise.all([F.deleteDoc(F.doc(D0,'wallets',U0)),P0?F.deleteDoc(F.doc(D0,'ids',P0)):null,UN0?F.deleteDoc(F.doc(D0,'usernames',unKey(UN0))).catch(()=>{}):null]);
+  await Promise.all([F.deleteDoc(F.doc(D0,'wallets',U0)),P0?F.deleteDoc(F.doc(D0,'ids',P0)):null,UN0?F.deleteDoc(F.doc(D0,'usernames',unKey(UN0))).catch(()=>{}):null,window.__ibZikirDocId?Promise.all([F.deleteDoc(F.doc(D0,'zikir',window.__ibZikirDocId(U0,UN0))),F.deleteDoc(F.doc(D0,'zikir',window.__ibZikirDocId(U0,'')))]).catch(()=>{}):null]);
   await F.deleteDoc(F.doc(D0,'users',U0));
   try{wUnsub&&wUnsub()}catch(e){}
   return true};
@@ -21485,10 +21485,144 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   function key(){var d=new Date();return 'maneviYolculuk_dailyZikirCounts'+accountScope()+'_'+d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function load(){var c=Z.map(function(){return 0;});try{var s=JSON.parse(localStorage.getItem(key())||'null');if(Array.isArray(s))c=Z.map(function(_,i){var n=Number(s[i]);return isFinite(n)?Math.max(0,Math.min(T,Math.floor(n))):0;});}catch(e){}return c;}
   function save(c){try{localStorage.setItem(key(),JSON.stringify(c));}catch(e){}}
+
+  /* ===== FIREBASE SENKRONU =====
+     Firestore: zikir/{uid}__{hesap} = {d:'YYYY-AA-GG', c:[6 günlük sayaç], tot:[6 toplam], t:zaman}
+     wallets ile aynı desen: yerel kayıt ANINDA çalışır (çevrimdışı da), her değişiklik fark (delta) olarak kalıcı kuyruğa yazılır,
+     arka planda runTransaction ile buluta işlenir. Google/Facebook ile giriş yapılan aynı hesapta cihazlar arası senkron olur. */
+  var FBV='https://www.gstatic.com/firebasejs/10.12.2/',PENDK='maneviYolculuk_dailyZikirPend',OKK='maneviYolculuk_dailyZikirCloudOk:';
+  var cl={p:null,busy:false,again:false,timer:null,first:0,pullAt:0,bad:0,hold:0,warned:false};
+  function pad2(n){return String(n).padStart(2,'0');}
+  function dayStr(){var d=new Date();return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());}
+  function zeros(){return Z.map(function(){return 0;});}
+  function toInt(v){var n=Number(v);return isFinite(n)?Math.trunc(n):0;}
+  function pendEmpty(p){return !p.c.some(Boolean)&&!p.tot.some(Boolean)&&!p.z.some(Boolean);}
+  function pendGet(sc){
+    var p=null;try{p=JSON.parse(localStorage.getItem(PENDK+(sc||accountScope()))||'null');}catch(e){}
+    if(!p||typeof p!=='object')p={};
+    return {d:typeof p.d==='string'?p.d:dayStr(),c:Z.map(function(_,i){return toInt(p.c&&p.c[i]);}),tot:Z.map(function(_,i){return toInt(p.tot&&p.tot[i]);}),z:Z.map(function(_,i){return toInt(p.z&&p.z[i]);})};
+  }
+  function pendSet(p,sc){
+    try{var k=PENDK+(sc||accountScope());if(pendEmpty(p))localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(p));}catch(e){}
+  }
+  /* i. zikirde sayaç farkı dc, toplam farkı dt: kuyruğa yaz, kısa süre sonra buluta gönder */
+  function cloudAdd(i,dc,dt){
+    var p=pendGet(),d=dayStr();
+    if(p.d!==d){p.d=d;p.c=zeros();p.z=zeros();} /* gün döndüyse eski güne ait sayaç farkları atılır; toplam farkları kalır */
+    p.c[i]+=dc;p.tot[i]+=dt;pendSet(p);cloudSoon(2500);
+  }
+  /* Sıfırla: farkla değil mutlak işlem; bulutta da o günün sayacı 0 olur (toplam etkilenmez) */
+  function cloudReset(i){
+    var p=pendGet(),d=dayStr();
+    if(p.d!==d){p.d=d;p.c=zeros();p.z=zeros();}
+    p.c[i]=0;p.z[i]+=1;pendSet(p);cloudSoon(2500);
+  }
+  function cloudSoon(ms,exact){
+    var now=Date.now(),w=ms||2500;if(!cl.first)cl.first=now;
+    if(!exact)w=Math.min(w,Math.max(300,cl.first+20000-now)); /* sürekli dokunsa da en geç ~20 sn'de bir gönderilir */
+    clearTimeout(cl.timer);cl.timer=setTimeout(function(){cloudSync(false);},w);
+  }
+  function docIdFor(uid,sc){return uid+'__'+(sc==='_guest'?'g':'n_'+sc.slice(1).replace(/\./g,'%2E'));}
+  window.__ibZikirDocId=function(uid,name){return docIdFor(uid,scopeOf(name));};
+  function fbOpen(){
+    if(cl.p)return cl.p;
+    cl.p=(async function(){
+      if(!/^https?:$/.test(location.protocol)||!window.ibFbAuth)throw {code:'offline-env'};
+      var x=await window.ibFbAuth();await x.au.authStateReady();
+      if(!x.au.currentUser)await x.U.signInAnonymously(x.au);
+      var S=await import(FBV+'firebase-firestore.js'),A=await import(FBV+'firebase-app.js');
+      return {S:S,A:A,au:x.au};
+    })();
+    cl.p.catch(function(){cl.p=null;});
+    return cl.p;
+  }
+  /* bulut değerlerini yerel kayda yazar; değiştiyse ekranı yeniler */
+  function applyLocal(c,t){
+    var chg=false;
+    try{
+      if(c){var cur=load();if(cur.join()!==c.join()){save(c);chg=true;}}
+      var tc=getTotals();if(tc.join()!==t.join()){localStorage.setItem(totsKey(),JSON.stringify(t));chg=true;}
+    }catch(e){}
+    if(chg){try{render();}catch(e){}}
+  }
+  async function cloudRun(pull){
+    var sc=accountScope(),td=dayStr();
+    if(pendEmpty(pendGet(sc))&&(!pull||Date.now()-cl.pullAt<20000))return;
+    clearTimeout(cl.timer);cl.first=0;
+    var f=await fbOpen(),S=f.S,user=f.au.currentUser;
+    if(!user)throw {code:'no-user'};
+    if(accountScope()!==sc){cl.again=true;return;} /* bu arada hesap değişti: yeni hesap için tekrar çalışır */
+    var uid=user.uid,db=S.getFirestore(f.A.getApp()),ref=S.doc(db,'zikir',docIdFor(uid,sc)),okk=OKK+uid+'|'+sc;
+    var firstTime=true;try{firstTime=localStorage.getItem(okk)!=='1';}catch(e){}
+    /* tek seferde (await yok): kuyruk anlık görüntüsü + yerel durum tutarlı olsun */
+    var p=pendGet(sc);if(p.d!==td){p.c=zeros();p.z=zeros();p.d=td;}
+    var loc={c:load(),tot:getTotals()};
+    var r=await S.runTransaction(db,async function(tx){
+      var sn=await tx.get(ref),cur=sn.exists()?sn.data():null,res;
+      if(!cur){
+        if(!loc.c.some(Boolean)&&!loc.tot.some(Boolean))return null; /* hiç zikir yoksa boş belge açılmaz */
+        res={d:td,c:loc.c.slice(),tot:loc.tot.slice(),w:1}; /* ilk kez: yerel durumdan başlar (kuyruk zaten içinde) */
+      }else{
+        var cd=String(cur.d||''),w=0,
+            cc=Z.map(function(_,i){return Math.max(0,Math.min(T,toInt(cur.c&&cur.c[i])));}),
+            ct=Z.map(function(_,i){return Math.max(0,toInt(cur.tot&&cur.tot[i]));});
+        if(firstTime){
+          /* bu cihazın henüz buluta işlenmemiş yerel kayıtları: toplamlara eklenir, günlük sayaçta büyük olan alınır */
+          if(loc.tot.some(Boolean)){ct=ct.map(function(n,i){return n+loc.tot[i];});w=1;}
+          if(cd<td){cd=td;cc=loc.c.slice();w=1;}
+          else if(cd===td){var m=cc.map(function(n,i){return Math.max(n,loc.c[i]);});if(m.join()!==cc.join()){cc=m;w=1;}}
+        }else if(!pendEmpty(p)){
+          ct=ct.map(function(n,i){return Math.max(0,n+p.tot[i]);});
+          if(cd<td){cd=td;cc=zeros();}
+          if(cd===td)cc=cc.map(function(n,i){return Math.max(0,Math.min(T,(p.z[i]?0:n)+p.c[i]));});
+          w=1;
+        }
+        res={d:cd,c:cc,tot:ct,w:w};
+      }
+      if(res.w)tx.set(ref,{d:res.d,c:res.c,tot:res.tot,t:Date.now()});
+      return res;
+    });
+    /* gönderilen farkları kuyruktan düş (işlem sırasında gelen yeni dokunuşlar kalır) */
+    var now=pendGet(sc);
+    if(now.d===td){now.c=now.c.map(function(n,i){return now.z[i]>p.z[i]?n:n-p.c[i];});now.z=now.z.map(function(n,i){return Math.max(0,n-p.z[i]);});}
+    else if(now.d<td){now.c=zeros();now.z=zeros();now.d=td;}
+    now.tot=now.tot.map(function(n,i){return n-p.tot[i];});
+    pendSet(now,sc);
+    try{localStorage.setItem(okk,'1');}catch(e){}
+    cl.bad=0;cl.pullAt=Date.now();
+    if(!r||accountScope()!==sc||!f.au.currentUser||f.au.currentUser.uid!==uid)return;
+    /* yerel görünüm = bulut + henüz gönderilmemiş (işlem sırasında gelen) farklar */
+    var rem=pendGet(sc),nc=null;
+    if(r.d===td||r.d<td){var base=r.d===td?r.c:zeros();nc=Z.map(function(_,i){return Math.max(0,Math.min(T,base[i]+(rem.d===td?rem.c[i]:0)));});}
+    applyLocal(nc,Z.map(function(_,i){return Math.max(0,r.tot[i]+rem.tot[i]);}));
+  }
+  function cloudFail(e){
+    var code=String(e&&(e.code||e.message)||e);cl.bad++;
+    if(/permission-denied|insufficient/i.test(code)){
+      if(!cl.warned){cl.warned=true;console.warn('Zikir buluta yazılamadı: Firestore kurallarına zikir bloğunu ekleyip yayınla.',e);}
+      cl.hold=Date.now()+300000;if(!pendEmpty(pendGet()))cloudSoon(300000,true);return;
+    }
+    if(!/offline-env|no-user/.test(code))console.warn('zikir sync',e);
+    if(!pendEmpty(pendGet()))cloudSoon(Math.min(60000,4000*cl.bad),true);
+  }
+  /* pull=true: buluttan da çek (süre sınırlı); false: yalnızca bekleyen fark varsa gönder */
+  async function cloudSync(pull){
+    if(Date.now()<cl.hold)return;
+    if(cl.busy){cl.again=true;return;}
+    cl.busy=true;
+    try{await cloudRun(pull);}catch(e){cloudFail(e);}
+    cl.busy=false;
+    if(cl.again){cl.again=false;cloudSync(true);}
+  }
+  document.addEventListener('visibilitychange',function(){cloudSync(!document.hidden);});
+  window.addEventListener('online',function(){cloudSync(true);});
+  window.addEventListener('pagehide',function(){cloudSync(false);});
+  setTimeout(function(){var nm='';try{nm=localStorage.getItem('islamibilgi_name')||''}catch(e){}if(nm||!pendEmpty(pendGet()))cloudSync(true);},3000);
   /* Hesap başına zikir kayıtlarını (tüm günler + seçili zikir) siler; yeni kayıtta ve hesap silinince çağrılır */
   function scopeOf(name){var nm=String(name||'').trim().toLocaleLowerCase('tr');return nm?'_'+encodeURIComponent(nm):'_guest';}
   window.__ibWipeZikir=function(name,alsoGuest){
     var scopes=[scopeOf(name)];
+    clearTimeout(cl.timer);cl.first=0;cl.hold=Date.now()+(alsoGuest?60000:3000);
     if(alsoGuest&&scopes.indexOf('_guest')<0)scopes.push('_guest');
     try{
       var del=[],i,j,k,pc;
@@ -21497,7 +21631,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
         for(j=0;j<scopes.length;j++){
           pc='maneviYolculuk_dailyZikirCounts'+scopes[j]+'_';
           if(k.indexOf(pc)===0&&/^\d{4}-\d{2}-\d{2}$/.test(k.slice(pc.length))){del.push(k);break;}
-          if(k==='maneviYolculuk_dailyZikirSelected'+scopes[j]||k==='maneviYolculuk_dailyZikirTotal'+scopes[j]||k==='maneviYolculuk_dailyZikirTotals'+scopes[j]){del.push(k);break;}
+          if(k==='maneviYolculuk_dailyZikirSelected'+scopes[j]||k==='maneviYolculuk_dailyZikirTotal'+scopes[j]||k==='maneviYolculuk_dailyZikirTotals'+scopes[j]||k===PENDK+scopes[j]||(k.indexOf(OKK)===0&&k.slice(k.indexOf('|')+1)===scopes[j])){del.push(k);break;}
         }
       }
       del.forEach(function(x){localStorage.removeItem(x);});
@@ -21578,7 +21712,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     toast.textContent=Z[sel][0]+' tamamlandı. Günlük '+T+' okuma hedefini bitirdin.';
     toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},3800);
   }
-  function tap(){var c=load();if(c[sel]>=T)return;c[sel]++;save(c);addTotal(sel,1);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
+  function tap(){var c=load();if(c[sel]>=T)return;c[sel]++;save(c);addTotal(sel,1);cloudAdd(sel,1,1);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
     var ch=document.querySelector('#dzBar .dz-chip[data-i="'+sel+'"]'),fl=ch&&ch.querySelector('.dz-fill');
     if(fl){fl.style.transition='none';fl.style.width=(c[sel]-1)+'%';void fl.offsetWidth;fl.style.transition='';fl.style.width=Math.min(100,c[sel])+'%';}
     if(ch&&c[sel]>=T){ch.classList.remove('puff');void ch.offsetWidth;ch.classList.add('puff');}
@@ -21586,18 +21720,18 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   function bind(){
     var pg=$('dailyZikirPage');if(!pg||pg.dataset.v2==='1')return;pg.dataset.v2='1';
     $('dzTap').addEventListener('click',function(e){e.preventDefault();tap();});
-    $('dzUndo').addEventListener('click',function(){var c=load();if(c[sel]>0){c[sel]--;save(c);addTotal(sel,-1);render();}});
+    $('dzUndo').addEventListener('click',function(){var c=load();if(c[sel]>0){c[sel]--;save(c);addTotal(sel,-1);cloudAdd(sel,-1,-1);render();}});
     var tb=$('dzTotalsBtn');if(tb)tb.addEventListener('click',function(e){e.preventDefault();openTotals();});
     var tc=$('dzTotalsClose');if(tc)tc.addEventListener('click',function(e){e.preventDefault();closeTotals();});
     var ts=$('dzTotalsSheet');if(ts)ts.addEventListener('click',function(e){if(e.target===ts)closeTotals();});
     var rs=$('dzReset');
     rs.addEventListener('click',function(){
-      if(rs.getAttribute('data-arm')){clearTimeout(rt);rs.removeAttribute('data-arm');rs.textContent='Sıfırla';var c=load();c[sel]=0;save(c);try{played[sel]=false;}catch(e){}render();}
+      if(rs.getAttribute('data-arm')){clearTimeout(rt);rs.removeAttribute('data-arm');rs.textContent='Sıfırla';var c=load(),prev=c[sel];c[sel]=0;save(c);cloudReset(sel);try{played[sel]=false;}catch(e){}render();}
       else{rs.setAttribute('data-arm','1');rs.textContent='Emin misin?';rt=setTimeout(function(){rs.removeAttribute('data-arm');rs.textContent='Sıfırla';},3000);}
     });
     $('dzvNext').addEventListener('click',function(){select(parseInt(this.getAttribute('data-i'),10)||0);});
     pg.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('.dz-chip'):null;if(b)select(parseInt(b.getAttribute('data-i'),10)||0);});
-    new MutationObserver(function(){if(pg.classList.contains('on'))render();else closeTotals();}).observe(pg,{attributes:true,attributeFilter:['class']});
+    new MutationObserver(function(){if(pg.classList.contains('on')){render();cloudSync(true);}else{closeTotals();cloudSync(false);}}).observe(pg,{attributes:true,attributeFilter:['class']});
     render();
   }
   function beads(){
@@ -21630,6 +21764,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     var sc=accountScope();if(sc===lastScope)return;lastScope=sc;
     try{sel=Math.min(Z.length-1,Math.max(0,parseInt(localStorage.getItem(selKey())||'0',10)||0));}catch(e){sel=0;}
     try{render();}catch(e){}
+    cloudSync(true);
   },700);
 })();
 </script>

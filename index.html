@@ -1417,7 +1417,8 @@ html body #sLogin#sLogin#sLogin #hcBg::after{background:var(--v7bg) right top/ca
    else if(ph==='ans'){if(!cur){var q2=qBy(st.qi);if(q2)showQ(q2)}var mine=st.claim&&st.claim.u===NET.uid;phase=mine?'answering':'watch';if(mine)board.classList.add('answering');countTo(st.end,true)}
    else if(ph==='result'){
     if(!cur){var q3=qBy(st.qi);if(q3)showQ(q3)}phase='result';var r=st.res;
-    if(r){if(r.p>=0&&bc.children[r.p])bc.children[r.p].classList.add(r.a===r.p?'ok':'no');if(r.u===NET.uid){doFlash(r.ok?'ok':'no');scoreMe(st)}}
+    if(r){if(r.p>=0&&bc.children[r.p])bc.children[r.p].classList.add(r.a===r.p?'ok':'no');if(r.u===NET.uid){doFlash(r.ok?'ok':'no');scoreMe(st)}
+     if(NET.snd!==st.qn){NET.snd=st.qn;try{if(r.ok){if(typeof playCorrectSound==='function')playCorrectSound()}else{if(typeof playWrongSound==='function')playWrongSound()}}catch(e){}}}
    }else{hideQuestion();phase='idle'}
   }
   updBtn();applySeats();
@@ -21731,7 +21732,8 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     });
     $('dzvNext').addEventListener('click',function(){select(parseInt(this.getAttribute('data-i'),10)||0);});
     pg.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('.dz-chip'):null;if(b)select(parseInt(b.getAttribute('data-i'),10)||0);});
-    new MutationObserver(function(){if(pg.classList.contains('on')){render();cloudSync(true);}else{closeTotals();cloudSync(false);}}).observe(pg,{attributes:true,attributeFilter:['class']});
+    var wasOn=pg.classList.contains('on');
+    new MutationObserver(function(){var on=pg.classList.contains('on');if(on&&!wasOn){sel=0;try{localStorage.setItem(selKey(),'0');}catch(e){}}wasOn=on;if(on){render();cloudSync(true);}else{closeTotals();cloudSync(false);}}).observe(pg,{attributes:true,attributeFilter:['class']});
     render();
   }
   function beads(){
@@ -21977,6 +21979,27 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   left:10%!important;right:10%!important;top:2px!important;height:42%!important;border-radius:999px!important;
   background:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,.05))!important;
 }
+</style>
+<style id="daily-zikir-sel-highlight">
+/* Seçili zikir üstte net görünsün: altın dolgu + parlama + büyütme; diğerleri soluk */
+#dzBar .dz-chip:not(.sel){opacity:.62!important;filter:saturate(.75)!important}
+#dzBar .dz-chip.ok:not(.sel){opacity:.85!important;filter:none!important}
+#dzBar .dz-chip.sel{
+  opacity:1!important;filter:none!important;z-index:5!important;
+  transform:scale(1.1)!important;
+  border-color:#fff6d0!important;
+  background:linear-gradient(180deg,#fff3c2 0%,#f5c34b 55%,#d2951c 100%)!important;
+  box-shadow:0 0 0 2px #ffd98a,0 0 16px 4px rgba(255,217,138,.85),0 5px 9px rgba(0,0,0,.5),inset 0 2px 2px rgba(255,255,255,.9)!important;
+  color:#2a1c05!important;
+}
+#dzBar .dz-chip.sel .dz-cn{color:#2a1c05!important;font-weight:900!important;text-shadow:none!important}
+#dzBar .dz-chip.sel em{color:#4a3208!important;font-weight:900!important;text-shadow:none!important}
+#dzBar .dz-chip.sel .dz-fill{background:linear-gradient(180deg,rgba(56,190,110,.85),rgba(18,120,58,.9))!important}
+#dzBar .dz-chip.sel.ok{
+  background:radial-gradient(circle at 32% 24%,#8bf0b0 0%,#2fae5f 40%,#0f6a35 100%)!important;
+  box-shadow:0 0 0 2px #ffd98a,0 0 16px 4px rgba(255,217,138,.85),0 5px 9px rgba(0,0,0,.5),inset 0 2px 2px rgba(255,255,255,.7)!important;
+}
+#dzBar .dz-chip.sel.ok .dz-cn,#dzBar .dz-chip.sel.ok em{color:#fff!important;text-shadow:0 1px 3px rgba(0,0,0,.6)!important}
 </style>
 <style id="daily-zikir-tap3d">
 /* Basma butonu v2: altın kenarlı cam kubbe + basılma/yaylanma + parçacık patlaması */

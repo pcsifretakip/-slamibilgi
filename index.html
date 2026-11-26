@@ -1145,6 +1145,8 @@ html body #sLogin#sLogin#sLogin #hcBg::after{background:var(--v7bg) right top/ca
 <div id="dailyZikirPage" aria-label="Günlük Zikirler" aria-hidden="true">
   <nav id="dzBar" class="dz-bar" dir="rtl" aria-label="Zikirler"></nav>
   <button type="button" id="dailyZikirBack" aria-label="Geri">‹</button>
+  <button type="button" id="dzTotalsBtn" aria-haspopup="dialog">Toplamlar</button>
+  <div id="dzTotalsSheet" hidden><div class="dzt-card" role="dialog" aria-modal="true" aria-label="Toplam zikirlerin"><h3>Toplam Zikirlerin</h3><p class="dzt-sub">Başladığından beri her zikirden çektiklerin</p><ul id="dzTotalsList"></ul><div class="dzt-sum"><span>Genel toplam</span><b id="dzTotalsAll">0</b></div><button type="button" id="dzTotalsClose">Kapat</button></div></div>
   <main id="dailyZikirContent">
     <header class="dz-head"><span class="dz-kicker">MANEVİ YOLCULUK</span><h1>Günlük Zikirler</h1><p>Günün bereketini zikirle güzelleştir</p></header>
     <section id="dzApp" aria-label="Zikir sayacı">
@@ -21495,7 +21497,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
         for(j=0;j<scopes.length;j++){
           pc='maneviYolculuk_dailyZikirCounts'+scopes[j]+'_';
           if(k.indexOf(pc)===0&&/^\d{4}-\d{2}-\d{2}$/.test(k.slice(pc.length))){del.push(k);break;}
-          if(k==='maneviYolculuk_dailyZikirSelected'+scopes[j]){del.push(k);break;}
+          if(k==='maneviYolculuk_dailyZikirSelected'+scopes[j]||k==='maneviYolculuk_dailyZikirTotal'+scopes[j]||k==='maneviYolculuk_dailyZikirTotals'+scopes[j]){del.push(k);break;}
         }
       }
       del.forEach(function(x){localStorage.removeItem(x);});
@@ -21507,10 +21509,44 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   function badge(c){
     var card=document.querySelector('.hc-daily-zikir-card.dzb');if(!card)return;
     var d=0,sum=0;c.forEach(function(n){sum+=n;if(n>=T)d++;});
-    var b=card.querySelector('.dzb-badge'),f=card.querySelector('.dzb-bar i');
-    if(b)b.textContent=d+'/'+Z.length;if(f)f.style.width=(sum/(T*Z.length)*100)+'%';
-    card.classList.toggle('all',d===Z.length);
+    var b=card.querySelector('.dzb-badge'),f=card.querySelector('.dzb-bar i'),full=d===Z.length,pc=pctOf(sum);
+    if(b)b.textContent=full?'✓':'%'+pc;
+    if(f)f.style.width=pc+'%';
+    card.classList.toggle('all',full);
+    card.setAttribute('aria-label',full?'Günlük Zikirler, tamamlandı':'Günlük Zikirler, yüzde '+pc);
   }
+  /* Yüzde: tamamlanmadan asla %100 göstermez (aşağı yuvarlar) */
+  function pctOf(sum){var tg=T*Z.length;return sum>=tg?100:Math.floor(sum*100/tg);}
+  /* Toplam zikir (tüm günler, üst üste eklenir): "Geri al" düşürür, "Sıfırla" ve gün dönümü etkilemez */
+  function totsKey(){return 'maneviYolculuk_dailyZikirTotals'+accountScope();}
+  /* Zikir başına kalıcı toplamlar: [Sübhanallah, Elhamdülillah, ...] */
+  function getTotals(){
+    var a=null;try{a=JSON.parse(localStorage.getItem(totsKey())||'null');}catch(e){}
+    if(Array.isArray(a))return Z.map(function(_,i){var n=Number(a[i]);return isFinite(n)?Math.max(0,Math.floor(n)):0;});
+    /* ilk kullanımda mevcut günlük kayıtların zikir bazlı toplamından başlar */
+    var t=Z.map(function(){return 0;});
+    try{
+      var pc='maneviYolculuk_dailyZikirCounts'+accountScope()+'_',i,k,d;
+      for(i=0;i<localStorage.length;i++){k=localStorage.key(i);
+        if(k&&k.indexOf(pc)===0&&/^\d{4}-\d{2}-\d{2}$/.test(k.slice(pc.length))){
+          d=JSON.parse(localStorage.getItem(k)||'null');
+          if(Array.isArray(d))Z.forEach(function(_,j){var n=Number(d[j]);if(isFinite(n))t[j]+=Math.max(0,Math.min(T,Math.floor(n)));});
+        }}
+      localStorage.setItem(totsKey(),JSON.stringify(t));
+    }catch(e){}
+    return t;
+  }
+  function getTotal(){return getTotals().reduce(function(s,n){return s+n;},0);}
+  function addTotal(i,d){var t=getTotals();t[i]=Math.max(0,t[i]+d);try{localStorage.setItem(totsKey(),JSON.stringify(t));}catch(e){}return t[i];}
+  function fmt(n){try{return Number(n).toLocaleString('tr-TR');}catch(e){return String(n);}}
+  function renderTotals(){
+    var ul=$('dzTotalsList');if(!ul)return;
+    var t=getTotals(),mx=Math.max.apply(null,t.concat([1])),all=0,h='';
+    t.forEach(function(n,i){all+=n;h+='<li><span class="dzt-n">'+Z[i][0]+'</span><b class="dzt-c">'+fmt(n)+'</b><i class="dzt-b"><u style="width:'+(n/mx*100).toFixed(1)+'%"></u></i></li>';});
+    ul.innerHTML=h;$('dzTotalsAll').textContent=fmt(all);
+  }
+  function openTotals(){renderTotals();var s=$('dzTotalsSheet');if(s)s.hidden=false;}
+  function closeTotals(){var s=$('dzTotalsSheet');if(s)s.hidden=true;}
   function render(pop){
     var bar=$('dzBar');if(!bar)return;
     var c=load(),p=0,tot=0;
@@ -21525,10 +21561,13 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     if(n>=T&&nx>-1){nb.hidden=false;nb.textContent='Sıradaki: '+Z[nx][0];nb.setAttribute('data-i',nx);}else nb.hidden=true;
     var overallTarget=T*Z.length,overallPct=overallTarget?Math.min(100,(tot/overallTarget)*100):0;
     var op=document.getElementById('dzOverallPct'),of=document.getElementById('dzOverallFill'),od=document.getElementById('dzOverallDone');
-    if(op)op.textContent=Math.round(overallPct)+'%';
+    if(op)op.textContent=p?'%'+pctOf(tot):'✓ Tamamlandı';
     if(of)of.style.width=overallPct.toFixed(2)+'%';
     if(od)od.textContent=tot+' / '+overallTarget;
-    $('dzTotal').textContent=(tot?'Bugün toplam '+tot+' zikir çektin.':'Bugün henüz zikir çekmedin.')+(p?'':' Allah kabul etsin.');
+    var tt2=$('dzTotal');
+    tt2.textContent=(tot?'Bugün toplam '+tot+' zikir çektin.':'Bugün henüz zikir çekmedin.')+(p?'':' Allah kabul etsin.');
+    var lt=document.createElement('b');lt.className='dz-life';lt.textContent='Toplam zikir sayın: '+getTotal();
+    tt2.appendChild(document.createElement('br'));tt2.appendChild(lt);
     if(pop){ring.classList.remove('pop');void ring.offsetWidth;ring.classList.add('pop');}
     badge(c);
   }
@@ -21539,7 +21578,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     toast.textContent=Z[sel][0]+' tamamlandı. Günlük '+T+' okuma hedefini bitirdin.';
     toast.classList.add('show');clearTimeout(tt);tt=setTimeout(function(){toast.classList.remove('show');},3800);
   }
-  function tap(){var c=load();if(c[sel]>=T)return;c[sel]++;save(c);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
+  function tap(){var c=load();if(c[sel]>=T)return;c[sel]++;save(c);addTotal(sel,1);try{if(navigator.vibrate)navigator.vibrate(c[sel]>=T?[30,40,60]:8);}catch(e){}render(true);
     var ch=document.querySelector('#dzBar .dz-chip[data-i="'+sel+'"]'),fl=ch&&ch.querySelector('.dz-fill');
     if(fl){fl.style.transition='none';fl.style.width=(c[sel]-1)+'%';void fl.offsetWidth;fl.style.transition='';fl.style.width=Math.min(100,c[sel])+'%';}
     if(ch&&c[sel]>=T){ch.classList.remove('puff');void ch.offsetWidth;ch.classList.add('puff');}
@@ -21547,7 +21586,10 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   function bind(){
     var pg=$('dailyZikirPage');if(!pg||pg.dataset.v2==='1')return;pg.dataset.v2='1';
     $('dzTap').addEventListener('click',function(e){e.preventDefault();tap();});
-    $('dzUndo').addEventListener('click',function(){var c=load();if(c[sel]>0){c[sel]--;save(c);render();}});
+    $('dzUndo').addEventListener('click',function(){var c=load();if(c[sel]>0){c[sel]--;save(c);addTotal(sel,-1);render();}});
+    var tb=$('dzTotalsBtn');if(tb)tb.addEventListener('click',function(e){e.preventDefault();openTotals();});
+    var tc=$('dzTotalsClose');if(tc)tc.addEventListener('click',function(e){e.preventDefault();closeTotals();});
+    var ts=$('dzTotalsSheet');if(ts)ts.addEventListener('click',function(e){if(e.target===ts)closeTotals();});
     var rs=$('dzReset');
     rs.addEventListener('click',function(){
       if(rs.getAttribute('data-arm')){clearTimeout(rt);rs.removeAttribute('data-arm');rs.textContent='Sıfırla';var c=load();c[sel]=0;save(c);try{played[sel]=false;}catch(e){}render();}
@@ -21555,7 +21597,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     });
     $('dzvNext').addEventListener('click',function(){select(parseInt(this.getAttribute('data-i'),10)||0);});
     pg.addEventListener('click',function(e){var b=e.target.closest?e.target.closest('.dz-chip'):null;if(b)select(parseInt(b.getAttribute('data-i'),10)||0);});
-    new MutationObserver(function(){if(pg.classList.contains('on'))render();}).observe(pg,{attributes:true,attributeFilter:['class']});
+    new MutationObserver(function(){if(pg.classList.contains('on'))render();else closeTotals();}).observe(pg,{attributes:true,attributeFilter:['class']});
     render();
   }
   function beads(){
@@ -21567,7 +21609,7 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
     var card=document.querySelector('.hc-daily-zikir-card');if(!card)return false;
     if(card.classList.contains('dzb'))return true;
     card.classList.add('dzb');
-    card.innerHTML='<svg class="dzb-star" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="dzbE" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#c79bff"/><stop offset=".55" stop-color="#7a3fd0"/><stop offset="1" stop-color="#2b1058"/></radialGradient></defs><g class="dzb-s1"><polygon points="50.0,2.0 64.2,15.8 83.9,16.1 84.2,35.8 98.0,50.0 84.2,64.2 83.9,83.9 64.2,84.2 50.0,98.0 35.8,84.2 16.1,83.9 15.8,64.2 2.0,50.0 15.8,35.8 16.1,16.1 35.8,15.8" fill="url(#dzbE)" stroke="#f3d58a" stroke-width="3" stroke-linejoin="round"/></g><g class="dzb-s2"><polygon points="58.0,9.8 67.2,24.2 84.1,27.2 80.4,44.0 90.2,58.0 75.8,67.2 72.8,84.1 56.0,80.4 42.0,90.2 32.8,75.8 15.9,72.8 19.6,56.0 9.8,42.0 24.2,32.8 27.2,15.9 44.0,19.6" fill="none" stroke="rgba(243,213,138,.6)" stroke-width="1.4" stroke-linejoin="round"/></g></svg><span class="dzb-badge">0/'+Z.length+'</span>'+beads()+'<span class="dzb-t">Günlük<br>Zikirler</span><span class="dzb-bar"><i></i></span>';
+    card.innerHTML='<svg class="dzb-star" viewBox="0 0 100 100" aria-hidden="true"><defs><radialGradient id="dzbE" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#c79bff"/><stop offset=".55" stop-color="#7a3fd0"/><stop offset="1" stop-color="#2b1058"/></radialGradient></defs><g class="dzb-s1"><polygon points="50.0,2.0 64.2,15.8 83.9,16.1 84.2,35.8 98.0,50.0 84.2,64.2 83.9,83.9 64.2,84.2 50.0,98.0 35.8,84.2 16.1,83.9 15.8,64.2 2.0,50.0 15.8,35.8 16.1,16.1 35.8,15.8" fill="url(#dzbE)" stroke="#f3d58a" stroke-width="3" stroke-linejoin="round"/></g><g class="dzb-s2"><polygon points="58.0,9.8 67.2,24.2 84.1,27.2 80.4,44.0 90.2,58.0 75.8,67.2 72.8,84.1 56.0,80.4 42.0,90.2 32.8,75.8 15.9,72.8 19.6,56.0 9.8,42.0 24.2,32.8 27.2,15.9 44.0,19.6" fill="none" stroke="rgba(243,213,138,.6)" stroke-width="1.4" stroke-linejoin="round"/></g></svg><span class="dzb-badge">%0</span>'+beads()+'<span class="dzb-t">Günlük<br>Zikirler</span><span class="dzb-bar"><i></i></span>';
     card.setAttribute('aria-label','Günlük Zikirler');
     badge(load());return true;
   }
@@ -21577,6 +21619,12 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   window.addEventListener('load',start);
   var tries=0,iv=setInterval(function(){start();if(document.querySelector('.hc-daily-zikir-card.dzb')||++tries>40)clearInterval(iv);},250);
   /* Hesap değişince (giriş/çıkış/yeni kayıt/silme) seçili zikir ve ana ekran rozeti yeni hesaba göre yenilenir */
+  /* Her gün aynı saatte (yerel saat 00:00) sıfırlanır: sayaçlar tarihe göre tutulur, tamamlansa da tamamlanmasa da yeni gün 0'dan başlar */
+  var lastDay=key();
+  function rollover(){var k=key();if(k===lastDay)return;lastDay=k;try{render();}catch(e){}}
+  setInterval(rollover,20000);
+  document.addEventListener('visibilitychange',function(){if(!document.hidden)rollover();});
+  window.addEventListener('focus',rollover);
   var lastScope=accountScope();
   setInterval(function(){
     var sc=accountScope();if(sc===lastScope)return;lastScope=sc;
@@ -21908,6 +21956,56 @@ html body #frm.fsub .frtabs#famSub button#frFam,html body #frm.fsub .frtabs#famS
   var t=0,iv=setInterval(function(){if(hook()||++t>40)clearInterval(iv);},250);
 })();
 </script>
+<style id="daily-zikir-home-fix">
+/* Ana sayfa "Günlük Zikirler" yıldızı: ana sayfa satır stilleri (v7) butonu ezip dar bir hap şekline sokuyordu; daha güçlü seçiciyle yıldız geri getirildi */
+html body #sLogin #hcHome .hc-row > .hc-card.hc-daily-zikir-card.dzb{position:fixed!important;z-index:100001!important;top:calc(max(8px,env(safe-area-inset-top)) + 58px)!important;left:10px!important;right:auto!important;bottom:auto!important;width:88px!important;height:88px!important;min-width:88px!important;min-height:88px!important;max-height:none!important;padding:0!important;margin:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:0!important;overflow:visible!important;border:0!important;border-radius:50%!important;background:none!important;box-shadow:none!important}
+html body #sLogin #hcHome .hc-row > .hc-card.hc-daily-zikir-card.dzb > svg.dzb-star:not(.hc-deco){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;margin:0!important}
+html body #sLogin #hcHome .hc-row > .hc-card.hc-daily-zikir-card.dzb > svg.dzb-ico:not(.hc-deco){position:relative!important;width:26px!important;height:26px!important;margin:-4px 0 0!important}
+#hcHome .hc-daily-zikir-card.dzb .dzb-t{font-size:9.5px!important;margin-top:0!important}
+#hcHome .hc-daily-zikir-card.dzb .dzb-bar{margin-top:3px!important}
+/* Rozet: yüzde; tamamlanınca yeşil tik */
+#hcHome .hc-daily-zikir-card.dzb .dzb-badge{top:2px!important;right:-4px!important;left:auto!important;min-width:30px!important;padding:2px 6px!important;font-size:10.5px!important;font-weight:900!important;line-height:1.1!important}
+#hcHome .hc-daily-zikir-card.dzb.all .dzb-badge{min-width:0!important;width:22px!important;height:22px!important;padding:0!important;border-radius:50%!important;font-size:14px!important;line-height:19px!important;background:#1f9b57!important;border-color:#c9ffd8!important;color:#fff!important}
+.dz-total .dz-life{display:inline-block;margin-top:3px;color:#ffe6ad;font-weight:900}
+</style>
+<style id="daily-zikir-actions-style">
+/* Geri al / Sıfırla / Emin misin? / Sıradaki: diğer zikir butonlarıyla aynı parlak cam stil, daha büyük */
+#dailyZikirPage .dz-acts{gap:12px!important}
+#dailyZikirPage .dz-acts button,#dailyZikirPage #dzvNext{position:relative;overflow:hidden;min-height:46px;min-width:112px;padding:11px 24px!important;border-radius:999px!important;border:1.5px solid rgba(255,217,138,.85)!important;background:linear-gradient(180deg,#8a55d6 0%,#5a2fa6 52%,#3a1b78 100%)!important;color:#fff4d6!important;font:900 15px/1 Nunito,system-ui,sans-serif!important;letter-spacing:.2px;text-shadow:0 1px 3px rgba(20,6,50,.7);box-shadow:inset 0 2px 2px rgba(255,255,255,.55),inset 0 -5px 8px rgba(18,6,48,.45),0 4px 12px rgba(10,4,30,.5),0 0 12px rgba(170,105,255,.3)!important;transition:transform .12s ease,filter .12s ease,background .2s ease,border-color .2s ease;-webkit-tap-highlight-color:transparent}
+#dailyZikirPage .dz-acts button::before,#dailyZikirPage #dzvNext::before{content:"";position:absolute;left:6%;right:6%;top:0;height:46%;border-radius:999px 999px 60% 60%;background:linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,.04));pointer-events:none}
+#dailyZikirPage .dz-acts button:active,#dailyZikirPage #dzvNext:active{transform:translateY(2px) scale(.97);filter:brightness(.9)}
+/* "Emin misin?" onay durumu: sıcak kırmızı, dikkat çeker */
+#dailyZikirPage #dzReset[data-arm]{background:linear-gradient(180deg,#f06a5f 0%,#c4303c 52%,#8a1626 100%)!important;border-color:#ffd0c8!important;box-shadow:inset 0 2px 2px rgba(255,255,255,.6),inset 0 -5px 8px rgba(70,0,10,.45),0 4px 12px rgba(10,4,30,.5),0 0 14px rgba(255,100,90,.55)!important}
+#dailyZikirPage #dzvNext{background:linear-gradient(180deg,#ffdf8f 0%,#e9a93a 52%,#b3701b 100%)!important;color:#3a2108!important;text-shadow:0 1px 0 rgba(255,244,210,.6)}
+</style>
+<style id="daily-zikir-totals-style">
+/* Toplamlar butonu: geri butonuyla aynı satırda, sağda */
+#dailyZikirPage #dzTotalsBtn{position:fixed;top:calc(env(safe-area-inset-top,0px) + 72px);right:12px;z-index:4;height:38px;padding:0 18px;border-radius:999px;overflow:hidden;border:1.5px solid rgba(255,217,138,.85);background:linear-gradient(180deg,#8a55d6 0%,#5a2fa6 52%,#3a1b78 100%);color:#fff4d6;font:900 13px/1 Nunito,system-ui,sans-serif;text-shadow:0 1px 3px rgba(20,6,50,.7);box-shadow:inset 0 2px 2px rgba(255,255,255,.55),inset 0 -4px 7px rgba(18,6,48,.45),0 3px 10px rgba(10,4,30,.5);-webkit-tap-highlight-color:transparent}
+#dailyZikirPage #dzTotalsBtn::before{content:"";position:absolute;left:8%;right:8%;top:0;height:46%;border-radius:999px 999px 60% 60%;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,.04));pointer-events:none}
+#dailyZikirPage #dzTotalsBtn:active{transform:scale(.96);filter:brightness(.9)}
+/* Toplamlar penceresi */
+#dailyZikirPage #dzTotalsSheet{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;background:rgba(8,3,20,.74);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#dailyZikirPage #dzTotalsSheet[hidden]{display:none}
+#dzTotalsSheet .dzt-card{width:100%;max-width:360px;max-height:100%;overflow-y:auto;box-sizing:border-box;padding:18px 16px 16px;border-radius:24px;border:1.5px solid rgba(255,217,138,.7);background:linear-gradient(160deg,rgba(70,38,110,.97),rgba(20,12,42,.98));box-shadow:0 14px 40px rgba(0,0,0,.55),inset 0 1px rgba(255,255,255,.14);color:#fff4d8;font-family:Nunito,system-ui,sans-serif;text-align:center}
+#dzTotalsSheet h3{margin:0;font-size:20px;font-weight:900;color:#ffe6ad;text-shadow:0 2px 10px #6e438e}
+#dzTotalsSheet .dzt-sub{margin:4px 0 12px;font-size:12px;color:#d7c9e8}
+#dzTotalsList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+#dzTotalsList li{position:relative;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px 12px;border-radius:14px;border:1px solid rgba(216,176,255,.32);background:rgba(207,158,255,.12);overflow:hidden}
+#dzTotalsList .dzt-n{font-size:14px;font-weight:800;color:#f1e4ff}
+#dzTotalsList .dzt-c{font-size:17px;font-weight:900;color:#ffe6ad;font-variant-numeric:tabular-nums}
+#dzTotalsList .dzt-b{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.1)}
+#dzTotalsList .dzt-b u{display:block;height:100%;border-radius:0 3px 3px 0;background:linear-gradient(90deg,#c58cff,#ffd98a)}
+#dzTotalsSheet .dzt-sum{display:flex;justify-content:space-between;align-items:center;margin:12px 0 14px;padding:11px 14px;border-radius:14px;border:1.5px solid rgba(255,217,138,.75);background:linear-gradient(135deg,rgba(255,217,138,.22),rgba(207,158,255,.16));font-weight:900}
+#dzTotalsSheet .dzt-sum span{font-size:14px;color:#fff0c8}
+#dzTotalsSheet .dzt-sum b{font-size:22px;color:#ffe6ad;font-variant-numeric:tabular-nums}
+#dzTotalsSheet #dzTotalsClose{position:relative;overflow:hidden;min-width:120px;min-height:44px;padding:0 26px;border-radius:999px;border:1.5px solid rgba(255,217,138,.85);background:linear-gradient(180deg,#8a55d6 0%,#5a2fa6 52%,#3a1b78 100%);color:#fff4d6;font:900 15px/1 Nunito,system-ui,sans-serif;box-shadow:inset 0 2px 2px rgba(255,255,255,.55),inset 0 -5px 8px rgba(18,6,48,.45),0 4px 12px rgba(10,4,30,.5)}
+#dzTotalsSheet #dzTotalsClose:active{transform:scale(.97);filter:brightness(.9)}
+</style>
+<style id="daily-zikir-overlap-fix">
+/* Geri butonu zikir çubuğunun altında kendi satırında durur; ilerleme kartı onun altından başlar (üst üste binme yok) */
+#dailyZikirPage #dailyZikirBack{top:calc(env(safe-area-inset-top,0px) + 72px)!important;left:12px!important;width:38px!important;height:38px!important;font-size:28px!important}
+#dailyZikirPage #dailyZikirContent{padding-top:calc(env(safe-area-inset-top,0px) + 118px)!important;padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px)!important}
+</style>
 <script id="daily-zikir-audio-fix">
 (function(){
   'use strict';

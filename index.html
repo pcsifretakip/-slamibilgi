@@ -18355,6 +18355,7 @@ var ICONS={
  modes:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/>'};
 function svg(n){return '<svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[n]+'</svg>'}
 var ART={
+ ulke:'<ellipse cx="32" cy="57" rx="21" ry="3.5" fill="#000" fill-opacity=".3"/><rect x="7" y="13" width="50" height="36" rx="7" fill="#e0243c" stroke="#ffe9b0" stroke-width="2"/><circle cx="28" cy="31" r="9.5" fill="#fff"/><circle cx="31" cy="31" r="7.6" fill="#e0243c"/><polygon points="41.0,27.2 42.1,30.5 45.6,30.5 42.8,32.6 43.8,35.9 41.0,33.9 38.2,35.9 39.2,32.6 36.4,30.5 39.9,30.5" fill="#fff"/>',
  gizli:'<defs><linearGradient id="haG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f0d4ff"/><stop offset="1" stop-color="#9a52e6"/></linearGradient></defs><ellipse cx="32" cy="59" rx="21" ry="3.5" fill="#000" fill-opacity=".3"/><path d="M7 59c1-15 10-21 25-21s24 6 25 21z" fill="#1a0f55" stroke="url(#haG)" stroke-width="2.2" stroke-linejoin="round"/><path d="M26 39l6 8 6-8" fill="none" stroke="url(#haG)" stroke-width="1.8" stroke-linejoin="round"/><circle cx="32" cy="27" r="11" fill="#1a0f55" stroke="url(#haG)" stroke-width="2.2"/><path d="M14 23h36" fill="none" stroke="url(#haG)" stroke-width="3.6" stroke-linecap="round"/><path d="M21 23c0-10 4-14 11-14s11 4 11 14z" fill="#1a0f55" stroke="url(#haG)" stroke-width="2.2" stroke-linejoin="round"/><path d="M21.5 19.5h21" fill="none" stroke="#e8c8ff" stroke-width="2"/><path d="M28.2 28.2a3.9 3.9 0 1 1 5.7 3.4c-1.1.7-1.9 1.4-1.9 2.8" fill="none" stroke="#f1dcff" stroke-width="2.6" stroke-linecap="round"/><circle cx="32" cy="37.4" r="1.5" fill="#f1dcff"/><path d="M52 8l1.3 3.7L57 13l-3.7 1.3L52 18l-1.3-3.7L47 13l3.7-1.3z" fill="#ffe08a"/>',
  daily:'<defs><linearGradient id="haD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ff6ff"/><stop offset="1" stop-color="#1fa4d8"/></linearGradient></defs><rect x="7" y="12" width="48" height="44" rx="9" fill="#0b2a63" stroke="url(#haD)" stroke-width="2.6"/><path d="M7 21a9 9 0 0 1 9-9h30a9 9 0 0 1 9 9v5H7z" fill="url(#haD)"/><path d="M19 7v9M43 7v9" fill="none" stroke="#ffe08a" stroke-width="3.6" stroke-linecap="round"/><path d="M19 42l8 8 16-17" fill="none" stroke="#ffffff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M56 5l1.5 4.2 4.2 1.5-4.2 1.5L56 16.4l-1.5-4.2-4.2-1.5 4.2-1.5z" fill="#ffe08a"/>',
  tahmin:'<defs><radialGradient id="haT" cx=".35" cy=".28" r=".85"><stop offset="0" stop-color="#e2fff2"/><stop offset=".42" stop-color="#3dffa0"/><stop offset="1" stop-color="#0a6a49"/></radialGradient><linearGradient id="haTg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a0"/><stop offset="1" stop-color="#c98a1e"/></linearGradient></defs><ellipse cx="32" cy="59" rx="19" ry="3.4" fill="#000" fill-opacity=".28"/><path d="M16 57c1-8 6-11 16-11s15 3 16 11z" fill="url(#haTg)" stroke="#8a5f12" stroke-width="1.2" stroke-linejoin="round"/><circle cx="32" cy="28" r="21" fill="url(#haT)" stroke="#eafff6" stroke-opacity=".8" stroke-width="1.6"/><path d="M24.5 23.5a8 8 0 1 1 11.7 7c-2.5 1.4-4.2 3-4.2 6" fill="none" stroke="#ffffff" stroke-width="4.6" stroke-linecap="round"/><circle cx="32" cy="43" r="2.9" fill="#ffffff"/><ellipse cx="21.5" cy="15.5" rx="5.5" ry="3" fill="#ffffff" fill-opacity=".55" transform="rotate(-35 21.5 15.5)"/><path d="M54 6l1.3 3.7L59 11l-3.7 1.3L54 16l-1.3-3.7L49 11l3.7-1.3z" fill="#ffffff"/>',
@@ -18389,14 +18390,37 @@ function startWatch(){
   if(left&&u){stopWatch();openSheet()}
  },250)}
 
+/* Modu önce aç, Diğer Modlar penceresini mod ekranı gerçekten görününce kapat: ana sayfa hiç görünmesin */
+function go(sel){
+ if(!sheet)return;stopWatch();
+ /* küresel "pencere dışına tıklamayı engelle" koruması açık pencereyi görürse tıklamayı keser: tıklama sırasında rolü geçici kaldır */
+ sheet.removeAttribute('role');sheet.removeAttribute('aria-modal');sheet.style.pointerEvents='none';
+ var t0=Date.now(),iv;
+ function fin(ok){clearInterval(iv);sheet.setAttribute('role','dialog');sheet.setAttribute('aria-modal','true');sheet.style.pointerEvents='';if(ok){close();startWatch()}}
+ click(sel);
+ iv=setInterval(function(){
+  var dt=Date.now()-t0,cov=false;
+  if(card&&card.isConnected){
+   var r=card.getBoundingClientRect();
+   if(r.width&&r.height){
+    var x=r.left+r.width/2,y=r.top+r.height/2;
+    if(x>=0&&y>=0&&x<=innerWidth&&y<=innerHeight){
+     var els=document.elementsFromPoint(x,y);
+     var ci=-1,i;for(i=0;i<els.length;i++){if(els[i]===card||card.contains(els[i])){ci=i;break}}
+     var above=(ci<0?els:els.slice(0,ci)).filter(function(el){return el!==document.documentElement&&el!==document.body&&el!==sheet&&!sheet.contains(el)});
+     cov=above.length>0;
+    }else cov=dt>400;
+   }else cov=dt>150; /* ana sayfa gizlendi = mod açıldı */
+  }else cov=dt>400;
+  if(cov&&dt>120)fin(true);else if(dt>2500)fin(false);
+ },40);
+}
 function item(icn,title,subFn,rgb,sel){
  var b=document.createElement('button');b.type='button';b.className='hcm-item';b.style.setProperty('--rgb',rgb);b.setAttribute('aria-label',title);
  b.classList.add('hcm-'+icn);if(icn!=='gizli'&&icn!=='daily')b.classList.add('hcm-tile');
  b.innerHTML='<span class="hcm-art"><svg viewBox="0 0 64 64" aria-hidden="true">'+(ART[icn]||'')+'</svg></span><span class="hcm-tx"><b>'+title+'</b><small></small></span>';
  b._sub=subFn;
- b.addEventListener('click',function(e){
-  e.stopPropagation();close();startWatch();
-  setTimeout(function(){click(sel)},60)});
+ b.addEventListener('click',function(e){e.stopPropagation();go(sel)});
  return b}
 function build(){
  if(sheet)return;
@@ -18409,6 +18433,7 @@ function build(){
  l.appendChild(item('esma','Esmaül Hüsna',function(){return 'Allah’ın 99 ismini ve anlamını öğren'},'255,211,106','#esmaStart'));
  l.appendChild(item('namaz','Abdest ve Namaz',function(){return 'Erkek için adım adım anlatım'},'127,208,255','#nmzStart'));
  l.appendChild(item('dua','Dualar ve Sureler',function(){return 'Namazda okunan dualar ve anlamları'},'255,160,120','#duaStart'));
+  l.appendChild(item('ulke','Ülkeni Ne Kadar Tanıyorsun?',function(){return 'Türkiye hakkında bilgini test et'},'255,110,130','#ulkeBtn'));
  /* sadece X ile kapanır */
  sheet.querySelector('.hcm-x').addEventListener('click',function(e){e.stopPropagation();stopWatch();close()});
  var fx='<div class="hcm-fx" aria-hidden="true"><i class="fx-rays"></i>',fi;
@@ -22383,11 +22408,11 @@ html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin
 html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #satTalkBtn,
 html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #ulkeBtn{height:calc(var(--uy)*74)!important}
 html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-points-card{top:calc(var(--uy)*806)!important}
-html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-online{top:calc(var(--uy)*886)!important}
-html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-rank-card{top:calc(var(--uy)*966)!important}
-html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-modes-card{top:calc(var(--uy)*1046)!important}
-html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #hatimRoomBtn{top:calc(var(--uy)*1126)!important}
-html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #satTalkBtn{top:calc(var(--uy)*1206)!important}
+html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-online{top:calc(var(--uy)*898)!important}
+html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-rank-card{top:calc(var(--uy)*990)!important}
+html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome .hc-row>.hc-modes-card{top:calc(var(--uy)*1266)!important}
+html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #hatimRoomBtn{top:calc(var(--uy)*1082)!important}
+html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #satTalkBtn{top:calc(var(--uy)*1174)!important}
 html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #ulkeBtn{position:absolute!important;z-index:6;left:calc(var(--ux)*12)!important;top:calc(var(--uy)*1286)!important;width:calc(var(--ux)*667)!important;display:flex!important;align-items:center!important;gap:calc(var(--ux)*20)!important;padding:0 calc(var(--ux)*54) 0 calc(var(--ux)*44)!important;margin:0!important;min-height:0!important;box-sizing:border-box!important;border:1.5px solid rgba(255,214,140,.65)!important;border-radius:calc(var(--u)*34)!important;background:linear-gradient(180deg,#e0475a 0%,#b92b45 52%,#8c1c38 100%)!important;box-shadow:0 3px 8px rgba(50,4,20,.55),0 0 14px rgba(255,120,120,.28),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(60,6,24,.35)!important;color:#fff4e0!important;overflow:hidden!important;text-align:left!important;cursor:pointer;-webkit-tap-highlight-color:transparent;font-family:"Nunito",system-ui,sans-serif;transform:none!important;filter:none!important}
 html body #sLogin #hcHome #ulkeBtn:active{filter:brightness(1.12)!important}
 html body #sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin#sLogin #hcHome#hcHome #ulkeBtn>svg{flex:none;display:block;width:calc(var(--ux)*54)!important;height:calc(var(--ux)*54)!important;fill:none;stroke:#ffe9b0;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
@@ -22413,6 +22438,7 @@ html body #sLogin #hcHome #ulkeBtn::after{content:"";position:absolute;right:cal
       b.innerHTML=ICON+'<span class="ul-t">ÜLKENİ NE KADAR TANIYORSUN?</span>';
       b.addEventListener('click',function(e){if(window.__openTrQuiz){e.stopPropagation();e.preventDefault();window.__openTrQuiz()}else soon(e)})}
     if(b.parentNode!==home)home.appendChild(b);
+    b.style.setProperty('display','none','important');b.setAttribute('aria-hidden','true');b.tabIndex=-1;
     return true}
   addBtn();
   var si=(window.__real&&window.__real.setInterval)||window.setInterval.bind(window);
@@ -23038,7 +23064,15 @@ function build(){
   ov.innerHTML='<div class="h"><button class="bk" type="button" aria-label="Geri">‹</button><div class="t"></div></div><div class="b"></div>';
   document.body.appendChild(ov);
   tt=ov.querySelector('.t');bd=ov.querySelector('.b');
-  ov.querySelector('.bk').addEventListener('click',back);
+  var bk=ov.querySelector('.bk'),lastBk=0;
+  function bkGo(e){if(e){e.preventDefault();e.stopPropagation()}var n=Date.now();if(n-lastBk<450)return;lastBk=n;back()}
+  bk.addEventListener('click',bkGo);bk.addEventListener('pointerup',bkGo);
+  window.addEventListener('popstate',function(){
+    if(!ov||!ov.classList.contains('on'))return;S.h=0;
+    if(S.spin){try{history.pushState({trq:1},'');S.h=1}catch(e){}return}
+    if(S.view==='cats'){ov.classList.remove('on')}
+    else{cats();try{history.pushState({trq:1},'');S.h=1}catch(e){}}
+  });
 }
 /* ---- Türkiye haritalı kategori ekranı (mobil oyun görünümü) ---- */
 var A={tr_peygamber:'tr_peygamberler',tr_sahabe:'tr_sahabeler',tr_alim:'tr_alimler',tr_dag:'tr_daglar',tr_nehir:'tr_nehirler',tr_deniz:'tr_denizler',tr_hayvan:'tr_hayvancilik',tr_tarihi_yapi:'tr_yapilar',tr_komsu:'tr_komsular',tr_sehir:'tr_sehirler',tr_savas:'tr_savaslar',tr_antlasma:'tr_antlasmalar',tarih:'tr_tarih',kultur:'tr_kultur',cografya:'tr_cografya'};
@@ -23111,20 +23145,72 @@ var css3='#trq.mapv{background:#0a1a3a;--mp:url(data:image/jpeg;base64,/9j/4AAQS
 +'#trq .tqb{display:flex;gap:10px}'
 +'#trq .tqb button{flex:1;padding:13px 8px;border-radius:14px;font:800 15px/1 "Nunito",sans-serif;cursor:pointer}'
 +'#trq .tqy{border:1.5px solid #fff0b8;background:linear-gradient(180deg,#ffd24a,#d9941a);color:#4a2d00}'
-+'#trq .tqn{border:1.5px solid rgba(255,214,140,.5);background:rgba(0,0,0,.3);color:#ffe9b0}';
++'#trq .tqn{border:1.5px solid rgba(255,214,140,.5);background:rgba(0,0,0,.3);color:#ffe9b0}'
++'#trq #trqTst{top:auto;bottom:calc(22px + env(safe-area-inset-bottom,0px));padding:14px 16px 16px;transform:translate(-50%,28px) scale(.96)}'
++'#trq #trqTst.on{transform:translate(-50%,0) scale(1)}'
++'#trq #trqTst .tqe{font-size:26px;margin-bottom:4px}'
++'#trq #trqTst p{font-size:15px;margin:0 0 12px}'
++'#trq .trs{background:transparent}'
++'#trq.spinning .h,#trq.spinning .b{visibility:hidden}'
++'#trq.spinning .trs-t{display:none}'
++'#trq .trs-m{position:absolute;pointer-events:none;overflow:visible}'
++'#trq .trs-m .rg{fill:rgba(255,214,90,0);stroke:rgba(255,255,255,0);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;transition:fill .12s,stroke .12s}'
++'#trq .trs-m .rg.on{fill:rgba(255,205,60,.62);stroke:#fff6c8;filter:drop-shadow(0 0 5px rgba(255,214,90,.95))}'
++'#trq .trs-m .rg.win{fill:rgba(255,205,60,.75);stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 9px rgba(255,214,90,1));animation:trsP .7s ease-in-out infinite alternate}'
++'@keyframes trsP{from{fill:rgba(255,205,60,.5)}to{fill:rgba(255,225,110,.9)}}'
++'#trq .tnote{display:flex;flex-wrap:nowrap;gap:4px;margin-bottom:5px;max-width:100%;overflow:hidden}'
++'#trq .tk{white-space:nowrap;flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}'
++'#trq .tk{display:inline-block;padding:2px 8px;border-radius:99px;border:1px solid rgba(255,255,255,.65);color:#fff;font:800 10px/1.4 "Nunito",sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.6);box-shadow:0 1px 4px rgba(0,0,0,.4)}'
++'#trq .tk.a{background:linear-gradient(180deg,#4d96ff,#2a56c6)}#trq .tk.b{background:linear-gradient(180deg,#27c46b,#127a40)}'
++'#trq.mapv .h{z-index:6}#trq .bk{touch-action:manipulation;-webkit-tap-highlight-color:transparent}'
++'#trq .hud{display:flex;flex-direction:column;gap:8px}'
++'#trq .hb{position:relative;height:20px;border-radius:99px;background:rgba(0,0,0,.55);border:1.5px solid rgba(255,214,140,.7);overflow:hidden}'
++'#trq .hb i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(180deg,#43e08a,#12904a);border-radius:99px;transition:width .4s}'
++'#trq .hb b{position:relative;display:block;text-align:center;font:800 10.5px/17px "Nunito",sans-serif;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.8)}'
++'#trq .hc{display:grid;grid-template-columns:1fr 1fr;gap:8px}'
++'#trq .hd{border-radius:14px;padding:7px 7px 6px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);min-width:0}'
++'#trq .hd.ok{background:rgba(6,44,28,.72);border:1.5px solid #7dffb0}'
++'#trq .hd.wp{background:rgba(58,32,6,.74);border:1.5px solid #ffb23e}'
++'#trq .hh{display:flex;align-items:center;justify-content:space-between;gap:6px;font:900 10px/1 "Nunito",sans-serif;letter-spacing:.05em;margin-bottom:6px;white-space:nowrap}'
++'#trq .hd.ok .hh{color:#9dffc4}#trq .hd.wp .hh{color:#ffd08a}'
++'#trq .hh em{font-style:normal;min-width:20px;padding:2px 6px;border-radius:99px;text-align:center;color:#fff;font-size:10px}'
++'#trq .hd.ok .hh em{background:#1f9d55}#trq .hd.wp .hh em{background:#d9731a}'
++'#trq .hl{display:flex;flex-wrap:wrap;gap:4px;max-height:118px;overflow-y:auto;align-content:flex-start;-webkit-overflow-scrolling:touch}'
++'#trq .hk{padding:2px 7px;border-radius:99px;border:1px solid rgba(255,255,255,.6);color:#fff;font:800 10px/1.35 "Nunito",sans-serif;text-shadow:0 1px 2px rgba(0,0,0,.6)}'
++'#trq .he{font:700 10px/1.4 "Nunito",sans-serif;color:#fff;opacity:.55}'
++'#trq .hr{position:relative;width:100%;display:flex;align-items:center;justify-content:space-between;gap:6px;padding:6px 8px 8px;border-radius:10px;background:rgba(178,101,255,.32);border:1px solid rgba(214,170,255,.75);color:#fff;font:800 11px/1.2 "Nunito",sans-serif;cursor:pointer;overflow:hidden;touch-action:manipulation}'
++'#trq .hr:active{filter:brightness(1.3)}#trq .hr small{font-size:10px;font-weight:800;color:#ffe9b0;white-space:nowrap}'
++'#trq .hr span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
++'#trq .hr .hn{color:#ffd08a;font-weight:900;margin-right:2px}'
++'#trq .hr u{position:absolute;left:0;bottom:0;height:3px;background:#ffb23e;text-decoration:none}'
++'#trq .tnote.w{flex-wrap:wrap;overflow:visible;align-items:flex-start;align-content:flex-start}'
++'#trq button.tk{min-height:0;height:auto;width:auto;margin:0;font:800 10px/1.4 "Nunito",sans-serif;padding:2px 8px;flex:0 0 auto}'
++'#trq .tk.o{align-self:flex-start;flex:0 0 auto}'
++'#trq .tk.o{background:linear-gradient(180deg,#ffb23e,#d9731a)}#trq .tk.r{background:linear-gradient(180deg,#b265ff,#6b2fd0);cursor:pointer}'
++'#trq.qv::before{filter:blur(14px) brightness(.42)}'
++'#trq.qv::after{opacity:.45}'
++'#trq.qv .b{z-index:1}'
++'#trq.qv .q{text-shadow:0 2px 8px rgba(0,0,0,.9)}'
++'#trq.qv .o{background:rgba(10,8,46,.58);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}'
++'#trq.qv .o.ok{background:#1f9d55}#trq.qv .o.no{background:#c0392b}'
++'#trq .o.sel{border-color:#ffd24a;background:rgba(255,210,74,.25)!important}'
++'#trq.mapv:not(.qv) .t{white-space:nowrap;min-width:0;letter-spacing:0;font-size:clamp(11px,4.2vw,19px)}';
 var st3=document.createElement('style');st3.id='trq-css3';st3.textContent=css3;document.head.appendChild(st3);
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;')}
 function bub(o,i){var c=o.c,g=o.g,n=c.q.length,b=best(c.id);
   var bg=n?(b>=n?'✓':(b>0?b:'')):'…';
   return '<button type="button" class="bb" data-id="'+c.id+'" style="--c:'+g.c+';--d:'+g.d+';--i:'+i+'"'+(n?'':' disabled')+' aria-label="'+esc(c.n)+'"><i class="bi">'+ico(c.id)+'</i>'+(bg!==''?'<u'+(n&&b>=n?' class="ok"':'')+'>'+bg+'</u>':'')+'<span>'+(SH[c.id]||c.n)+'</span></button>'}
+function progOf(id){try{var p=JSON.parse(localStorage.getItem('trq_prog_'+id)||'null');var c=CATS.filter(function(x){return x.id===id})[0];if(!p||!c||!c.q||!p.o||p.o.length<2||p.i>=p.o.length||p.o.some(function(k){return !c.q[k]}))return null;return p}catch(e){return null}}
+function setProg(id,p){try{localStorage.setItem('trq_prog_'+id,JSON.stringify(p))}catch(e){}}
+function clearProg(id){try{localStorage.removeItem('trq_prog_'+id)}catch(e){}}
 function doneOf(id){try{return localStorage.getItem('trq_done_'+id)==='1'}catch(e){return false}}
 function setDone(id){try{localStorage.setItem('trq_done_'+id,'1')}catch(e){}}
 function playable(){return CATS.filter(function(c){return c.q&&c.q.length})}
 function remaining(){return playable().filter(function(c){return !doneOf(c.id)})}
 var css4='#trq .trs{position:absolute;left:0;top:0;right:0;bottom:0;z-index:20;background:rgba(5,10,32,.5);overflow:hidden}'
 +'#trq .trs-t{position:absolute;left:0;right:0;top:24%;text-align:center;color:#ffe9b0;font:800 15px/1 "Nunito",sans-serif;letter-spacing:.06em;text-shadow:0 2px 6px #000}'
-+'#trq .trs-b{position:absolute;left:0;top:0;width:54px;height:54px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.6),var(--c) 46%,var(--d));border:2px solid rgba(255,255,255,.9);box-shadow:0 4px 12px rgba(0,0,0,.5);transition:transform .55s cubic-bezier(.45,.05,.3,1),opacity .4s;will-change:transform}'
-+'#trq .trs-b .ico{width:30px;height:30px;fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}'
++'#trq .trs-b{position:absolute;left:0;top:0;width:var(--z,54px);height:var(--z,54px);border-radius:50%;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 32% 24%,rgba(255,255,255,.6),var(--c) 46%,var(--d));border:2px solid rgba(255,255,255,.9);box-shadow:0 4px 12px rgba(0,0,0,.5);transition:transform .55s cubic-bezier(.45,.05,.3,1),opacity .4s;will-change:transform}'
++'#trq .trs-b .ico{width:calc(var(--z,54px)*.55);height:calc(var(--z,54px)*.55);fill:none;stroke:#fff;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}'
 +'#trq .trs-b.hl{box-shadow:0 0 0 4px rgba(255,240,184,.9),0 0 22px 6px rgba(255,214,140,.8);z-index:2}'
 +'#trq .trs-b.win{z-index:3;animation:trsW .6s ease-in-out infinite alternate}'
 +'#trq .trs-n{position:absolute;left:0;right:0;text-align:center;color:#fff3d0;font:900 24px/1.2 "Nunito",sans-serif;text-shadow:0 2px 8px #000;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}'
@@ -23132,92 +23218,108 @@ var css4='#trq .trs{position:absolute;left:0;top:0;right:0;bottom:0;z-index:20;b
 +'@keyframes trsW{from{box-shadow:0 0 0 4px #fff0b8,0 0 20px 6px rgba(255,214,140,.7)}to{box-shadow:0 0 0 6px #fff0b8,0 0 44px 16px rgba(255,214,140,1)}}';
 var st4=document.createElement('style');st4.id='trq-css4';st4.textContent=css4;document.head.appendChild(st4);
 function gcol(id){for(var i=0;i<GR.length;i++)if(GR[i].ids.indexOf(id)>=0)return GR[i];return DG}
-function pickRandom(){var r=remaining();if(!r.length)return false;spinTo(r[Math.floor(Math.random()*r.length)]);return true}
+function pickRandom(){var r=remaining();if(!r.length)return false;var f=r.filter(function(c){return !progOf(c.id)});if(f.length)r=f;spinTo(r[Math.floor(Math.random()*r.length)]);return true}
+var PR=[[490,144,444,160,437,170,438,173,443,175,447,181,455,186,458,194,478,196,486,193,494,185,501,183,507,177,506,168,492,152],[492,144,493,152,507,168,508,177,511,180,519,181,526,185,536,199,545,202,557,199,564,194,584,194,597,183,599,171,596,167,591,165,588,160,598,142,605,142,606,139,580,139,575,136,548,134,499,140],[60,195,64,196,76,190,97,188,106,192,110,204,134,215,146,203,163,199,166,191,160,180,172,169,187,166,188,162,185,156,150,132,106,132,77,160,77,165,82,169,78,174,69,177,70,189,67,192,61,191],[228,233,239,235,251,242,269,238,279,238,285,241,306,241,316,231,318,225,331,213,332,208,329,203,330,195,247,185,241,194,242,197,264,212,273,213,276,219,270,225,261,227,239,227,229,230],[483,209,477,197,458,195,455,192,454,186,436,172,439,165,438,163,432,165,428,171,420,176,395,183,393,190,386,195,370,197,343,192,334,194,330,200,335,211,342,211,359,219,373,219,382,226,393,226,396,224,409,226,416,232,418,241,428,239,433,242,442,237,449,230,464,226,470,217,480,214],[507,179,501,184,494,186,486,194,480,196,479,199,484,206,482,211,483,216,486,217,493,226,501,227,511,234,518,234,524,230,532,229,544,219,544,206,542,202,536,200,531,195,526,186],[634,134,619,143,606,142,597,144,589,161,599,169,599,181,585,196,588,204,596,215,592,229,602,234,608,244,619,250,629,251,647,243,652,236,653,232,649,222,645,218,644,211,652,196,662,195,670,191,673,186,670,174,675,167,674,163,668,162,658,154,651,152,647,145],[678,164,671,174,674,181,674,186,671,191,662,196,652,197,645,211,646,218,650,222,654,232,653,236,647,244,638,247,632,252,636,265,645,274,645,279,639,287,640,293,658,302,665,302,671,308,690,304,695,309,700,310,710,316,715,322,719,323,723,317,712,301,714,294,722,291,727,291,732,294,741,294,747,287,757,291,760,283,751,276,750,270,744,260,740,258,725,258,713,250,707,241,715,234,715,224,717,222,724,220,730,214,743,215,750,209,758,207,765,198,765,195,744,188,728,186,721,181,709,178],[594,212,587,204,583,195,564,195,557,200,546,202,544,204,545,219,537,227,530,231,522,232,518,237,521,242,529,244,537,250,564,247,569,244,575,235,585,233,591,229,591,224,595,217],[275,216,273,214,266,214,245,201,240,195,244,188,243,184,191,164,185,168,177,168,167,173,161,180,167,191,165,198,146,204,134,216,110,205,104,191,97,189,76,191,58,199,48,221,47,228,50,231,70,231,68,235,56,241,51,252,52,259,57,265,64,263,70,257,98,241,112,240,120,237,127,237,137,248,148,250,164,250,170,245,183,246,190,242,200,244,214,242,228,245,242,244,246,241,245,239,239,236,229,235,226,232,229,229,239,226,261,226,270,224,274,221],[830,205,828,220,837,233,839,241,854,250,865,253,875,270,880,272,888,262,891,251,883,236,898,219,904,207,904,199,896,198,846,205],[1136,211,1133,207,1128,206,1124,200,1111,189,1114,183,1123,182,1128,176,1127,171,1112,161,1049,158,1020,168,1013,175,1007,176,1001,181,978,190,971,190,964,196,954,197,948,201,939,202,919,196,907,197,905,207,900,215,903,218,919,221,926,226,934,226,942,232,947,230,966,231,975,226,989,229,993,232,996,243,1008,257,1013,267,1021,267,1023,260,1029,259,1042,263,1047,268,1066,265,1070,258,1077,255,1082,246,1089,246,1107,238,1124,219,1133,218],[334,212,319,225,317,231,308,243,312,252,328,258,335,264,351,263,366,249,370,241,377,235,380,227,373,220,359,220,342,212],[708,241,713,249,727,258,744,258,753,250,759,249,770,236,764,228,752,226,743,216,730,215,724,221,716,224,717,232],[945,232,943,234,942,258,931,271,930,276,943,283,965,278,980,283,984,288,982,297,984,302,992,301,996,298,1003,298,1005,296,1005,277,1010,274,1011,266,1007,257,995,243,992,232,979,227,975,227,966,232],[901,218,884,236,892,251,890,261,882,271,886,275,906,283,916,282,928,276,930,271,940,260,942,235,934,227,926,227,919,222],[431,243,428,240,417,242,415,232,409,227,400,225,383,227,378,235,371,241,367,249,354,261,353,265,359,272,382,273,389,268,405,271,414,265,422,264,432,252],[310,248,307,243,303,241,285,242,279,239,269,239,254,243,247,242,235,246,218,243,205,244,201,247,201,254,194,265,194,269,208,282,209,289,219,291,228,298,233,298,244,303,251,298,267,295,271,288,280,281,283,273,290,272,299,266,300,261,309,252],[476,215,470,218,464,227,449,231,433,244,433,252,422,265,410,268,407,273,412,280,413,286,429,295,428,306,430,309,436,310,446,305,455,306,461,310,470,311,472,316,478,319,482,324,489,318,497,324,500,324,510,310,512,302,509,296,513,293,521,295,527,290,524,282,526,271,537,266,546,273,555,272,561,267,561,261,554,250,547,249,537,251,531,246,521,243,515,235,511,235,501,228,493,227,486,218,481,215],[127,238,98,242,70,258,64,264,58,265,56,269,59,279,35,301,37,303,43,303,78,294,93,295,97,300,96,303,75,320,76,324,83,330,82,338,89,341,93,340,112,324,129,324,137,317,142,309,150,303,150,294,153,286,142,277,144,268,149,261,149,252,147,250,137,249],[308,254,301,261,299,267,300,272,308,282,313,283,318,288,320,296,342,298,357,273,353,266,350,264,335,265,318,254],[827,204,780,199,769,196,762,201,758,208,752,209,746,214,747,220,752,225,764,227,771,236,759,250,753,251,745,259,752,276,758,279,761,285,756,293,752,289,747,288,742,295,732,295,727,292,714,295,713,301,724,317,722,322,716,326,718,331,728,337,745,338,758,326,763,318,767,317,773,311,780,293,798,291,810,283,817,283,838,271,839,265,833,250,837,242,837,235,827,220],[1199,293,1195,285,1198,276,1187,263,1178,269,1157,266,1149,272,1135,270,1127,276,1120,285,1124,294,1133,303,1145,309,1150,315,1162,314,1167,311,1174,312,1191,301],[199,244,190,243,183,247,170,246,165,251,150,252,150,262,145,268,143,277,154,286,151,294,153,302,173,303,198,298,207,290,207,282,193,269,193,265,200,253],[442,327,436,317,436,313,427,306,427,294,415,289,405,272,389,269,382,274,371,274,368,272,357,274,350,289,342,300,340,308,319,324,315,335,328,344,344,340,354,346,360,346,369,340,383,341,395,332,404,332,415,342,431,341,438,336],[590,231,575,236,568,246,557,250,562,261,562,267,557,272,546,274,535,267,527,271,525,282,530,290,539,293,550,293,558,301,566,304,575,315,570,327,571,332,585,344,596,345,606,335,614,334,618,328,626,324,630,319,644,320,649,315,661,313,667,309,668,306,665,303,658,303,653,299,645,298,639,293,638,287,644,275,635,265,630,252,617,250,608,245,602,235],[511,295,510,297,513,303,504,321,508,328,515,330,519,337,527,337,545,349,552,343,560,344,570,355,570,358,577,361,583,367,584,376,587,379,593,376,604,377,606,375,605,365,607,361,620,353,616,346,616,335,606,336,596,346,587,346,575,338,569,330,574,317,573,313,566,305,558,302,552,295,539,294,532,291,521,296,516,294],[341,300,335,297,320,297,317,288,313,284,308,283,299,271,295,270,283,274,281,281,272,288,267,296,251,299,243,305,243,309,248,316,249,328,257,329,267,337,282,335,293,338,312,335,318,324,339,308],[37,304,36,308,38,312,51,312,77,304,84,305,82,309,71,315,68,319,69,327,76,337,76,344,84,351,82,355,72,358,68,362,70,374,78,386,76,389,70,389,69,391,90,393,97,390,99,387,96,380,83,376,73,363,75,360,89,357,93,353,93,348,90,343,81,338,82,330,74,323,74,319,87,311,95,303,95,298,91,295,78,295,54,302],[1214,260,1191,226,1154,189,1133,175,1129,175,1125,182,1116,183,1112,188,1128,205,1133,206,1137,210,1137,215,1133,219,1125,220,1116,227,1107,239,1089,247,1082,247,1078,255,1070,259,1064,267,1046,269,1042,264,1025,260,1021,268,1013,268,1011,274,1006,278,1005,298,1015,303,1034,304,1046,311,1050,311,1056,306,1063,312,1072,313,1077,317,1092,315,1102,323,1111,321,1125,330,1142,328,1147,325,1160,326,1165,321,1165,317,1162,315,1150,316,1145,310,1133,304,1123,294,1119,284,1135,269,1149,271,1157,265,1178,268,1195,258,1202,259,1208,264,1214,264],[247,316,242,309,242,305,237,301,228,299,219,292,208,291,198,299,173,304,151,303,143,309,130,326,140,340,150,343,157,349,175,341,180,346,178,352,186,355,196,353,202,345,221,347,234,340,246,329],[841,243,836,244,834,248,838,257,840,270,817,284,811,284,798,292,780,294,774,311,767,318,763,319,759,326,748,337,756,349,755,356,759,366,784,364,790,369,793,379,798,383,801,390,800,395,793,402,793,407,797,411,804,411,809,414,813,412,816,405,822,401,825,395,834,388,851,389,862,384,860,373,849,368,841,358,845,350,844,344,852,332,854,314,860,312,872,317,880,314,889,305,898,302,907,287,905,283,897,279,890,278,882,273,877,273,865,254,854,251],[980,284,967,279,943,284,927,277,916,283,909,284,901,300,889,306,880,315,872,318,865,314,856,313,853,332,845,344,846,350,842,356,843,360,849,367,861,373,865,385,883,391,892,399,897,394,901,394,904,388,914,386,920,389,924,387,926,381,921,376,919,367,925,355,933,354,939,350,943,350,957,357,963,354,980,355,989,349,991,342,995,338,1000,336,1000,329,982,306,981,297,983,288],[1251,290,1219,265,1208,265,1202,260,1195,259,1191,262,1191,265,1199,276,1196,285,1200,290,1200,294,1176,312,1167,312,1165,314,1167,319,1162,326,1147,326,1142,329,1127,331,1111,322,1102,324,1092,316,1077,318,1072,314,1065,314,1056,307,1051,312,1046,312,1034,305,1015,304,1004,299,996,299,992,302,984,303,983,306,1002,330,1002,335,995,339,990,349,983,354,981,365,994,376,1009,374,1031,384,1045,377,1051,378,1062,374,1080,385,1091,396,1091,401,1097,408,1102,423,1106,425,1113,421,1121,420,1124,413,1136,414,1138,412,1135,406,1129,404,1118,393,1112,390,1112,384,1115,382,1130,382,1139,369,1152,363,1166,363,1175,352,1196,348,1200,353,1198,367,1200,369,1208,367,1216,376,1218,372,1215,363,1221,333,1224,328,1245,312],[322,340,313,336,293,339,282,336,267,338,257,330,248,329,234,341,221,348,202,346,196,354,186,356,180,355,177,352,178,344,172,342,158,351,156,360,148,376,167,392,174,393,181,389,188,390,196,399,198,408,196,415,202,422,202,430,230,442,240,444,251,440,259,432,278,430,285,425,285,406,309,391,314,385,312,379,316,373,315,361,322,353,324,346],[74,363,83,375,96,379,120,378,129,380,143,377,147,374,155,360,157,351,150,344,140,341,128,326,112,325,92,341,91,344,94,348,93,355,83,360,77,360],[501,343,505,348,518,351,525,358,531,358,535,362,532,372,539,381,551,381,556,386,562,387,570,382,577,381,583,375,582,367,577,362,571,360,569,355,562,350,559,345,552,344,548,350,544,350,540,346,532,343,529,339,520,339,518,337,506,338],[924,357,920,371,927,381,927,385,921,389,920,394,927,401,927,413,932,419,941,421,959,419,966,424,970,421,974,421,980,425,987,425,992,429,996,429,1003,434,1009,431,1010,422,1003,417,993,403,981,395,981,392,991,385,992,377,988,371,981,367,980,356,963,355,957,358,943,351,939,351,933,355],[616,331,618,335,617,346,623,354,631,353,635,356,642,369,642,373,651,382,652,396,654,398,662,397,666,400,670,400,677,397,685,403,698,402,701,404,712,396,725,398,735,394,745,385,756,366,754,356,755,349,746,339,728,338,715,329,715,324,710,317,695,310,690,305,668,309,659,315,649,316,644,321,632,319],[435,438,435,433,427,425,427,420,430,415,428,406,414,400,404,385,392,377,381,382,370,391,353,387,347,391,339,392,329,383,318,384,309,392,286,406,286,418,288,423,280,430,281,434,288,439,308,428,320,427,324,429,332,439,340,443,353,441,362,432,370,429,389,432,412,465,420,465,429,460,429,446],[197,410,195,400,188,391,181,390,174,394,167,393,147,377,129,381,120,379,99,380,98,384,100,388,93,393,62,394,65,402,70,404,74,409,102,421,103,429,96,441,99,445,116,444,121,446,126,439,140,442,143,439,145,427,148,423,153,423,157,420,164,423,178,421,194,416],[982,392,983,396,993,402,1004,417,1011,422,1010,431,1012,433,1022,430,1029,438,1035,440,1042,434,1042,429,1047,424,1052,422,1068,422,1071,424,1080,424,1084,428,1089,429,1098,440,1103,437,1100,416,1091,403,1090,396,1080,386,1062,375,1051,379,1045,378,1033,385,1009,375,994,377,992,385],[784,365,757,368,751,374,746,385,735,395,725,399,712,397,704,404,704,416,699,432,701,442,689,457,689,461,693,471,700,477,708,489,719,492,726,491,735,472,748,457,757,454,763,449,789,449,800,437,803,429,809,425,807,414,797,412,792,408,792,402,799,395,800,390,797,383,792,379,789,369],[791,449,792,452,804,458,838,451,857,466,882,466,903,485,903,493,907,497,912,495,928,497,946,490,950,490,958,496,972,495,984,499,989,494,979,480,973,464,965,456,955,454,951,450,949,443,939,435,940,422,932,420,927,415,926,401,914,387,904,389,901,395,896,396,892,400,883,392,877,391,872,387,861,386,851,390,834,389,826,395,823,401,817,405,814,412,809,416,810,425,804,429,801,437],[68,405,68,409,74,420,93,429,95,435,84,441,87,453,100,449,100,446,97,445,95,441,102,429,101,421,76,411],[200,420,193,417,169,424,157,421,147,425,144,439,140,443,126,440,121,447,109,445,92,452,89,456,90,465,96,470,105,470,109,475,108,480,105,482,99,479,95,480,99,498,101,500,151,497,183,507,189,506,196,495,197,486,172,460,185,443,193,441,201,432],[313,380,316,384,329,382,337,390,342,391,353,386,370,390,390,376,396,378,405,385,414,399,428,405,431,410,428,425,436,433,436,439,430,446,432,461,443,465,448,470,452,480,461,486,478,490,488,495,510,494,519,484,520,475,508,468,501,454,495,449,503,441,504,436,510,431,518,419,526,415,534,419,544,419,547,411,558,405,562,405,572,410,582,410,592,435,604,438,616,436,621,433,627,425,641,421,646,412,646,407,652,399,650,382,641,373,637,361,631,354,620,355,610,359,606,365,607,375,604,378,593,377,588,380,581,378,575,383,570,383,562,388,558,388,550,382,542,383,536,379,531,372,534,364,531,359,525,359,520,353,507,350,500,344,506,337,516,336,515,331,508,329,502,324,497,325,489,319,482,325,478,320,471,317,470,312,464,312,450,306,446,306,437,311,437,317,443,329,439,336,431,342,415,343,404,333,395,333,383,342,369,341,360,347,354,347,344,341,325,346,322,355,316,362,317,373],[677,398,670,401,666,401,662,398,652,400,647,407,644,419,641,422,627,426,617,438,622,447,622,456,625,460,632,462,638,468,636,476,630,480,625,490,632,501,632,505,622,513,621,517,626,524,633,524,641,519,646,528,650,528,658,533,662,533,680,523,686,517,696,514,708,492,699,477,692,471,688,461,688,457,700,442,698,432,703,416,702,406,698,403,685,404],[339,443,332,440,326,432,320,428,308,429,287,441,286,451,296,472,308,468,315,468,322,473,326,473,340,467,339,459,342,452],[294,472,291,461,285,451,286,441,277,431,259,433,251,441,240,445,230,443,209,433,202,433,193,442,185,444,173,460,190,479,198,484,207,483,214,478,235,476,246,480,265,492,282,489],[748,458,736,472,730,484,729,493,751,505,759,529,766,529,788,539,796,546,811,546,814,542,813,529,808,522,807,516,793,509,785,500,799,483,804,468,803,458,786,449,764,450],[341,445,343,452,340,459,342,469,346,472,354,472,358,477,363,479,369,487,401,483,410,471,410,465,400,451,398,444,389,433,370,430,362,433,355,441],[1117,423,1122,432,1131,431,1135,437,1131,444,1133,456,1148,470,1154,486,1162,489,1167,495,1172,496,1185,490,1199,491,1209,496,1222,494,1234,506,1240,505,1248,500,1255,501,1260,497,1261,490,1252,454,1232,411,1219,377,1209,383,1201,384,1198,391,1199,402,1194,407,1170,407,1164,411,1155,411,1145,405,1139,405,1139,412,1136,415,1125,414,1123,419],[786,500,793,508,808,516,809,522,814,528,814,537,817,542,827,541,833,537,842,535,844,532,841,527,850,517,859,516,862,518,864,524,883,533,892,529,898,531,904,540,899,547,941,545,1003,528,1011,519,1004,510,1002,502,992,496,984,500,972,496,958,497,952,492,946,491,928,498,918,496,907,498,902,493,902,485,882,467,856,467,838,452,820,457,807,458,800,483],[941,423,940,435,950,443,955,453,965,455,974,464,980,480,989,492,1003,502,1005,510,1012,519,1008,527,1120,516,1124,509,1130,507,1153,486,1147,470,1141,466,1131,454,1130,444,1134,438,1132,433,1122,433,1114,423,1103,427,1104,437,1099,441,1095,439,1089,430,1079,425,1071,425,1068,423,1052,423,1047,425,1043,429,1043,434,1035,441,1029,439,1022,431,1003,435,996,430,992,430,986,426,980,426,974,422,966,425,958,420,948,420],[594,437,585,447,584,456,574,463,565,473,570,483,578,488,583,495,593,495,600,499,605,499,615,492,623,491,629,480,635,476,637,469,632,463,625,461,621,456,621,447,614,437,604,439],[582,411,572,411,565,407,558,406,547,412,544,420,534,420,526,416,518,420,511,431,505,436,504,441,496,449,502,454,510,469,517,471,522,477,519,486,512,494,516,500,517,513,511,519,502,523,492,534,492,538,496,544,506,547,512,553,513,560,516,564,538,565,544,562,556,564,566,560,589,539,604,530,613,528,615,526,615,516,631,504,630,499,623,492,615,493,605,500,600,500,593,496,585,497,578,489,569,483,564,474,574,462,582,457,583,449,591,439,591,434,586,426],[412,467,404,484,422,504,440,509,446,504,456,501,461,492,461,488,451,480,447,470,443,466,429,461,423,465],[1122,515,1181,512,1244,512,1252,505,1252,502,1248,501,1240,506,1234,507,1222,495,1209,497,1199,492,1185,491,1173,497,1168,497,1162,490,1153,488,1130,508,1124,510],[441,511,445,520,455,525,464,538,478,539,482,536,490,536,502,522,515,514,516,508,515,500,509,495,488,496,478,491,464,488,457,501,446,505],[710,491,700,510,710,519,712,524,707,551,709,554,717,557,721,562,722,568,725,569,736,552,745,553,746,546,757,529,756,520,750,505,741,502,726,492,719,493],[293,545,294,550,301,556,310,558,315,550,321,549,324,546,322,532,327,524,333,521,397,534,404,539,418,544,433,558,438,558,429,543,420,534,391,519,360,516,354,513,338,512,335,510,330,510,320,516,313,517,309,531,301,535],[190,506,190,508,196,512,203,527,212,531,210,542,222,560,236,564,240,569,247,571,274,569,288,563,297,565,303,562,304,558,292,549,292,545,301,534,308,531,313,516,320,515,330,509,349,511,360,515,391,518,420,533,430,543,440,560,452,566,491,576,513,564,512,555,506,548,496,545,490,537,482,537,478,540,464,539,455,526,448,524,444,520,440,511,422,505,414,498,412,492,403,485,369,488,363,480,358,478,354,473,345,473,340,469,326,474,321,474,315,469,308,469,296,473,282,490,264,493,257,487,235,477,214,479,198,487,197,496],[903,541,898,532,892,530,886,534,880,533,864,525,859,517,850,518,844,523,842,527,845,532,842,536,833,538,827,542,816,543,814,547,890,548,896,547],[722,571,719,560,709,555,706,551,711,524,705,515,698,513,690,516,662,534,646,529,641,520,633,525,626,525,618,515,615,518,616,526,613,529,604,531,589,540,566,561,556,565,549,563,538,566,514,565,493,576,493,578,506,580,514,577,530,577,543,574,562,575,584,554,589,553,603,543,609,543,621,536,638,538,656,546,662,546,684,531,689,530,695,524,703,526,706,529,706,533,685,551,687,562,683,578,684,583,680,593,692,611,716,584],[746,553,750,554,752,546,758,541,771,543,778,549,783,549,791,545,791,542,769,531,759,530,748,544]];
 function spinTo(ch){
   if(S.spin)return;S.spin=1;
   if(S.view!=='cats')cats();
-  S.view='spin';
-  var pool=sh(remaining().filter(function(c){return c.id!==ch.id})).slice(0,9),items=sh(pool.concat([ch]));
-  var W=ov.clientWidth,H=ov.clientHeight,z=54,st=document.createElement('div');st.className='trs';
-  var h='<div class="trs-t">Kategori seçiliyor…</div>';
-  items.forEach(function(c){var g=gcol(c.id);h+='<div class="trs-b" style="--c:'+g.c+';--d:'+g.d+'">'+ico(c.id)+'</div>'});
-  st.innerHTML=h+'<div class="trs-n"></div>';ov.appendChild(st);
-  var bs=[].slice.call(st.querySelectorAll('.trs-b')),win=bs[items.indexOf(ch)],nm=st.querySelector('.trs-n');
-  function put(b,x,y,s){b._x=x;b._y=y;b.style.transform='translate('+x+'px,'+y+'px) scale('+s+')'}
-  function rx(){return 10+Math.random()*(W-z-20)}
-  function ry(){return H*.3+Math.random()*(H*.4-z)}
-  bs.forEach(function(b){b.style.transition='none';b.style.opacity='0';put(b,rx(),ry(),.4)});
-  ST(function(){bs.forEach(function(b){b.style.transition='';b.style.opacity='1';put(b,rx(),ry(),1)})},30);
-  var D=[260,260,280,300,340,390,450,520,620],k=0;
-  function reveal(){
-    bs.forEach(function(b){if(b!==win){b.style.opacity='0';put(b,b._x,b._y,.3)}});
-    win.classList.add('win');put(win,W/2-z/2,H*.44-z/2,2.6);
-    nm.textContent=SH[ch.id]||ch.n;nm.style.top=(H*.44+z*1.3+16)+'px';nm.classList.add('on');
-    ST(function(){st.remove();S.spin=0;start(ch.id)},1500);
-  }
+  S.view='spin';ov.classList.add('spinning');
+  var W=ov.clientWidth,H=ov.clientHeight,MH=W*941/1672,MT=(H-MH)/2;
+  var st=document.createElement('div');st.className='trs';
+  var h='<div class="trs-t">Kategori seçiliyor…</div><svg class="trs-m" viewBox="0 0 1280 720" style="left:0;top:'+MT+'px;width:'+W+'px;height:'+MH+'px" aria-hidden="true">';
+  PR.forEach(function(p){var d='M'+p[0]+' '+p[1],k;for(k=2;k<p.length;k+=2)d+='L'+p[k]+' '+p[k+1];h+='<path class="rg" d="'+d+'Z"/>'});
+  h+='</svg><div class="trs-n"></div>';
+  st.innerHTML=h;ov.appendChild(st);
+  var rg=[].slice.call(st.querySelectorAll('.rg')),nm=st.querySelector('.trs-n'),last=-1,k=0;
+  /* il il gezen vurgu: başta hızlı, sona doğru yavaşlar */
+  var D=[110,110,110,120,125,135,150,165,185,210,240,280,330,390,470,570];
+  function pickR(){var i;do{i=Math.floor(Math.random()*rg.length)}while(i===last&&rg.length>1);last=i;return i}
   function tick(){
-    var hb=k>=D.length-1?win:bs[k%bs.length];
-    bs.forEach(function(b){b.classList.toggle('hl',b===hb);put(b,rx(),ry(),b===hb?1.3:1)});
-    if(k<D.length-1){ST(tick,D[k++])}else{ST(reveal,700)}
+    rg.forEach(function(r){r.classList.remove('on')});
+    rg[pickR()].classList.add('on');
+    if(k<D.length)ST(tick,D[k++]);else ST(reveal,450);
   }
-  ST(tick,350);
+  function reveal(){
+    rg.forEach(function(r){r.classList.remove('on')});
+    rg[last].classList.add('win');
+    nm.textContent=SH[ch.id]||ch.n;nm.style.top=(MT+MH+14)+'px';nm.classList.add('on');
+    ST(function(){st.remove();ov.classList.remove('spinning');S.spin=0;start(ch.id)},1700);
+  }
+  ST(tick,250);
 }
 function cats(){
-  S.view='cats';ov.classList.add('mapv');tt.textContent='Ülkeni Ne Kadar Tanıyorsun?';
+  S.view='cats';ov.classList.add('mapv');ov.classList.remove('qv');ov.classList.remove('spinning');tt.textContent='Ülkeni Ne Kadar Tanıyorsun?';
   var pl=playable(),dn=pl.filter(function(c){return doneOf(c.id)}),left=pl.length-dn.length;
-  var h='<div class="tmw"><div class="tdw"><div class="tcn">⭐ '+dn.length+' / '+pl.length+' tamamlandı</div><div class="tdone">';
-  dn.forEach(function(c){h+='<span class="td"><i>✓</i>'+esc(SH[c.id]||c.n)+'<small>Tamamlandı</small></span>'});
-  h+='</div></div>';
-  h+=left?'<button type="button" class="tgo" id="trqRnd">🎲 RASTGELE KATEGORİ</button>':'<button type="button" class="tgo" id="trqRst">🔄 BAŞTAN BAŞLA</button>';
-  h+='</div><div class="tqt" id="trqTst" role="alertdialog"><div class="tqe">🇹🇷</div><p></p><div class="tqb"><button type="button" class="tqy" id="trqYes"></button><button type="button" class="tqn" id="trqNo">Şimdi değil</button></div></div>';
+  var pg=pl.filter(function(c){return !doneOf(c.id)&&progOf(c.id)});
+  var pct=pl.length?Math.round(dn.length/pl.length*100):0;
+  var okh=dn.length?dn.map(function(c){var g=gcol(c.id);return '<span class="hk" style="background:linear-gradient(180deg,'+g.c+','+g.d+')">'+esc(SH[c.id]||c.n)+'</span>'}).join(''):'<span class="he">Henüz yok</span>';
+  var wph=pg.length?pg.map(function(c,ix){var p=progOf(c.id),w=Math.round(p.i/p.o.length*100);return '<div class="hr" role="button" tabindex="0" data-rid="'+c.id+'"><span><b class="hn">'+(ix+1)+'.</b> '+esc(SH[c.id]||c.n)+'</span><small>'+p.i+'/'+p.o.length+'</small><u style="width:'+w+'%"></u></div>'}).join(''):'<span class="he">Yarım kalan yok</span>';
+  var h='<div class="tmw"><div class="hud"><div class="hb"><i style="width:'+pct+'%"></i><b>'+dn.length+' / '+pl.length+' kategori tamamlandı</b></div>'
+   +'<div class="hc"><div class="hd ok"><div class="hh">✅ TAMAMLANAN<em>'+dn.length+'</em></div><div class="hl">'+okh+'</div></div>'
+   +'<div class="hd wp"><div class="hh">▶ YARIM KALAN<em>'+pg.length+'</em></div><div class="hl">'+wph+'</div></div></div></div>';
+  h+=left?'':'<button type="button" class="tgo" id="trqRst">🔄 BAŞTAN BAŞLA</button>';
+  h+='</div><div class="tqt" id="trqTst"><div class="tqe">🇹🇷</div><p></p><div class="tqb"><button type="button" class="tqy" id="trqYes"></button><button type="button" class="tqn" id="trqNo">Şimdi değil</button></div></div>';
   bd.innerHTML=h;bd.scrollTop=0;
   var ts=document.getElementById('trqTst'),tp=ts.querySelector('p'),yes=document.getElementById('trqYes'),no=document.getElementById('trqNo');
   function hideT(){ts.classList.remove('on')}
   if(left){
-    tp.textContent='Ülkemizle ilgili birçok kategoriden soruları cevaplamaya hazır mısınız?';yes.textContent='Hazırım';
+    tp.textContent='Ülkemizle ilgili birçok kategoriden soruları cevaplamaya hazır mısınız?';yes.textContent='Başla';no.style.display='none';
     yes.addEventListener('click',function(){hideT();pickRandom()});
   }else{
     tp.textContent='Tebrikler! Tüm kategorileri tamamladın 🎉';yes.textContent='Baştan başla';
     yes.addEventListener('click',function(){resetAll();cats()});no.textContent='Kapat';
   }
   no.addEventListener('click',hideT);
+  bd.querySelectorAll('[data-rid]').forEach(function(b){b.addEventListener('click',function(){hideT();resume(b.getAttribute('data-rid'))})});
   var rnd=document.getElementById('trqRnd'),rst=document.getElementById('trqRst');
   if(rnd)rnd.addEventListener('click',function(){pickRandom()});
   if(rst)rst.addEventListener('click',function(){resetAll();cats()});
   ST(function(){if(S.view==='cats')ts.classList.add('on')},350);
 }
-function resetAll(){CATS.forEach(function(c){try{localStorage.removeItem('trq_done_'+c.id)}catch(e){}})}
+function resetAll(){CATS.forEach(function(c){try{localStorage.removeItem('trq_done_'+c.id);localStorage.removeItem('trq_prog_'+c.id)}catch(e){}})}
+function resume(id){
+  var p=progOf(id);if(!p||S.spin)return start(id);
+  S.c=CATS.filter(function(c){return c.id===id})[0];
+  ov.classList.add('mapv','qv');S.o=p.o;S.l=p.o.map(function(k){return S.c.q[k]});S.i=p.i;S.s=p.s||0;S.lock=false;question();
+}
 function start(id){
   S.c=CATS.filter(function(c){return c.id===id})[0];
-  ov.classList.remove('mapv');S.l=sh(S.c.q);S.i=0;S.s=0;S.lock=false;question();
+  ov.classList.add('mapv','qv');S.l=sh(S.c.q);S.o=S.l.map(function(x){return S.c.q.indexOf(x)});S.i=0;S.s=0;S.lock=false;question();
 }
 function question(){
-  S.view='quiz';var c=S.c,q=S.l[S.i];tt.textContent=c.n;S.lock=false;
+  S.view='quiz';var c=S.c,q=S.l[S.i];tt.textContent=c.n;S.lock=false;if(S.o)setProg(c.id,{o:S.o,i:S.i,s:S.s});
   var opts=sh(q.slice(1));
   var h='<div class="p"><div style="width:'+(S.i/S.l.length*100)+'%"></div></div><div class="m"><span>Soru '+(S.i+1)+' / '+S.l.length+'</span><span>Puan: '+S.s+'</span></div><div class="q"></div>';
   opts.forEach(function(o){h+='<button type="button" class="o"></button>'});
-  bd.innerHTML=h;bd.querySelector('.q').textContent=q[0];
+  h+='<div class="tqt" id="trqCf"><p>Emin misiniz?</p><div class="tqb"><button type="button" class="tqn" id="trqCn">Vazgeç</button><button type="button" class="tqy" id="trqCy">Evet</button></div></div>';
+  bd.innerHTML=h;bd.querySelector('.q').textContent=q[0];S.pend=false;
+  var cf=document.getElementById('trqCf'),pick=-1;
+  document.getElementById('trqCn').addEventListener('click',function(){cf.classList.remove('on');bd.querySelectorAll('.o').forEach(function(x){x.classList.remove('sel')});S.pend=false;pick=-1});
+  document.getElementById('trqCy').addEventListener('click',function(){
+    if(S.lock||pick<0)return;S.lock=true;cf.classList.remove('on');
+    var b=bd.querySelectorAll('.o')[pick];b.classList.remove('sel');
+    var ok=opts[pick]===q[1];if(ok)S.s++;
+    bd.querySelectorAll('.o').forEach(function(x,j){if(opts[j]===q[1])x.classList.add('ok')});
+    if(!ok)b.classList.add('no');
+    ST(function(){if(S.view!=='quiz')return;S.i++;if(S.i<S.l.length)question();else result()},1100);
+  });
   bd.querySelectorAll('.o').forEach(function(b,i){
     b.textContent=opts[i];
     b.addEventListener('click',function(){
-      if(S.lock)return;S.lock=true;
-      var ok=opts[i]===q[1];if(ok)S.s++;
-      bd.querySelectorAll('.o').forEach(function(x,j){if(opts[j]===q[1])x.classList.add('ok')});
-      if(!ok)b.classList.add('no');
-      ST(function(){if(S.view!=='quiz')return;S.i++;if(S.i<S.l.length)question();else result()},1100);
+      if(S.lock||S.pend)return;S.pend=true;pick=i;b.classList.add('sel');cf.classList.add('on');
     });
   });
 }
 function result(){
-  S.view='res';setBest(S.c.id,S.s);setDone(S.c.id);var n=S.l.length,r=S.s/n;
+  S.view='res';setBest(S.c.id,S.s);setDone(S.c.id);clearProg(S.c.id);var n=S.l.length,r=S.s/n;
   var msg=r===1?'Mükemmel! Türkiye\'yi avucunun içi gibi biliyorsun 🇹🇷':r>=.7?'Harika, çok iyisin!':r>=.4?'Fena değil, biraz daha çalış!':'Daha öğreneceğin çok şey var, tekrar dene!';
   bd.innerHTML='<div class="r"><div class="ri">'+ico(S.c.id)+'</div><div class="sc">'+S.s+' / '+n+'</div><p>'+msg+'</p><button type="button" class="o" id="trqAg" style="text-align:center">'+(remaining().length?'🎲 Sıradaki Kategori':'🏁 Haritaya Dön')+'</button><button type="button" class="o" id="trqCt" style="text-align:center">Haritaya Dön</button></div>';
   document.getElementById('trqAg').addEventListener('click',function(){if(!pickRandom())cats()});
   document.getElementById('trqCt').addEventListener('click',cats);
 }
 function back(){if(S.spin)return;if(S.view==='cats')close();else cats()}
-function open(){if(!ov)build();ov.classList.add('on');cats()}
-function close(){if(ov)ov.classList.remove('on')}
+function open(){if(!ov)build();ov.classList.add('on');cats();if(!S.h){try{history.pushState({trq:1},'');S.h=1}catch(e){}}}
+function close(){if(ov)ov.classList.remove('on');if(S.h){S.h=0;try{history.back()}catch(e){}}}
 window.__openTrQuiz=open;
 var prev=window.__androidBack;
 window.__androidBack=function(){if(ov&&ov.classList.contains('on')){back();return true}return typeof prev==='function'?prev.apply(this,arguments):false};
